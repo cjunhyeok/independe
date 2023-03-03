@@ -27,4 +27,5 @@ public class Member extends BaseEntity {
     private String number; // 전화번호
     @Embedded // 값 타입
     private Address address; // 주소
+
 }
