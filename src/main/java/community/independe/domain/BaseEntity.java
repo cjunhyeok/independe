@@ -2,7 +2,6 @@ package community.independe.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -11,7 +10,6 @@ import java.time.LocalDateTime;
 
 @MappedSuperclass
 @Getter
-@Setter
 @EntityListeners(AuditingEntityListener.class) // auditing
 public class BaseEntity {
 
@@ -22,7 +20,11 @@ public class BaseEntity {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate; // 수정 일자
 
-//    @PrePersist // persist 전에 발생
+    public void updateLastModifiedDate(LocalDateTime lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    //    @PrePersist // persist 전에 발생
 //    public void prePersist() {
 //        LocalDateTime now = LocalDateTime.now();
 //        createdDate = now;
