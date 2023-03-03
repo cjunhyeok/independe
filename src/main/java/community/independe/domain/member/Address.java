@@ -1,4 +1,4 @@
-package community.independe.domain;
+package community.independe.domain.member;
 
 import jakarta.persistence.Embeddable;
 import lombok.Getter;

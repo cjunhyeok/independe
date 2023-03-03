@@ -1,5 +1,6 @@
-package community.independe.domain;
+package community.independe.domain.member;
 
+import community.independe.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
