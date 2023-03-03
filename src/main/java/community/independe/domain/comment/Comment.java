@@ -6,6 +6,9 @@ import community.independe.domain.post.Post;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 public class Comment extends BaseEntity {
@@ -16,6 +19,15 @@ public class Comment extends BaseEntity {
 
     @Column(columnDefinition = "text") // 텍스트 타입
     private String content;
+
+    //== 계층형 댓글 ==//
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
+    @OneToMany(mappedBy = "parent")
+    private List<Comment> child = new ArrayList<>();
+
 
     //== 연관 관계 ==//
     @ManyToOne
