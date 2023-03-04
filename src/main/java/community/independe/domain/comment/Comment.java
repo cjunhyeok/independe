@@ -9,6 +9,8 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jakarta.persistence.FetchType.*;
+
 @Entity
 @Getter
 public class Comment extends BaseEntity {
@@ -21,7 +23,7 @@ public class Comment extends BaseEntity {
     private String content;
 
     //== 계층형 댓글 ==//
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "parent_id")
     private Comment parent;
 
@@ -30,11 +32,11 @@ public class Comment extends BaseEntity {
 
 
     //== 연관 관계 ==//
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     private Member member; // 댓글, 회원 N : 1 다대일 단방향 매핑
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "post_id")
     private Post post; // 댓글, 게시 N : 1 다대일 단방향 매핑
 }
