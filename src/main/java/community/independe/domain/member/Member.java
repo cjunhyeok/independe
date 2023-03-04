@@ -3,6 +3,7 @@ package community.independe.domain.member;
 import community.independe.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,5 +28,18 @@ public class Member extends BaseEntity {
     private String number; // 전화번호
     @Embedded // 값 타입
     private Address address; // 주소
+
+    //== 생성 메서드 ==//
+    @Builder
+    public Member(String username, String password, String nickname, String role,
+                               String email, String number, Address address) {
+        this.username = username;
+        this.password = password;
+        this.nickname = nickname;
+        this.role = role;
+        this.email = email;
+        this.number = number;
+        this.address = address;
+    }
 
 }
