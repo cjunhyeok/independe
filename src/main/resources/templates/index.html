@@ -9,6 +9,8 @@
 <h1>Independe</h1>
 <p>회원</p>
 <p sec:authorize="isAnonymous()"><a th:href="@{/members/new}">회원가입</a></p>
+<p>게시글</p>
+<p sec:authorize="isAnonymous()"><a th:href="@{/posts/independent/new}">게시글 등록</a></p>
 
 </body>
 
