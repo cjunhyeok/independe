@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+</head>
+<body>
+<h1>Independe</h1>
+<p>회원</p>
+<p sec:authorize="isAnonymous()"><a th:href="@{/members/new}">회원가입</a></p>
+
+</body>
+
