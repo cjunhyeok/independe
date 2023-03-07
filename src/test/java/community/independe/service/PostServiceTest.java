@@ -45,7 +45,7 @@ public class PostServiceTest {
     }
 
     @Test
-    public void basicCreateRegiontPostTest() {
+    public void basicCreateRegionPostTest() {
 
         Member member = Member.builder()
                 .username("id1")
