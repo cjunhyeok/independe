@@ -1,11 +1,8 @@
 package community.independe.controller;
 
 import community.independe.controller.form.IndependentPostForm;
-import community.independe.controller.form.RegionPostForm;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.IndependentPostType;
-import community.independe.domain.post.enums.RegionPostType;
-import community.independe.domain.post.enums.RegionType;
 import community.independe.service.MemberService;
 import community.independe.service.PostService;
 import jakarta.validation.Valid;
@@ -21,11 +18,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 @RequiredArgsConstructor
 @Slf4j
-public class PostController {
+public class IndependentPostController {
 
     private final MemberService memberService;
     private final PostService postService;
 
+    //== 자취 게시글 작성==//
     @GetMapping("/posts/independent/new")
     public String createIndependentPostForm(Model model) {
 
@@ -50,33 +48,6 @@ public class PostController {
         }
 
         postService.createIndependentPost(member.getId(), form.getTitle(), form.getContent(), form.getIndependentPostType());
-        return "redirect:/";
-    }
-
-    @GetMapping("/posts/region/new")
-    public String createRegionPostForm(Model model) {
-
-        model.addAttribute("postForm", new RegionPostForm());
-        model.addAttribute("regionTypes", RegionType.values());
-        model.addAttribute("regionPostTypes", RegionPostType.values());
-        return "posts/createRegionPostForm";
-    }
-
-    @PostMapping("posts/region/new")
-    public String createRegionPost(@Valid RegionPostForm form,
-                                   BindingResult result,
-                                   @AuthenticationPrincipal Member member) {
-        if (result.hasErrors()) {
-            return "posts/createIndependentPostForm";
-        }
-
-        if (member == null) {
-
-            // for test member (before add login in security)
-            member = memberService.findById(1L);
-        }
-
-        postService.createRegionPost(member.getId(), form.getTitle(), form.getContent(), form.getRegionType(), form.getRegionPostType());
         return "redirect:/";
     }
 }
