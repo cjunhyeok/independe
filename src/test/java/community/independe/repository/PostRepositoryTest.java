@@ -7,6 +7,8 @@ import community.independe.domain.post.RegionPost;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,8 @@ class PostRepositoryTest {
     private PostRepository postRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @PersistenceContext
+    EntityManager em;
 
     @Test
     public void basicPostTest() {
@@ -109,8 +113,8 @@ class PostRepositoryTest {
         postRepository.save(independentPost);
         postRepository.save(regionPost);
 
-        List<IndependentPost> allIndependentPost = postRepository.findAllIndependentPost();
-        List<RegionPost> allRegionPost = postRepository.findAllRegionPost();
+        List<IndependentPost> allIndependentPost = postRepository.findAllIndependentPosts();
+        List<RegionPost> allRegionPost = postRepository.findAllRegionPosts();
 
         for (IndependentPost independentPost1 : allIndependentPost) {
             System.out.println(independentPost1.getIndependentPostType());
@@ -122,6 +126,36 @@ class PostRepositoryTest {
 
         Assertions.assertThat(allIndependentPost.size()).isEqualTo(2);
         Assertions.assertThat(allRegionPost.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void basicFetchTest() {
+        Member member = Member.builder()
+                .username("id1")
+                .password("1234")
+                .nickname("nick1")
+                .role("ROLE_USER")
+                .build();
+        memberRepository.save(member);
+
+        RegionPost regionPost = RegionPost.builder()
+                .title("title3")
+                .content("content3")
+                .member(member)
+                .regionType(RegionType.ALL)
+                .regionPostType(RegionPostType.RESTAURANT)
+                .build();
+        postRepository.save(regionPost);
+
+        em.flush();
+        em.clear();
+
+        List<RegionPost> allRegionPosts = postRepository.findAllRegionPostsWithMember();
+
+        for (RegionPost allRegionPost : allRegionPosts) {
+            System.out.println(allRegionPost.getMember().getUsername());
+        }
+
     }
 
 }

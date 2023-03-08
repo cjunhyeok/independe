@@ -1,9 +1,13 @@
 package community.independe.service;
 
+import community.independe.domain.post.IndependentPost;
 import community.independe.domain.post.Post;
+import community.independe.domain.post.RegionPost;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
+
+import java.util.List;
 
 public interface PostService {
 
@@ -16,6 +20,12 @@ public interface PostService {
     // 지역 게시판에 글 쓰기
     Long createRegionPost(Long memberId, String title, String content,
                           RegionType regionType, RegionPostType regionPostType);
+
+    // 자취 게시글 전체 조회
+    List<IndependentPost> findAllIndependentPosts();
+
+    // 지역 게시글 전체 조회
+    List<RegionPost> findAllRegionPosts();
 
 
 }

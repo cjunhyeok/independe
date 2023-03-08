@@ -12,6 +12,8 @@ import community.independe.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService{
@@ -25,6 +27,7 @@ public class PostServiceImpl implements PostService{
                 .orElseThrow(() -> new IllegalArgumentException("Id not exist"));
     }
 
+    // 자취 게시글 생성
     @Override
     public Long createIndependentPost(Long memberId, String title, String content, IndependentPostType independentPostType) {
 
@@ -42,6 +45,7 @@ public class PostServiceImpl implements PostService{
         return post.getId();
     }
 
+    // 지역 게시글 생성
     @Override
     public Long createRegionPost(Long memberId, String title, String content, RegionType regionType, RegionPostType regionPostType) {
 
@@ -58,5 +62,15 @@ public class PostServiceImpl implements PostService{
 
         postRepository.save(post);
         return post.getId();
+    }
+
+    @Override
+    public List<IndependentPost> findAllIndependentPosts() {
+        return postRepository.findAllIndependentPostsWithMember();
+    }
+
+    @Override
+    public List<RegionPost> findAllRegionPosts() {
+        return postRepository.findAllRegionPostsWithMember();
     }
 }

@@ -15,4 +15,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("select p from RegionPost p")
     List<RegionPost> findAllRegionPosts();
+
+    @Query("select p from RegionPost p join fetch p.member")
+    List<RegionPost> findAllRegionPostsWithMember();
+
+    @Query("select p from IndependentPost p join fetch p.member")
+    List<IndependentPost> findAllIndependentPostsWithMember();
+
 }
