@@ -11,8 +11,8 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("select p from IndependentPost p")
-    List<IndependentPost> findAllIndependentPost();
+    List<IndependentPost> findAllIndependentPosts();
 
     @Query("select p from RegionPost p")
-    List<RegionPost> findAllRegionPost();
+    List<RegionPost> findAllRegionPosts();
 }
