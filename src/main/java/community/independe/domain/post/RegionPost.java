@@ -23,8 +23,8 @@ public class RegionPost extends Post{
     private RegionPostType regionPostType;
 
     @Builder
-    public RegionPost(String title, String content, Member member, RegionType regionType, RegionPostType regionPostType) {
-        super(title, content, member);
+    public RegionPost(String title, String content, Member member, Integer views, Integer recommendCount, RegionType regionType, RegionPostType regionPostType) {
+        super(title, content, views, recommendCount, member);
         this.regionType = regionType;
         this.regionPostType = regionPostType;
     }

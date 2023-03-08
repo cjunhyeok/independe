@@ -33,7 +33,7 @@ public abstract class Post extends BaseEntity {
         this.title = title;
         this.content = content;
         this.views = views;
-        this.member = member;
         this.recommendCount = recommendCount;
+        this.member = member;
     }
 }

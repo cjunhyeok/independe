@@ -19,8 +19,8 @@ public class IndependentPost extends Post{
     private IndependentPostType independentPostType;
 
     @Builder
-    public IndependentPost(String title, String content, Member member, IndependentPostType independentPostType) {
-        super(title, content, member);
+    public IndependentPost(String title, String content, Member member, Integer views, Integer recommendCount, IndependentPostType independentPostType) {
+        super(title, content, views, recommendCount, member);
         this.independentPostType = independentPostType;
     }
 }
