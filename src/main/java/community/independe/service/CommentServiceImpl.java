@@ -1,0 +1,44 @@
+package community.independe.service;
+
+import community.independe.domain.comment.Comment;
+import community.independe.domain.member.Member;
+import community.independe.domain.post.Post;
+import community.independe.repository.CommentRepository;
+import community.independe.repository.MemberRepository;
+import community.independe.repository.PostRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional(readOnly = true)
+@Slf4j
+@RequiredArgsConstructor
+public class CommentServiceImpl implements CommentService{
+
+    private final MemberRepository memberRepository;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+
+    @Override
+    public Long createParentPost(Long memberId, Long postId, String content) {
+
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("member not exist"));
+
+        Post findPost = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("post not exist"));
+
+        Comment comment = Comment.builder()
+                .content(content)
+                .member(findMember)
+                .post(findPost)
+                .build();
+
+        Comment savedComment = commentRepository.save(comment);
+        return savedComment.getId();
+    }
+
+
+}
