@@ -59,13 +59,13 @@ public class IndependentPostController {
     }
 
     @GetMapping("/posts/independent/{type}")
-    public String independentPosts(@PathVariable String type,
-                                   Model model,
-                                   @PageableDefault(size = 3) Pageable pageable) {
+    public String independentPosts(@PathVariable IndependentPostType type,
+                                   @PageableDefault(size = 3) Pageable pageable,
+                                   Model model) {
 
-        IndependentPostType independentPostType = judgeType(type);
+        log.info("type : {}", type);
 
-        Page<IndependentPost> allIndependentPosts = postService.findAllIndependentPosts(independentPostType, pageable);
+        Page<IndependentPost> allIndependentPosts = postService.findAllIndependentPosts(type, pageable);
         List<IndependentPost> content = allIndependentPosts.getContent();
         long totalElements = allIndependentPosts.getTotalElements();
 
@@ -73,22 +73,5 @@ public class IndependentPostController {
         model.addAttribute("totalCount", totalElements);
 
         return "posts/independentPosts";
-    }
-
-    private IndependentPostType judgeType(String type) {
-
-        if (type.equals("clean")) {
-            return IndependentPostType.CLEAN;
-        } else if (type.equals("wash")) {
-            return IndependentPostType.WASH;
-        } else if (type.equals("cook")) {
-            return IndependentPostType.COOK;
-        } else if (type.equals("health")) {
-            return IndependentPostType.HEALTH;
-        } else if (type.equals("etc")) {
-            return IndependentPostType.ETC;
-        } else {
-          throw new IllegalArgumentException("type not exist");
-        }
     }
 }
