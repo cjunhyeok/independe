@@ -10,11 +10,17 @@ import community.independe.domain.post.enums.RegionType;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
+@Slf4j
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService{
 
@@ -28,6 +34,7 @@ public class PostServiceImpl implements PostService{
     }
 
     // 자취 게시글 생성
+    @Transactional
     @Override
     public Long createIndependentPost(Long memberId, String title, String content, IndependentPostType independentPostType) {
 
@@ -47,6 +54,7 @@ public class PostServiceImpl implements PostService{
 
     // 지역 게시글 생성
     @Override
+    @Transactional
     public Long createRegionPost(Long memberId, String title, String content, RegionType regionType, RegionPostType regionPostType) {
 
         Member findMember = memberRepository.findById(memberId)
@@ -65,8 +73,8 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public List<IndependentPost> findAllIndependentPosts() {
-        return postRepository.findAllIndependentPostsWithMember();
+    public Page<IndependentPost> findAllIndependentPosts(IndependentPostType independentPostType, Pageable pageable) {
+        return postRepository.findAllIndependentPostsWithMember(independentPostType, pageable);
     }
 
     @Override

@@ -6,6 +6,8 @@ import community.independe.domain.post.RegionPost;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -22,7 +24,7 @@ public interface PostService {
                           RegionType regionType, RegionPostType regionPostType);
 
     // 자취 게시글 전체 조회
-    List<IndependentPost> findAllIndependentPosts();
+    Page<IndependentPost> findAllIndependentPosts(IndependentPostType independentPostType, Pageable pageable);
 
     // 지역 게시글 전체 조회
     List<RegionPost> findAllRegionPosts();
