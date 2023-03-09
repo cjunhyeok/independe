@@ -47,5 +47,29 @@ public class CommentServiceImpl implements CommentService{
         return savedComment.getId();
     }
 
+    @Transactional
+    @Override
+    public Long createChildPost(Long memberId, Long postId, Long commentId, String content) {
+
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("member not exist"));
+
+        Post findPost = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("post not exist"));
+
+        Comment parentComment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("comment not exist"));
+
+        Comment comment = Comment.builder()
+                .content(content)
+                .member(findMember)
+                .post(findPost)
+                .parent(parentComment)
+                .build();
+
+        Comment savedComment = commentRepository.save(comment);
+        return savedComment.getId();
+    }
+
 
 }

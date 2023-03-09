@@ -41,4 +41,28 @@ public class CommentServiceTest {
         Comment findComment = commentService.findById(parentId);
         Assertions.assertThat(findComment.getId()).isEqualTo(parentId);
     }
+
+    @Test
+    public void createChildCommentTest() {
+        Member member = Member.builder()
+                .username("id1")
+                .password("1234")
+                .nickname("nickname")
+                .role("ROLE_USER")
+                .build();
+        Long joinMemberId = memberService.join(member);
+
+        String title = "title";
+        String content = "content";
+        IndependentPostType independentPostType = IndependentPostType.COOK;
+
+        Long independentPostId = postService.createIndependentPost(joinMemberId, title, content, independentPostType);
+
+        Long parentId = commentService.createParentPost(joinMemberId, independentPostId, "parent");
+
+        Long childId = commentService.createChildPost(joinMemberId, independentPostId, parentId, "child");
+        Comment childComment = commentService.findById(childId);
+        Comment parentComment = commentService.findById(parentId);
+        Assertions.assertThat(childComment.getParent().getId()).isEqualTo(parentComment.getId());
+    }
 }
