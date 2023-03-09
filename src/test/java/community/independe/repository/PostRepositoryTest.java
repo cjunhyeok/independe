@@ -150,7 +150,7 @@ class PostRepositoryTest {
         em.flush();
         em.clear();
 
-        List<RegionPost> allRegionPosts = postRepository.findAllRegionPostsWithMember();
+        List<RegionPost> allRegionPosts = postRepository.findAllRegionPosts();
 
         for (RegionPost allRegionPost : allRegionPosts) {
             System.out.println(allRegionPost.getMember().getUsername());
