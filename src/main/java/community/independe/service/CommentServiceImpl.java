@@ -22,6 +22,13 @@ public class CommentServiceImpl implements CommentService{
     private final CommentRepository commentRepository;
 
     @Override
+    public Comment findById(Long id) {
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not exist"));
+    }
+
+    @Transactional
+    @Override
     public Long createParentPost(Long memberId, Long postId, String content) {
 
         Member findMember = memberRepository.findById(memberId)
