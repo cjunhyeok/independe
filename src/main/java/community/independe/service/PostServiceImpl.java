@@ -16,8 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @Transactional(readOnly = true)
 @Slf4j
@@ -78,7 +76,7 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public List<RegionPost> findAllRegionPosts() {
-        return postRepository.findAllRegionPostsWithMember();
+    public Page<RegionPost> findAllRegionPosts(RegionType regionType, RegionPostType regionPostType, Pageable pageable) {
+        return postRepository.findAllRegionPostsWithMember(regionType, regionPostType, pageable);
     }
 }
