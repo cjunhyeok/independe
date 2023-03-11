@@ -32,5 +32,5 @@ public abstract class SecuritySigner {
         return jwtToken;
     }
 
-    public abstract String getToken(UserDetails user, JWK jwk) throws JOSEException;
+    public abstract String getJwtToken(UserDetails user, JWK jwk) throws JOSEException;
 }

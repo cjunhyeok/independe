@@ -1,6 +1,8 @@
 package community.independe.security.config;
 
+import com.nimbusds.jose.jwk.OctetSequenceKey;
 import community.independe.security.filter.JwtAuthenticationFilter;
+import community.independe.security.signature.MacSecuritySigner;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +23,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
+    private final MacSecuritySigner macSecuritySigner;
+    private final OctetSequenceKey octetSequenceKey;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -32,7 +36,7 @@ public class SecurityConfig {
                 .requestMatchers("/").permitAll()
                 .anyRequest().authenticated();
 
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter(macSecuritySigner, octetSequenceKey), UsernamePasswordAuthenticationFilter.class);
 
         http.userDetailsService(userDetailsService);
 
@@ -45,8 +49,8 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    private JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter();
+    private JwtAuthenticationFilter jwtAuthenticationFilter(MacSecuritySigner macSecuritySigner, OctetSequenceKey octetSequenceKey) throws Exception {
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(macSecuritySigner, octetSequenceKey);
         jwtAuthenticationFilter.setAuthenticationManager(authenticationManager(null));
         return jwtAuthenticationFilter;
     }
