@@ -33,14 +33,16 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf().disable();
+        http.formLogin().disable();
+        http.httpBasic().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authorizeHttpRequests()
-                .requestMatchers("/").permitAll()
+                .requestMatchers("/", "/members/new").permitAll()
                 .anyRequest().authenticated();
 
-        http.addFilterBefore(jwtAuthenticationFilter(macSecuritySigner, octetSequenceKey), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthorizationMacFilter(octetSequenceKey), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter(macSecuritySigner, octetSequenceKey), UsernamePasswordAuthenticationFilter.class);
 
         http.userDetailsService(userDetailsService);
 

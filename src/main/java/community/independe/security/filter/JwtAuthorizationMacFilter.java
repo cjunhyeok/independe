@@ -12,6 +12,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // OncePerRequestFilter : 요청에 대해 한번만 실행
+@Slf4j
 public class JwtAuthorizationMacFilter extends OncePerRequestFilter {
 
     private final OctetSequenceKey jwk;
@@ -39,11 +41,13 @@ public class JwtAuthorizationMacFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 헤더 토큰 형식 검증
         String header = request.getHeader("Authorization");
+
         if (header == null || !header.startsWith("Bearer ")) {
             // 토큰이 없거나 Bearer로 시작하지 않으면 다음 필터로 넘긴다.
             filterChain.doFilter(request, response);
             return;
         }
+
 
         // 순수 token 뽑아내기
         String token = header.replace("Bearer ", "");
