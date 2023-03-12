@@ -26,6 +26,8 @@ public class Comment extends BaseEntity {
     @Column(columnDefinition = "text") // 텍스트 타입
     private String content;
 
+    private Integer recommendCount; // 추천수
+
     //== 계층형 댓글 ==//
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "parent_id")
