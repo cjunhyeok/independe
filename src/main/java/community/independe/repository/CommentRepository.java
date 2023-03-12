@@ -10,6 +10,7 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query(value = "select c from Comment c left join fetch c.parent" +
+            " join fetch c.member" +
             " where c.post.id = :postId",
     countQuery = "select c from Comment c" +
             " where c.post = :postId")
