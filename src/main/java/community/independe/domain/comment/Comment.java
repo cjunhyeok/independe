@@ -48,8 +48,9 @@ public class Comment extends BaseEntity {
 
     //== 생성 ==//
     @Builder
-    public Comment(String content, Member member, Post post, Comment parent) {
+    public Comment(String content, Integer recommendCount, Member member, Post post, Comment parent) {
         this.content = content;
+        this.recommendCount = recommendCount;
         this.member = member;
         this.post = post;
         this.parent = parent;
