@@ -1,6 +1,6 @@
 package community.independe.api;
 
-import community.independe.api.dtos.post.IndependentPostsResponse;
+import community.independe.api.dtos.post.PostsResponse;
 import community.independe.domain.post.IndependentPost;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.service.CommentService;
@@ -36,8 +36,8 @@ public class IndependentPostApiController {
         List<IndependentPost> independentPosts = allIndependentPosts.getContent();
         long totalCount = allIndependentPosts.getTotalElements();
 
-        List<IndependentPostsResponse> collect = independentPosts.stream()
-                .map(p -> new IndependentPostsResponse(
+        List<PostsResponse> collect = independentPosts.stream()
+                .map(p -> new PostsResponse(
                         p.getMember().getNickname(),
                         p.getTitle(),
                         p.getLastModifiedDate(),
