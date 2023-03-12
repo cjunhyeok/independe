@@ -128,6 +128,8 @@ public class CommentRepositoryTest {
             }
             System.out.println(comment.getParent().getContent());
         }
+        Long commentCount = commentRepository.countAllByPostId(independentPost.getId());
         Assertions.assertThat(allByPostId.size()).isEqualTo(3);
+        Assertions.assertThat(commentCount).isEqualTo(3);
     }
 }

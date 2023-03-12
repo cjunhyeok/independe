@@ -71,5 +71,10 @@ public class CommentServiceImpl implements CommentService{
         return savedComment.getId();
     }
 
+    @Override
+    public Long countAllByPostId(Long postId) {
+        return commentRepository.countAllByPostId(postId);
+    }
+
 
 }
