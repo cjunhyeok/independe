@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional(readOnly = true)
 @Slf4j
@@ -76,5 +78,8 @@ public class CommentServiceImpl implements CommentService{
         return commentRepository.countAllByPostId(postId);
     }
 
-
+    @Override
+    public List<Comment> findAllByPostId(Long postId) {
+        return commentRepository.findAllByPostId(postId);
+    }
 }
