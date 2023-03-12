@@ -1,14 +1,12 @@
 package community.independe.api;
 
+import community.independe.api.dtos.Result;
 import community.independe.api.dtos.post.PostsResponse;
 import community.independe.domain.post.RegionPost;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.service.CommentService;
 import community.independe.service.PostService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -50,18 +48,5 @@ public class RegionPostApiController {
                 .collect(Collectors.toList());
 
         return new Result(collect, totalCount);
-    }
-
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    static class Result<T> {
-        private T data;
-        private long count;
-
-        public Result(T data) {
-            this.data = data;
-        }
     }
 }

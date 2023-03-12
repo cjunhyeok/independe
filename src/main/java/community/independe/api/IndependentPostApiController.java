@@ -1,13 +1,11 @@
 package community.independe.api;
 
+import community.independe.api.dtos.Result;
 import community.independe.api.dtos.post.PostsResponse;
 import community.independe.domain.post.IndependentPost;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.service.CommentService;
 import community.independe.service.PostService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -49,17 +47,4 @@ public class IndependentPostApiController {
 
         return new Result(collect, totalCount);
     }
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    static class Result<T> {
-        private T data;
-        private long count;
-
-        public Result(T data) {
-            this.data = data;
-        }
-    }
-
 }
