@@ -38,7 +38,7 @@ public class SecurityConfig {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authorizeHttpRequests()
-                .requestMatchers("/", "/members/new").permitAll()
+                .requestMatchers("/", "/api/members/new").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtAuthorizationMacFilter(octetSequenceKey), UsernamePasswordAuthenticationFilter.class);
