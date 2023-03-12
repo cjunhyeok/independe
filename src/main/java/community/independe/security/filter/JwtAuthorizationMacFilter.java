@@ -82,6 +82,7 @@ public class JwtAuthorizationMacFilter extends OncePerRequestFilter {
 
                     // 인증 완료
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                    filterChain.doFilter(request, response);
                 }
             }
         } catch (ParseException e) {
