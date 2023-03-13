@@ -1,20 +1,21 @@
 package community.independe.api;
 
 import community.independe.api.dtos.Result;
+import community.independe.api.dtos.post.CreateRegionPostRequest;
 import community.independe.api.dtos.post.PostsResponse;
 import community.independe.domain.post.RegionPost;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.service.CommentService;
 import community.independe.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,5 +49,18 @@ public class RegionPostApiController {
                 .collect(Collectors.toList());
 
         return new Result(collect, totalCount);
+    }
+
+    @PostMapping("/api/posts/region/new")
+    public ResponseEntity<Long> createRegionPost(@RequestBody @Valid CreateRegionPostRequest request) {
+        Long regionPost = postService.createRegionPost(
+                request.getMemberId(),
+                request.getTitle(),
+                request.getContent(),
+                request.getRegionType(),
+                request.getRegionPostType()
+        );
+
+        return ResponseEntity.ok(regionPost);
     }
 }
