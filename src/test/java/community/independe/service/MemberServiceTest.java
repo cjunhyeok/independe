@@ -26,7 +26,7 @@ public class MemberServiceTest {
                 .build();
 
         // when
-        Long joinMemberId = memberService.join(member);
+        Long joinMemberId = memberService.join("id1", "1234", "nickname", null, null, null, null, null);
         Member findMember = memberService.findById(joinMemberId);
 
         Assertions.assertThat(findMember.getUsername()).isEqualTo(member.getUsername());

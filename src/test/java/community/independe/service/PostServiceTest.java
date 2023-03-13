@@ -1,6 +1,5 @@
 package community.independe.service;
 
-import community.independe.domain.member.Member;
 import community.independe.domain.post.IndependentPost;
 import community.independe.domain.post.RegionPost;
 import community.independe.domain.post.enums.IndependentPostType;
@@ -24,14 +23,7 @@ public class PostServiceTest {
     @Test
     public void basicCreateIndependentPostTest() {
 
-        Member member = Member.builder()
-                .username("id1")
-                .password("1234")
-                .nickname("nickname")
-                .role("ROLE_USER")
-                .build();
-
-        Long joinMemberId = memberService.join(member);
+        Long joinMemberId = memberService.join("id1", "1234", "nickname", null, null, null, null, null);
 
         String title = "title";
         String content = "content";
@@ -47,14 +39,7 @@ public class PostServiceTest {
     @Test
     public void basicCreateRegionPostTest() {
 
-        Member member = Member.builder()
-                .username("id1")
-                .password("1234")
-                .nickname("nickname")
-                .role("ROLE_USER")
-                .build();
-
-        Long joinMemberId = memberService.join(member);
+        Long joinMemberId = memberService.join("id1", "1234", "nickname", null, null, null, null, null);
 
         String title = "title";
         String content = "content";
