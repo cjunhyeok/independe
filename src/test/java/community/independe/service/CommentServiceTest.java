@@ -49,7 +49,7 @@ public class CommentServiceTest {
 
         Long parentId = commentService.createParentComment(joinMemberId, independentPostId, "parent");
 
-        Long childId = commentService.createChildPost(joinMemberId, independentPostId, parentId, "child");
+        Long childId = commentService.createChildComment(joinMemberId, independentPostId, parentId, "child");
         Comment childComment = commentService.findById(childId);
         Comment parentComment = commentService.findById(parentId);
         Assertions.assertThat(childComment.getParent().getId()).isEqualTo(parentComment.getId());

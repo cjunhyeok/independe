@@ -10,7 +10,7 @@ public interface CommentService {
 
     Long createParentComment(Long memberId, Long postId, String content);
 
-    Long createChildPost(Long memberId, Long postId, Long commentId, String content);
+    Long createChildComment(Long memberId, Long postId, Long commentId, String content);
 
     Long countAllByPostId(Long postId);
 
