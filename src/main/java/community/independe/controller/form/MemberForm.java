@@ -14,7 +14,6 @@ public class MemberForm {
     @NotEmpty
     private String nickname;
     private String role;
-    private String name;
     private String email;
     private String number;
 
