@@ -31,7 +31,7 @@ public class CommentServiceImpl implements CommentService{
 
     @Transactional
     @Override
-    public Long createParentPost(Long memberId, Long postId, String content) {
+    public Long createParentComment(Long memberId, Long postId, String content) {
 
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("member not exist"));

@@ -30,7 +30,7 @@ public class CommentServiceTest {
 
         Long independentPostId = postService.createIndependentPost(joinMemberId, title, content, independentPostType);
 
-        Long parentId = commentService.createParentPost(joinMemberId, independentPostId, "parent");
+        Long parentId = commentService.createParentComment(joinMemberId, independentPostId, "parent");
 
         Comment findComment = commentService.findById(parentId);
         Assertions.assertThat(findComment.getId()).isEqualTo(parentId);
@@ -47,7 +47,7 @@ public class CommentServiceTest {
 
         Long independentPostId = postService.createIndependentPost(joinMemberId, title, content, independentPostType);
 
-        Long parentId = commentService.createParentPost(joinMemberId, independentPostId, "parent");
+        Long parentId = commentService.createParentComment(joinMemberId, independentPostId, "parent");
 
         Long childId = commentService.createChildPost(joinMemberId, independentPostId, parentId, "child");
         Comment childComment = commentService.findById(childId);
