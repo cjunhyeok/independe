@@ -65,7 +65,7 @@ public class RegionPostController {
                               @PageableDefault(size = 3) Pageable pageable,
                               Model model) {
 
-        Page<RegionPost> allRegionPosts = postService.findAllRegionPosts(regionType, postType, pageable);
+        Page<RegionPost> allRegionPosts = postService.findAllRegionPostsByTypes(regionType, postType, pageable);
         List<RegionPost> content = allRegionPosts.getContent();
         long totalElements = allRegionPosts.getTotalElements();
 

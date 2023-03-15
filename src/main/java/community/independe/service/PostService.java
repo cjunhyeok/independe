@@ -25,7 +25,7 @@ public interface PostService {
     Page<IndependentPost> findAllIndependentPostsByType(IndependentPostType independentPostType, Pageable pageable);
 
     // 지역 게시글 전체 조회
-    Page<RegionPost> findAllRegionPosts(RegionType regionType, RegionPostType regionPostType, Pageable pageable);
+    Page<RegionPost> findAllRegionPostsByTypes(RegionType regionType, RegionPostType regionPostType, Pageable pageable);
 
 
 }

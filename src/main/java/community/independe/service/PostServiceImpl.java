@@ -76,7 +76,7 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public Page<RegionPost> findAllRegionPosts(RegionType regionType, RegionPostType regionPostType, Pageable pageable) {
-        return postRepository.findAllRegionPostsWithMember(regionType, regionPostType, pageable);
+    public Page<RegionPost> findAllRegionPostsByTypes(RegionType regionType, RegionPostType regionPostType, Pageable pageable) {
+        return postRepository.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
     }
 }

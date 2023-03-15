@@ -36,7 +36,7 @@ public class RegionPostApiController {
                                       sort = "lastModifiedDate",
                                       direction = Sort.Direction.DESC)Pageable pageable) {
 
-        Page<RegionPost> allRegionPosts = postService.findAllRegionPosts(regionType, regionPostType, pageable);
+        Page<RegionPost> allRegionPosts = postService.findAllRegionPostsByTypes(regionType, regionPostType, pageable);
         List<RegionPost> regionPosts = allRegionPosts.getContent();
         long totalCount = allRegionPosts.getTotalElements();
 
