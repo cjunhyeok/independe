@@ -1,5 +1,6 @@
 package community.independe.api;
 
+import community.independe.api.dtos.comment.CreateChildCommentRequest;
 import community.independe.api.dtos.comment.CreateParentCommentRequest;
 import community.independe.service.CommentService;
 import jakarta.validation.Valid;
@@ -25,5 +26,18 @@ public class CommentApiController {
                 request.getContent());
 
         return ResponseEntity.ok(parentComment);
+    }
+
+    @PostMapping("/api/comments/child/new")
+    public ResponseEntity<Long> createChildComment(@RequestBody @Valid CreateChildCommentRequest request) {
+
+        Long childComment = commentService.createChildComment(
+                request.getMemberId(),
+                request.getPostId(),
+                request.getParentId(),
+                request.getContent()
+        );
+
+        return ResponseEntity.ok(childComment);
     }
 }
