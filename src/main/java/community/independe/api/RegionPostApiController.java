@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,9 @@ public class RegionPostApiController {
     @GetMapping("/api/posts/region/{regionType}/{regionPostType}")
     public Result regionPosts(@PathVariable(name = "regionType")RegionType regionType,
                               @PathVariable(name = "regionPostType")RegionPostType regionPostType,
-                              @PageableDefault(size = 10)Pageable pageable) {
+                              @PageableDefault(size = 10,
+                                      sort = "lastModifiedDate",
+                                      direction = Sort.Direction.ASC)Pageable pageable) {
 
         Page<RegionPost> allRegionPosts = postService.findAllRegionPosts(regionType, regionPostType, pageable);
         List<RegionPost> regionPosts = allRegionPosts.getContent();

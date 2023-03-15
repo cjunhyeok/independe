@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,10 @@ public class IndependentPostApiController {
 
     @GetMapping("/api/posts/independent/{type}")
     public Result independentPosts(@PathVariable(name = "type") IndependentPostType independentPostType,
-                                   @PageableDefault(size = 10)Pageable pageable) {
+                                   @PageableDefault(
+                                           size = 10,
+                                           sort = "lastModifiedDate",
+                                           direction = Sort.Direction.ASC) Pageable pageable) {
 
         Page<IndependentPost> allIndependentPosts = postService.findAllIndependentPosts(independentPostType, pageable);
         List<IndependentPost> independentPosts = allIndependentPosts.getContent();
