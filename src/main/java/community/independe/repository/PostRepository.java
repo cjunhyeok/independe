@@ -25,8 +25,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "select p from IndependentPost p join fetch p.member" +
             " where p.independentPostType = :independentPostType",
     countQuery = "select count(p) from IndependentPost  p")
-    Page<IndependentPost> findAllIndependentPostsWithMember(@Param("independentPostType") IndependentPostType independentPostType,
-                                                            Pageable pageable);
+    Page<IndependentPost> findAllIndependentPostsByTypeWithMember(@Param("independentPostType") IndependentPostType independentPostType,
+                                                                  Pageable pageable);
 
     @Query(value = "select p from RegionPost p join fetch p.member" +
             " where p.regionType = :regionType" +

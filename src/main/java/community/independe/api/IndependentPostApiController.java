@@ -35,7 +35,7 @@ public class IndependentPostApiController {
                                            sort = "lastModifiedDate",
                                            direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Page<IndependentPost> allIndependentPosts = postService.findAllIndependentPosts(independentPostType, pageable);
+        Page<IndependentPost> allIndependentPosts = postService.findAllIndependentPostsByType(independentPostType, pageable);
         List<IndependentPost> independentPosts = allIndependentPosts.getContent();
         long totalCount = allIndependentPosts.getTotalElements();
 

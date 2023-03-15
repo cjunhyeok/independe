@@ -65,7 +65,7 @@ public class IndependentPostController {
 
         log.info("type : {}", type);
 
-        Page<IndependentPost> allIndependentPosts = postService.findAllIndependentPosts(type, pageable);
+        Page<IndependentPost> allIndependentPosts = postService.findAllIndependentPostsByType(type, pageable);
         List<IndependentPost> content = allIndependentPosts.getContent();
         long totalElements = allIndependentPosts.getTotalElements();
 
