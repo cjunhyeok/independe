@@ -34,7 +34,7 @@ public class RegionPostApiController {
                               @PathVariable(name = "regionPostType")RegionPostType regionPostType,
                               @PageableDefault(size = 10,
                                       sort = "lastModifiedDate",
-                                      direction = Sort.Direction.ASC)Pageable pageable) {
+                                      direction = Sort.Direction.DESC)Pageable pageable) {
 
         Page<RegionPost> allRegionPosts = postService.findAllRegionPosts(regionType, regionPostType, pageable);
         List<RegionPost> regionPosts = allRegionPosts.getContent();

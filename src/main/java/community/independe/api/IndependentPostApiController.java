@@ -33,7 +33,7 @@ public class IndependentPostApiController {
                                    @PageableDefault(
                                            size = 10,
                                            sort = "lastModifiedDate",
-                                           direction = Sort.Direction.ASC) Pageable pageable) {
+                                           direction = Sort.Direction.DESC) Pageable pageable) {
 
         Page<IndependentPost> allIndependentPosts = postService.findAllIndependentPosts(independentPostType, pageable);
         List<IndependentPost> independentPosts = allIndependentPosts.getContent();
