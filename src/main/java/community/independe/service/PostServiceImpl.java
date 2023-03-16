@@ -1,9 +1,7 @@
 package community.independe.service;
 
 import community.independe.domain.member.Member;
-import community.independe.domain.post.IndependentPost;
 import community.independe.domain.post.Post;
-import community.independe.domain.post.RegionPost;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
@@ -11,8 +9,6 @@ import community.independe.repository.MemberRepository;
 import community.independe.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +35,7 @@ public class PostServiceImpl implements PostService{
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Id not exist"));
 
-        IndependentPost post = IndependentPost.builder()
+        Post post = Post.builder()
                 .title(title)
                 .content(content)
                 .member(findMember)
@@ -58,7 +54,7 @@ public class PostServiceImpl implements PostService{
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Id not exist"));
 
-        RegionPost post = RegionPost.builder()
+        Post post = Post.builder()
                 .title(title)
                 .content(content)
                 .member(findMember)
@@ -68,15 +64,5 @@ public class PostServiceImpl implements PostService{
 
         postRepository.save(post);
         return post.getId();
-    }
-
-    @Override
-    public Page<IndependentPost> findAllIndependentPostsByType(IndependentPostType independentPostType, Pageable pageable) {
-        return postRepository.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
-    }
-
-    @Override
-    public Page<RegionPost> findAllRegionPostsByTypes(RegionType regionType, RegionPostType regionPostType, Pageable pageable) {
-        return postRepository.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
     }
 }

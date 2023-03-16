@@ -7,6 +7,7 @@ import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -39,6 +40,7 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member; // 게시글, 회원 N : 1 다대일 단방향 매핑
 
+    @Builder
     public Post(String title, Integer views, Integer recommendCount, String content, IndependentPostType independentPostType, RegionType regionType, RegionPostType regionPostType, Member member) {
         this.title = title;
         this.views = views;
