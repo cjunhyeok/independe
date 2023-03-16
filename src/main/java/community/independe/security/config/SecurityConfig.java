@@ -2,6 +2,8 @@ package community.independe.security.config;
 
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import community.independe.repository.MemberRepository;
+import community.independe.security.exception.JwtAccessDeniedHandler;
+import community.independe.security.exception.JwtAuthenticationEntryPoint;
 import community.independe.security.filter.JwtAuthenticationFilter;
 import community.independe.security.filter.JwtAuthorizationMacFilter;
 import community.independe.security.signature.MacSecuritySigner;
@@ -37,6 +39,10 @@ public class SecurityConfig {
         http.httpBasic().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
+        http.exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint())
+                        .accessDeniedHandler(jwtAccessDeniedHandler());
+
         http.authorizeHttpRequests()
                 .requestMatchers("/", "/api/members/new").permitAll()
                 .anyRequest().authenticated();
@@ -47,6 +53,16 @@ public class SecurityConfig {
         http.userDetailsService(userDetailsService);
 
         return http.build();
+    }
+
+    @Bean
+    public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
+        return new JwtAuthenticationEntryPoint();
+    }
+
+    @Bean
+    public JwtAccessDeniedHandler jwtAccessDeniedHandler() {
+        return new JwtAccessDeniedHandler();
     }
 
     @Bean
