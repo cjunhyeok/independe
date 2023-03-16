@@ -75,7 +75,7 @@ public class CommentRepositoryTest {
                 .content("regionContent")
                 .member(member)
                 .regionType(RegionType.ALL)
-                .regionPostType(RegionPostType.RESTAURANT)
+                .regionPostType(RegionPostType.FREE)
                 .build();
         postRepository.save(regionPost);
 
