@@ -2,8 +2,7 @@ package community.independe.repository;
 
 import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
-import community.independe.domain.post.IndependentPost;
-import community.independe.domain.post.RegionPost;
+import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
@@ -42,7 +41,7 @@ public class CommentRepositoryTest {
                 .build();
         memberRepository.save(member);
 
-        IndependentPost post = IndependentPost.builder()
+        Post post = Post.builder()
                 .title("title")
                 .content("content")
                 .member(member)
@@ -71,7 +70,7 @@ public class CommentRepositoryTest {
                 .build();
         memberRepository.save(member);
 
-        RegionPost regionPost = RegionPost.builder()
+        Post regionPost = Post.builder()
                 .title("regionTitle")
                 .content("regionContent")
                 .member(member)
@@ -80,7 +79,7 @@ public class CommentRepositoryTest {
                 .build();
         postRepository.save(regionPost);
 
-        IndependentPost independentPost = IndependentPost.builder()
+        Post independentPost = Post.builder()
                 .title("independentTitle")
                 .content("independentContent")
                 .member(member)

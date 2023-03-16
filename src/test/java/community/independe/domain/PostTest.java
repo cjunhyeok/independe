@@ -1,9 +1,7 @@
 package community.independe.domain;
 
 import community.independe.domain.member.Member;
-import community.independe.domain.post.IndependentPost;
 import community.independe.domain.post.Post;
-import community.independe.domain.post.RegionPost;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
@@ -47,7 +45,7 @@ public class PostTest {
             // 요리 카테고리에 글 작성
             IndependentPostType cook = IndependentPostType.COOK;
 
-            post = IndependentPost.builder()
+            post = Post.builder()
                     .title(title + "cook")
                     .content(content + "cook")
                     .independentPostType(cook)
@@ -62,7 +60,7 @@ public class PostTest {
             // 식당 카테고리에 글 작성
             RegionPostType restaurant = RegionPostType.RESTAURANT;
 
-            post = RegionPost.builder()
+            post = Post.builder()
                     .title(title + "pusan" + "restaurant")
                     .content(content + "pusan" + "restaurant")
                     .regionType(pusan)
@@ -73,7 +71,7 @@ public class PostTest {
             postRepository.save(post);
         }
 
-        RegionPost findPost = (RegionPost) postRepository.findById(post.getId()).orElseThrow(() -> new IllegalArgumentException());
+        Post findPost = postRepository.findById(post.getId()).orElseThrow(() -> new IllegalArgumentException());
         RegionPostType regionPostType = findPost.getRegionPostType();
 
         Assertions.assertThat(findPost).isEqualTo(post);

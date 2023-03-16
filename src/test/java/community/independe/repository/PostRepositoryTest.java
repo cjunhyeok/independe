@@ -1,9 +1,7 @@
 package community.independe.repository;
 
 import community.independe.domain.member.Member;
-import community.independe.domain.post.IndependentPost;
 import community.independe.domain.post.Post;
-import community.independe.domain.post.RegionPost;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
@@ -40,21 +38,21 @@ class PostRepositoryTest {
                 .build();
         memberRepository.save(member);
 
-        IndependentPost post = IndependentPost.builder()
+        Post post = Post.builder()
                 .title("title")
                 .content("content")
                 .member(member)
                 .independentPostType(IndependentPostType.COOK)
                 .build();
 
-        IndependentPost independentPost = IndependentPost.builder()
+        Post independentPost = Post.builder()
                 .title("title2")
                 .content("content2")
                 .member(member)
                 .independentPostType(IndependentPostType.COOK)
                 .build();
 
-        RegionPost regionPost = RegionPost.builder()
+        Post regionPost = Post.builder()
                 .title("title3")
                 .content("content3")
                 .member(member)
@@ -67,13 +65,7 @@ class PostRepositoryTest {
         postRepository.save(regionPost);
 
         List<Post> findAllPost = postRepository.findAll();
-        for (Post post1 : findAllPost) {
-            if (post1 instanceof IndependentPost) {
-                System.out.println(((IndependentPost) post1).getIndependentPostType());
-            } else if (post1 instanceof RegionPost) {
-                System.out.println(((RegionPost) post1).getRegionPostType());
-            }
-        }
+
         Assertions.assertThat(findAllPost.size()).isEqualTo(3);
     }
 
@@ -87,21 +79,21 @@ class PostRepositoryTest {
                 .build();
         memberRepository.save(member);
 
-        IndependentPost post = IndependentPost.builder()
+        Post post = Post.builder()
                 .title("title")
                 .content("content")
                 .member(member)
                 .independentPostType(IndependentPostType.COOK)
                 .build();
 
-        IndependentPost independentPost = IndependentPost.builder()
+        Post independentPost = Post.builder()
                 .title("title2")
                 .content("content2")
                 .member(member)
                 .independentPostType(IndependentPostType.COOK)
                 .build();
 
-        RegionPost regionPost = RegionPost.builder()
+        Post regionPost = Post.builder()
                 .title("title3")
                 .content("content3")
                 .member(member)
@@ -113,14 +105,14 @@ class PostRepositoryTest {
         postRepository.save(independentPost);
         postRepository.save(regionPost);
 
-        List<IndependentPost> allIndependentPost = postRepository.findAllIndependentPosts();
-        List<RegionPost> allRegionPost = postRepository.findAllRegionPosts();
+        List<Post> allIndependentPost = postRepository.findAllIndependentPosts();
+        List<Post> allRegionPost = postRepository.findAllRegionPosts();
 
-        for (IndependentPost independentPost1 : allIndependentPost) {
+        for (Post independentPost1 : allIndependentPost) {
             System.out.println(independentPost1.getIndependentPostType());
         }
 
-        for (RegionPost regionPost1 : allRegionPost) {
+        for (Post regionPost1 : allRegionPost) {
             System.out.println(regionPost1.getRegionPostType());
         }
 
@@ -138,7 +130,7 @@ class PostRepositoryTest {
                 .build();
         memberRepository.save(member);
 
-        RegionPost regionPost = RegionPost.builder()
+        Post regionPost = Post.builder()
                 .title("title3")
                 .content("content3")
                 .member(member)
@@ -150,9 +142,9 @@ class PostRepositoryTest {
         em.flush();
         em.clear();
 
-        List<RegionPost> allRegionPosts = postRepository.findAllRegionPosts();
+        List<Post> allRegionPosts = postRepository.findAllRegionPosts();
 
-        for (RegionPost allRegionPost : allRegionPosts) {
+        for (Post allRegionPost : allRegionPosts) {
             System.out.println(allRegionPost.getMember().getUsername());
         }
 

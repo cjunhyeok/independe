@@ -1,7 +1,6 @@
 package community.independe.service;
 
-import community.independe.domain.post.IndependentPost;
-import community.independe.domain.post.RegionPost;
+import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
@@ -31,7 +30,7 @@ public class PostServiceTest {
 
         Long independentPostId = postService.createIndependentPost(joinMemberId, title, content, independentPostType);
 
-        IndependentPost findPost = (IndependentPost)postService.findById(independentPostId);
+        Post findPost = postService.findById(independentPostId);
 
         Assertions.assertThat(findPost.getIndependentPostType()).isEqualTo(IndependentPostType.COOK);
     }
@@ -49,7 +48,7 @@ public class PostServiceTest {
 
         Long regionPostId = postService.createRegionPost(joinMemberId, title, content, regionType, regionPostType);
 
-        RegionPost findPost = (RegionPost)postService.findById(regionPostId);
+        Post findPost = postService.findById(regionPostId);
 
         Assertions.assertThat(findPost.getRegionPostType()).isEqualTo(RegionPostType.RESTAURANT);
     }
