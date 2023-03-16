@@ -85,6 +85,9 @@ public class JwtAuthorizationMacFilter extends OncePerRequestFilter {
                     filterChain.doFilter(request, response);
                 }
             }
+            else {
+                filterChain.doFilter(request, response);
+            }
         } catch (ParseException e) {
             throw new RuntimeException(e);
         } catch (JOSEException e) {
