@@ -23,14 +23,20 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             " and p.regionPostType IS NOT NULL")
     List<Post> findAllRegionPosts();
 
-    @Query("select p from Post p join fetch p.member")
+    @Query(value = "select p from Post p join fetch p.member",
+    countQuery = "select count(p) from Post p")
     Page<Post> findAllPostsWithMember(Pageable pageable);
 
-    @Query("select p from Post p join fetch p.member" +
+    @Query(value = "select p from Post p join fetch p.member" +
+            " where p.independentPostType IS NOT NULL",
+    countQuery = "select count(p) from Post p" +
             " where p.independentPostType IS NOT NULL")
     Page<Post> findAllIndependentPostsWithMember(Pageable pageable);
 
-    @Query("select p from Post p join fetch p.member" +
+    @Query(value = "select p from Post p join fetch p.member" +
+            " where p.regionType IS NOT NULL" +
+            " and p.regionPostType IS NOT NULL",
+    countQuery = "select count(p) from Post p" +
             " where p.regionType IS NOT NULL" +
             " and p.regionPostType IS NOT NULL")
     Page<Post> findAllRegionPostsWithMember(Pageable pageable);
