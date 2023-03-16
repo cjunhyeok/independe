@@ -21,8 +21,8 @@ public class Post extends BaseEntity {
     private Long id;
 
     private String title;
-    private Integer views; // 조회수
-    private Integer recommendCount; // 추천수
+    private int views; // 조회수
+    private int recommendCount; // 추천수
     @Column(columnDefinition = "text") // 텍스트 타입
     private String content;
 
@@ -41,14 +41,14 @@ public class Post extends BaseEntity {
     private Member member; // 게시글, 회원 N : 1 다대일 단방향 매핑
 
     @Builder
-    public Post(String title, Integer views, Integer recommendCount, String content, IndependentPostType independentPostType, RegionType regionType, RegionPostType regionPostType, Member member) {
+    public Post(String title, String content, IndependentPostType independentPostType, RegionType regionType, RegionPostType regionPostType, Member member) {
         this.title = title;
-        this.views = views;
-        this.recommendCount = recommendCount;
         this.content = content;
         this.independentPostType = independentPostType;
         this.regionType = regionType;
         this.regionPostType = regionPostType;
         this.member = member;
+        this.views = 0;
+        this.recommendCount = 0;
     }
 }
