@@ -139,6 +139,7 @@ public class PostApiController {
         List<Post> findAllPopularPosts = postApiRepository.findAllPopularPosts(yesterday, today);
         List<PopularPostDto> popularPostDto = findAllPopularPosts.stream()
                 .map(p -> new PopularPostDto(
+                        p.getId(),
                         p.getTitle(),
                         (p.getIndependentPostType() == null) ? null : p.getIndependentPostType().getDescription(),
                         (p.getRegionType() == null) ? null : p.getRegionType().getDescription(),
@@ -153,6 +154,7 @@ public class PostApiController {
         List<Post> findAllIndependentTipPosts = postApiRepository.findAllIndependentTipPosts(lastWeek, today);
         List<TipPostsDto> tipPostsDto = findAllIndependentTipPosts.stream()
                 .map(p -> new TipPostsDto(
+                        p.getId(),
                         p.getTitle(),
                         p.getIndependentPostType().getDescription()
                 )).collect(Collectors.toList());
@@ -161,6 +163,7 @@ public class PostApiController {
         List<Post> findAllRegionPostByRecommendCount = postApiRepository.findAllRegionAllPostByRecommendCount(yesterday, today);
         List<RegionAllPostDto> regionAllPostDto = findAllRegionPostByRecommendCount.stream()
                 .map(p -> new RegionAllPostDto(
+                        p.getId(),
                         p.getTitle(),
                         p.getRecommendCount(),
                         commentService.countAllByPostId(p.getId()),
@@ -171,6 +174,7 @@ public class PostApiController {
         List<Post> findRegionNotAllPostByRecommendCount = postApiRepository.findRegionNotAllPostByRecommendCount(yesterday, today);
         List<RegionNotAllPostDto> regionNotAllPostDto = findRegionNotAllPostByRecommendCount.stream()
                 .map(p -> new RegionNotAllPostDto(
+                        p.getId(),
                         p.getTitle(),
                         p.getRegionType().getDescription(),
                         p.getRegionPostType().getDescription(),

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TipPostsDto {
 
+    private Long postId;
     private String title;
     private String independentPostType;
 }

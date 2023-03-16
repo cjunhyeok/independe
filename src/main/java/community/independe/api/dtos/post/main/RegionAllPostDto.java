@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RegionAllPostDto {
 
+    private Long postId;
     private String title;
     private int recommendCount;
     private Long commentCount;

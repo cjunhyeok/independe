@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RegionNotAllPostDto {
 
+    private Long postId;
     private String title;
     private String regionType;
     private String regionPostType;

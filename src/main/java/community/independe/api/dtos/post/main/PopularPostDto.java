@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PopularPostDto {
 
+    private Long postId;
     private String title;
     private String independentPostType;
     private String regionType;
