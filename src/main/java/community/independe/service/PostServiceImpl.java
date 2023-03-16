@@ -9,6 +9,8 @@ import community.independe.repository.MemberRepository;
 import community.independe.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,5 +66,15 @@ public class PostServiceImpl implements PostService{
 
         postRepository.save(post);
         return post.getId();
+    }
+
+    @Override
+    public Page<Post> findAllIndependentPostsByTypeWithMember(IndependentPostType independentPostType, Pageable pageable) {
+        return postRepository.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
+    }
+
+    @Override
+    public Page<Post> findAllRegionPostsByTypesWithMember(RegionType regionType, RegionPostType regionPostType, Pageable pageable) {
+        return postRepository.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
     }
 }
