@@ -2,6 +2,9 @@ package community.independe.domain.post;
 
 import community.independe.domain.BaseEntity;
 import community.independe.domain.member.Member;
+import community.independe.domain.post.enums.IndependentPostType;
+import community.independe.domain.post.enums.RegionPostType;
+import community.independe.domain.post.enums.RegionType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,10 +12,8 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Inheritance(strategy = InheritanceType.JOINED) // 조인 전략
-@DiscriminatorColumn
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class Post extends BaseEntity {
+public class Post extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "post_id")
@@ -24,16 +25,28 @@ public abstract class Post extends BaseEntity {
     @Column(columnDefinition = "text") // 텍스트 타입
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    private IndependentPostType independentPostType; // 자취 게시판 카테고리
+
+    @Enumerated(EnumType.STRING)
+    private RegionType regionType; // 지역 게시판 지역 정보
+
+    @Enumerated(EnumType.STRING)
+    private RegionPostType regionPostType; // 지역 게시판 카테고리
+
     //== 연관 관계 ==//
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member; // 게시글, 회원 N : 1 다대일 단방향 매핑
 
-    public Post(String title, String content, Integer views, Integer recommendCount, Member member) {
+    public Post(String title, Integer views, Integer recommendCount, String content, IndependentPostType independentPostType, RegionType regionType, RegionPostType regionPostType, Member member) {
         this.title = title;
-        this.content = content;
         this.views = views;
         this.recommendCount = recommendCount;
+        this.content = content;
+        this.independentPostType = independentPostType;
+        this.regionType = regionType;
+        this.regionPostType = regionPostType;
         this.member = member;
     }
 }
