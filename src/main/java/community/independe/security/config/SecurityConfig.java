@@ -34,6 +34,8 @@ public class SecurityConfig {
     private final OctetSequenceKey octetSequenceKey;
     private final MemberRepository memberRepository;
 
+    private String[] whiteList = {"/", "/api/members/new", "/api/posts/main"};
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -49,7 +51,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(jwtAccessDeniedHandler());
 
         http.authorizeHttpRequests()
-                .requestMatchers("/", "/api/members/new", "/api/posts/main").permitAll()
+                .requestMatchers(whiteList).permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtAuthorizationMacFilter(octetSequenceKey), UsernamePasswordAuthenticationFilter.class);
