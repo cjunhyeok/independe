@@ -1,6 +1,7 @@
 package community.independe.repository;
 
-import community.independe.domain.Keyword;
+import community.independe.domain.keyword.Keyword;
+import community.independe.domain.keyword.KeywordDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.assertj.core.api.Assertions;
@@ -59,5 +60,30 @@ public class KeywordRepositoryTest {
 
         Long count = keywordRepository.countAllByKeywordName("자취");
         Assertions.assertThat(count).isEqualTo(2);
+    }
+
+    @Test
+    public void groupByTest() {
+        Keyword keyword = new Keyword("자취");
+        Keyword keyword2 = new Keyword("자취");
+        Keyword keyword3 = new Keyword("생활");
+        Keyword keyword4 = new Keyword("생활");
+        Keyword keyword5 = new Keyword("생활");
+        Keyword keyword6 = new Keyword("꿀팁");
+
+        keywordRepository.save(keyword);
+        keywordRepository.save(keyword2);
+        keywordRepository.save(keyword3);
+        keywordRepository.save(keyword4);
+        keywordRepository.save(keyword5);
+        keywordRepository.save(keyword6);
+
+        em.flush();
+        em.clear();
+
+        List<KeywordDto> keywordsByGroup = keywordRepository.findKeywordsByGroup();
+
+        Assertions.assertThat(keywordsByGroup.get(0).getKeywordName()).isEqualTo("생활");
+        Assertions.assertThat(keywordsByGroup.get(0).getKeywordCount()).isEqualTo(3);
     }
 }
