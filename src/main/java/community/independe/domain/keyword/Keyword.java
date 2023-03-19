@@ -1,5 +1,6 @@
-package community.independe.domain;
+package community.independe.domain.keyword;
 
+import community.independe.domain.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
