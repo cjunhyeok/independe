@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @SpringBootTest
 @Transactional
 @Rollback(value = false)
@@ -22,28 +24,40 @@ public class KeywordRepositoryTest {
 
     @Test
     public void basicTest() {
-        Keyword keyword = Keyword.builder()
-                .keywordName("자취")
-                .build();
+        Keyword keyword = new Keyword("자취");
 
         Keyword savedKeyword = keywordRepository.save(keyword);
 
         Assertions.assertThat(savedKeyword.getKeywordName()).isEqualTo("자취");
-        Assertions.assertThat(savedKeyword.getKeywordCount()).isEqualTo(0);
     }
 
     @Test
-    public void basicFindByKeywordNameTest() {
-        Keyword keyword = Keyword.builder()
-                .keywordName("자취")
-                .build();
+    public void basicFindAllByKeywordNameTest() {
+        Keyword keyword = new Keyword("자취");
+        Keyword keyword2 = new Keyword("자취");
 
         Keyword savedKeyword = keywordRepository.save(keyword);
+        Keyword savedKeyword2 = keywordRepository.save(keyword2);
 
         em.flush();
         em.clear();
 
-        Keyword findKeyword = keywordRepository.findByKeywordName("자취");
-        Assertions.assertThat(findKeyword.getKeywordName()).isEqualTo("자취");
+        List<Keyword> keywords = keywordRepository.findAllByKeywordName("자취");
+        Assertions.assertThat(keywords.get(1).getKeywordName()).isEqualTo("자취");
+    }
+
+    @Test
+    public void countAllByKeywordNameTest() {
+        Keyword keyword = new Keyword("자취");
+        Keyword keyword2 = new Keyword("자취");
+
+        Keyword savedKeyword = keywordRepository.save(keyword);
+        Keyword savedKeyword2 = keywordRepository.save(keyword2);
+
+        em.flush();
+        em.clear();
+
+        Long count = keywordRepository.countAllByKeywordName("자취");
+        Assertions.assertThat(count).isEqualTo(2);
     }
 }
