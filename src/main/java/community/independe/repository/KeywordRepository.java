@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface KeywordRepository extends JpaRepository<Keyword, Long> {
 
-    Long countAllByKeywordCount(String keywordCount);
+    Long countAllByKeywordName(String keywordName);
 
     Keyword findByKeywordName(String keywordName);
 }
