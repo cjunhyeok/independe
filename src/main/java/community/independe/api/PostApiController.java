@@ -150,13 +150,17 @@ public class PostApiController {
                         true
                 )).collect(Collectors.toList());
 
-        // 자취 팁 10개
-        List<Post> findAllIndependentTipPosts = postApiRepository.findAllIndependentTipPosts(lastWeek, today);
-        List<TipPostsDto> tipPostsDto = findAllIndependentTipPosts.stream()
-                .map(p -> new TipPostsDto(
+        // 추천수 자취 게시글 10개
+        List<Post> findAllIndependentPostByRecommendCount = postApiRepository.findAllIndependentPostByRecommendCount(yesterday, today);
+        List<PopularIndependentPostsDto> popularIndependentPostsDto = findAllIndependentPostByRecommendCount.stream()
+                .map(p -> new PopularIndependentPostsDto(
                         p.getId(),
                         p.getTitle(),
-                        p.getIndependentPostType().getDescription()
+                        p.getIndependentPostType().getDescription(),
+                        p.getViews(),
+                        p.getRecommendCount(),
+                        commentService.countAllByPostId(p.getId())
+                        , true
                 )).collect(Collectors.toList());
 
         // 전체 지역 게시글 5개
@@ -188,7 +192,7 @@ public class PostApiController {
                 popularPostDto,
                 regionAllPostDto,
                 regionNotAllPostDto,
-                tipPostsDto
+                popularIndependentPostsDto
         );
 
         return new Result(mainPostDto);

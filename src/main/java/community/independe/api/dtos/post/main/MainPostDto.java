@@ -15,5 +15,5 @@ public class MainPostDto {
     private List<PopularPostDto> popularPostDtos;
     private List<RegionAllPostDto> regionAllPostDtos;
     private List<RegionNotAllPostDto> regionNotAllPostDtos;
-    private List<TipPostsDto> tipPostsDtos;
+    private List<PopularIndependentPostsDto> popularIndependentPostsDtos;
 }

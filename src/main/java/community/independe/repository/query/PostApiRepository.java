@@ -26,15 +26,15 @@ public class PostApiRepository {
                 .getResultList();
     }
 
-    public List<Post> findAllIndependentTipPosts(LocalDateTime lastWeek, LocalDateTime today) {
+    public List<Post> findAllIndependentPostByRecommendCount(LocalDateTime yesterday, LocalDateTime today) {
         return em.createQuery("select p from Post p" +
-                " where p.createdDate BETWEEN :lastWeek AND :today" +
+                " where p.createdDate BETWEEN :yesterday AND :today" +
                 " and p.independentPostType IS NOT NULL" +
-                " order by p.views", Post.class)
+                " order by p.recommendCount", Post.class)
+                .setParameter("yesterday", yesterday)
+                .setParameter("today", today)
                 .setFirstResult(0)
                 .setMaxResults(9)
-                .setParameter("lastWeek", lastWeek)
-                .setParameter("today", today)
                 .getResultList();
     }
 
