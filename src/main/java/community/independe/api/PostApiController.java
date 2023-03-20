@@ -163,7 +163,6 @@ public class PostApiController {
                         p.getId(),
                         p.getTitle(),
                         p.getIndependentPostType().getDescription(),
-                        p.getViews(),
                         p.getRecommendCount(),
                         commentService.countAllByPostId(p.getId())
                         , true

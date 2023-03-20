@@ -12,7 +12,6 @@ public class PopularIndependentPostsDto {
     private Long postId;
     private String title;
     private String independentPostType;
-    private int views;
     private int recommendCount;
     private Long commentCount;
     private boolean isPicture;
