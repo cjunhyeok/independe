@@ -192,6 +192,22 @@ public class InitDB {
             keywordRepository.save(keyword5);
             Keyword keyword6 = new Keyword("꿀팁");
             keywordRepository.save(keyword6);
+            Keyword keyword7 = new Keyword("건강");
+            keywordRepository.save(keyword7);
+            Keyword keyword8 = new Keyword("청소");
+            keywordRepository.save(keyword8);
+            Keyword keyword9 = new Keyword("빨레");
+            keywordRepository.save(keyword9);
+            Keyword keyword10 = new Keyword("요리");
+            keywordRepository.save(keyword10);
+            Keyword keyword11 = new Keyword("울산");
+            keywordRepository.save(keyword11);
+            Keyword keyword12 = new Keyword("부산");
+            keywordRepository.save(keyword12);
+            Keyword keyword13 = new Keyword("경남");
+            keywordRepository.save(keyword13);
+            Keyword keyword14 = new Keyword("만남");
+            keywordRepository.save(keyword14);
 
         }
     }
