@@ -20,7 +20,7 @@ public class PostApiRepository {
                 " where p.createdDate BETWEEN :yesterday AND :today" +
                         " order by p.views", Post.class)
                 .setFirstResult(0)
-                .setMaxResults(9)
+                .setMaxResults(10)
                 .setParameter("yesterday", yesterday)
                 .setParameter("today", today)
                 .getResultList();
@@ -34,7 +34,7 @@ public class PostApiRepository {
                 .setParameter("yesterday", yesterday)
                 .setParameter("today", today)
                 .setFirstResult(0)
-                .setMaxResults(9)
+                .setMaxResults(10)
                 .getResultList();
     }
 
@@ -46,7 +46,7 @@ public class PostApiRepository {
                 " and p.regionType = :regionType" +
                 " order by p.recommendCount", Post.class)
                 .setFirstResult(0)
-                .setMaxResults(4)
+                .setMaxResults(5)
                 .setParameter("yesterday", yesterday)
                 .setParameter("today", today)
                 .setParameter("regionType", RegionType.ALL)
@@ -60,7 +60,7 @@ public class PostApiRepository {
                 " and p.regionType <> :regionType" +
                 " order by p.recommendCount", Post.class)
                 .setFirstResult(0)
-                .setMaxResults(4)
+                .setMaxResults(5)
                 .setParameter("yesterday", yesterday)
                 .setParameter("today", today)
                 .setParameter("regionType", RegionType.ALL)

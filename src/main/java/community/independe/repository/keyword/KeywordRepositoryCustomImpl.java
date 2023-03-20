@@ -27,7 +27,7 @@ public class KeywordRepositoryCustomImpl implements KeywordRepositoryCustom {
                 .groupBy(keyword.keywordName)
                 .orderBy(keyword.count().desc())
                 .offset(0)
-                .limit(9)
+                .limit(10)
                 .fetch();
     }
 }
