@@ -8,7 +8,7 @@ import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.repository.CommentRepository;
-import community.independe.repository.KeywordRepository;
+import community.independe.repository.keyword.KeywordRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.PostRepository;
 import jakarta.annotation.PostConstruct;

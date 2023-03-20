@@ -1,7 +1,7 @@
 package community.independe.service;
 
 import community.independe.domain.keyword.KeywordDto;
-import community.independe.repository.KeywordRepository;
+import community.independe.repository.keyword.KeywordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package community.independe.repository;
+package community.independe.repository.keyword;
 
 import community.independe.domain.keyword.KeywordDto;
 

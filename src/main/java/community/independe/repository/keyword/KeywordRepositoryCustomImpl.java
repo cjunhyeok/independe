@@ -1,4 +1,4 @@
-package community.independe.repository;
+package community.independe.repository.keyword;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -9,7 +9,7 @@ import java.util.List;
 
 import static community.independe.domain.keyword.QKeyword.*;
 
-public class KeywordRepositoryCustomImpl implements KeywordRepositoryCustom{
+public class KeywordRepositoryCustomImpl implements KeywordRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 

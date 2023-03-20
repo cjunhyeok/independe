@@ -2,6 +2,7 @@ package community.independe.repository;
 
 import community.independe.domain.keyword.Keyword;
 import community.independe.domain.keyword.KeywordDto;
+import community.independe.repository.keyword.KeywordRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.assertj.core.api.Assertions;
