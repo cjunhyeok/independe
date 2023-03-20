@@ -1,4 +1,4 @@
-package community.independe.repository.video;
+package community.independe.api.dtos.post.main;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
