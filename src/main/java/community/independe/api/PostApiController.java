@@ -12,10 +12,12 @@ import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
+import community.independe.domain.video.Video;
 import community.independe.repository.query.PostApiRepository;
 import community.independe.service.CommentService;
 import community.independe.service.KeywordService;
 import community.independe.service.PostService;
+import community.independe.service.VideoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +40,7 @@ public class PostApiController {
     private final PostService postService;
     private final CommentService commentService;
     private final KeywordService keywordService;
+    private final VideoService videoService;
     private final PostApiRepository postApiRepository;
 
     // 자취 게시글 카테고리로 불러오기
@@ -193,13 +196,22 @@ public class PostApiController {
         // 인기 검색어 10개
         List<KeywordDto> keywordDto = keywordService.findKeywordsByGroup();
 
+        // 영상
+        List<Video> findAllForMain = videoService.findAllForMain();
+        List<VideoMainDto> videoMainDto = findAllForMain.stream()
+                .map(v -> new VideoMainDto(
+                        v.getVideoTitle(),
+                        v.getVideoUrl()
+                )).collect(Collectors.toList());
+
         MainPostDto mainPostDto = new MainPostDto(
                 "오늘은 힘드네요",
                 popularPostDto,
                 regionAllPostDto,
                 regionNotAllPostDto,
                 popularIndependentPostsDto,
-                keywordDto
+                keywordDto,
+                videoMainDto
         );
 
         return new Result(mainPostDto);

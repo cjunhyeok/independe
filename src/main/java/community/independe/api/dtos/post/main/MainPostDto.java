@@ -18,4 +18,5 @@ public class MainPostDto {
     private List<RegionNotAllPostDto> regionNotAllPostDtos;
     private List<PopularIndependentPostsDto> popularIndependentPostsDtos;
     private List<KeywordDto> keywordDtos;
+    private List<VideoMainDto> videoMainDtos;
 }
