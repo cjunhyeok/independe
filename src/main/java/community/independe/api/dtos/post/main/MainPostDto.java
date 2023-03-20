@@ -1,5 +1,6 @@
 package community.independe.api.dtos.post.main;
 
+import community.independe.domain.keyword.KeywordDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,4 +17,5 @@ public class MainPostDto {
     private List<RegionAllPostDto> regionAllPostDtos;
     private List<RegionNotAllPostDto> regionNotAllPostDtos;
     private List<PopularIndependentPostsDto> popularIndependentPostsDtos;
+    private List<KeywordDto> keywordDtos;
 }

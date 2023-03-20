@@ -7,12 +7,14 @@ import community.independe.api.dtos.post.PostResponse;
 import community.independe.api.dtos.post.PostsResponse;
 import community.independe.api.dtos.post.main.*;
 import community.independe.domain.comment.Comment;
+import community.independe.domain.keyword.KeywordDto;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.repository.query.PostApiRepository;
 import community.independe.service.CommentService;
+import community.independe.service.KeywordService;
 import community.independe.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,7 @@ public class PostApiController {
 
     private final PostService postService;
     private final CommentService commentService;
+    private final KeywordService keywordService;
     private final PostApiRepository postApiRepository;
 
     // 자취 게시글 카테고리로 불러오기
@@ -187,12 +190,16 @@ public class PostApiController {
                         true
                 )).collect(Collectors.toList());
 
+        // 인기 검색어 10개
+        List<KeywordDto> keywordDto = keywordService.findKeywordsByGroup();
+
         MainPostDto mainPostDto = new MainPostDto(
                 "오늘은 힘드네요",
                 popularPostDto,
                 regionAllPostDto,
                 regionNotAllPostDto,
-                popularIndependentPostsDto
+                popularIndependentPostsDto,
+                keywordDto
         );
 
         return new Result(mainPostDto);
