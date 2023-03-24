@@ -48,7 +48,7 @@ public class PostApiController {
     public Result independentPosts(@PathVariable(name = "type") IndependentPostType independentPostType,
                                    @PageableDefault(
                                            size = 10,
-                                           sort = "lastModifiedDate",
+                                           sort = "createdDate",
                                            direction = Sort.Direction.DESC) Pageable pageable) {
 
         Page<Post> allIndependentPosts =
@@ -88,7 +88,7 @@ public class PostApiController {
     public Result regionPosts(@PathVariable(name = "regionType") RegionType regionType,
                               @PathVariable(name = "regionPostType") RegionPostType regionPostType,
                               @PageableDefault(size = 10,
-                                      sort = "lastModifiedDate",
+                                      sort = "createdDate",
                                       direction = Sort.Direction.DESC)Pageable pageable) {
 
         Page<Post> allRegionPosts = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
