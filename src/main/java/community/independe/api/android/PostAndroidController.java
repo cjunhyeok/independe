@@ -1,6 +1,7 @@
 package community.independe.api.android;
 
 import community.independe.api.android.dto.AndroidMainPostDto;
+import community.independe.api.android.dto.TestDto;
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.post.main.*;
 import community.independe.domain.post.Post;
@@ -103,5 +104,11 @@ public class PostAndroidController {
         );
 
         return new Result(mainPostDto);
+    }
+
+    @GetMapping("/api/android/test")
+    public TestDto mainTest() {
+        TestDto connection = new TestDto("connection");
+        return connection;
     }
 }
