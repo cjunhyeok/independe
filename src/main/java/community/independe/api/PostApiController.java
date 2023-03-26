@@ -114,9 +114,10 @@ public class PostApiController {
 
     // 지역 게시글 생성
     @PostMapping("/api/posts/region/new")
-    public ResponseEntity<Long> createRegionPost(@RequestBody @Valid CreateRegionPostRequest request) {
+    public ResponseEntity<Long> createRegionPost(@RequestBody @Valid CreateRegionPostRequest request,
+                                                 @AuthenticationPrincipal Member member) {
         Long regionPost = postService.createRegionPost(
-                request.getMemberId(),
+                member.getId(),
                 request.getTitle(),
                 request.getContent(),
                 request.getRegionType(),
