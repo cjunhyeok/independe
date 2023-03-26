@@ -8,6 +8,7 @@ import community.independe.api.dtos.post.PostsResponse;
 import community.independe.api.dtos.post.main.*;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.keyword.KeywordDto;
+import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -72,10 +74,11 @@ public class PostApiController {
 
     // 자취 게시글 생성
     @PostMapping("/api/posts/independent/new")
-    public ResponseEntity<Long> createIndependentPost(@RequestBody @Valid CreateIndependentPostRequest request) {
+    public ResponseEntity<Long> createIndependentPost(@RequestBody @Valid CreateIndependentPostRequest request,
+                                                      @AuthenticationPrincipal Member member) {
 
         Long independentPost = postService.createIndependentPost(
-                request.getMemberId(),
+                member.getId(),
                 request.getTitle(),
                 request.getContent(),
                 request.getIndependentPostType());

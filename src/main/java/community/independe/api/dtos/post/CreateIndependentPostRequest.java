@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreateIndependentPostRequest {
 
-    private Long memberId;
     @NotEmpty
     private String title;
     private String content;
