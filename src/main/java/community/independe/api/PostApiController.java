@@ -134,6 +134,8 @@ public class PostApiController {
         Post findPost = postService.findById(postId);
         List<Comment> findComments = commentService.findAllByPostId(postId);
 
+        postService.increaseViews(postId); // 조회수 증가
+
         PostResponse postResponse = new PostResponse(findPost, findComments);
         return new Result(postResponse);
     }
