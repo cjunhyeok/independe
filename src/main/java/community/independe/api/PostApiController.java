@@ -131,10 +131,11 @@ public class PostApiController {
     @GetMapping("/api/posts/{postId}")
     public Result post(@PathVariable(name = "postId") Long postId) {
 
+        postService.increaseViews(postId); // 조회수 증가
+
+        // 증가 이후 찾기
         Post findPost = postService.findById(postId);
         List<Comment> findComments = commentService.findAllByPostId(postId);
-
-        postService.increaseViews(postId); // 조회수 증가
 
         PostResponse postResponse = new PostResponse(findPost, findComments);
         return new Result(postResponse);
