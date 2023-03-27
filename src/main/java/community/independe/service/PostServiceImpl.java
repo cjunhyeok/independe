@@ -77,4 +77,12 @@ public class PostServiceImpl implements PostService{
     public Page<Post> findAllRegionPostsByTypesWithMember(RegionType regionType, RegionPostType regionPostType, Pageable pageable) {
         return postRepository.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
     }
+
+    @Override
+    public void increaseViews(Long postId) {
+        Post findPost = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Id not exist"));
+
+        findPost.increaseViews(findPost.getViews() + 1);
+    }
 }

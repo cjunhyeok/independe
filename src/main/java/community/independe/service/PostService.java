@@ -26,4 +26,5 @@ public interface PostService {
                                                    RegionPostType regionPostType,
                                                    Pageable pageable);
 
+    void increaseViews(Long postId);
 }
