@@ -51,4 +51,9 @@ public class Post extends BaseEntity {
         this.views = 0;
         this.recommendCount = 0;
     }
+
+    // 조회수 증가
+    public void increaseViews(int views) {
+        this.views = views;
+    }
 }
