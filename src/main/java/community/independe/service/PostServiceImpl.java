@@ -85,4 +85,18 @@ public class PostServiceImpl implements PostService{
 
         findPost.increaseViews(findPost.getViews() + 1);
     }
+
+    @Override
+    public void increaseOrDecreaseRecommendCount(Long postId, boolean isUp) {
+        Post findPost = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Id not exist"));
+
+        if (isUp) {
+            findPost.increaseRecommendCount(findPost.getRecommendCount() + 1);
+        } else if (isUp != true && (findPost.getRecommendCount() <= 0)){
+            throw new IllegalArgumentException("Recommend Count can't be negative number");
+        } else if (isUp != true && (findPost.getRecommendCount()) > 0) {
+            findPost.decreaseRecommendCount(findPost.getRecommendCount() - 1);
+        }
+    }
 }

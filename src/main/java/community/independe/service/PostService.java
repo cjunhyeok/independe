@@ -27,4 +27,6 @@ public interface PostService {
                                                    Pageable pageable);
 
     void increaseViews(Long postId);
+
+    void increaseOrDecreaseRecommendCount(Long postId ,boolean isUp);
 }
