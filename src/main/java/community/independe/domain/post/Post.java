@@ -58,16 +58,12 @@ public class Post extends BaseEntity {
     }
 
     // 추천수 증가
-    public void increaseRecommendCount(boolean isUp) {
-        if (isUp) {
-            this.recommendCount = recommendCount + 1;
-        }
+    public void increaseRecommendCount(int recommendCount) {
+        this.recommendCount = recommendCount + 1;
     }
 
     // 추천주 감소
-    public void decreaseRecommendCount(boolean isUp) {
-        if (!isUp && (this.recommendCount > 0)) {
-            this.recommendCount = recommendCount - 1;
-        }
+    public void decreaseRecommendCount(int recommendCount) {
+        this.recommendCount = recommendCount;
     }
 }
