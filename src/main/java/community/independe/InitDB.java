@@ -154,6 +154,18 @@ public class InitDB {
                     .build();
             postRepository.save(independentPost8);
 
+            for (int i = 1; i <= 22; i++) {
+                postRepository.save(
+                        Post.builder()
+                                .title("AllFreeTitle" + i)
+                                .content("AllFreeContent" + i)
+                                .member(member)
+                                .regionType(RegionType.ALL)
+                                .regionPostType(RegionPostType.FREE)
+                                .build()
+                );
+            }
+
             Comment comment1 = Comment.builder()
                     .content("comment1")
                     .member(member)
