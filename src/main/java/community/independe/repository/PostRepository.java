@@ -52,7 +52,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             " where p.regionType = :regionType" +
             " and p.regionPostType = :regionPostType",
     countQuery = "select count(p) from Post p" +
-            " where p.regionPostType = :regionType" +
+            " where p.regionType = :regionType" +
             " and p.regionPostType = :regionPostType")
     Page<Post> findAllRegionPostsByTypesWithMember(@Param("regionType")RegionType regionType,
                                                    @Param("regionPostType")RegionPostType regionPostType,
