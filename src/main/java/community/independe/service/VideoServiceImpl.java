@@ -1,5 +1,6 @@
 package community.independe.service;
 
+import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.video.Video;
 import community.independe.repository.video.VideoRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,5 +21,10 @@ public class VideoServiceImpl implements VideoService{
     @Override
     public List<Video> findAllForMain() {
         return videoRepository.findAllForMain();
+    }
+
+    @Override
+    public List<Video> findAllByIndependentPostType(IndependentPostType independentPostType) {
+        return videoRepository.findAllByIndependentPostType(independentPostType);
     }
 }
