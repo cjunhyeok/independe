@@ -240,6 +240,14 @@ public class InitDB {
                     .build();
             videoRepository.save(cookVideo2);
 
+            Video cookVideo3 = Video.builder()
+                    .videoTitle("oneDay2")
+                    .videoUrl("https://www.youtube.com/embed/bLES_JyrmhQ")
+                    .independentPostType(IndependentPostType.COOK)
+                    .views(7)
+                    .build();
+            videoRepository.save(cookVideo3);
+
             Video cleanVideo = Video.builder()
                     .videoTitle("infinity challenge")
                     .videoUrl("https://www.youtube.com/embed/FVf-2DdFX80")
@@ -256,6 +264,14 @@ public class InitDB {
                     .build();
             videoRepository.save(cleanVideo2);
 
+            Video cleanVideo3 = Video.builder()
+                    .videoTitle("bang kok")
+                    .videoUrl("https://www.youtube.com/embed/8A4MwL_MiPE")
+                    .independentPostType(IndependentPostType.CLEAN)
+                    .views(3)
+                    .build();
+            videoRepository.save(cleanVideo3);
+
             Video washVideo = Video.builder()
                     .videoTitle("relaxMan")
                     .videoUrl("https://www.youtube.com/embed/iYPFRvQ9Jr4")
@@ -271,6 +287,62 @@ public class InitDB {
                     .views(12)
                     .build();
             videoRepository.save(washVideo2);
+
+            Video washVideo3 = Video.builder()
+                    .videoTitle("danuri2")
+                    .videoUrl("https://www.youtube.com/embed/Cr3zIEMk9Nk")
+                    .independentPostType(IndependentPostType.WASH)
+                    .views(12)
+                    .build();
+            videoRepository.save(washVideo3);
+
+            Video healthVideo1 = Video.builder()
+                    .videoTitle("health1")
+                    .videoUrl("https://www.youtube.com/embed/Cr3zIEMk9Nk")
+                    .independentPostType(IndependentPostType.HEALTH)
+                    .views(15)
+                    .build();
+            videoRepository.save(healthVideo1);
+
+            Video healthVideo2 = Video.builder()
+                    .videoTitle("health2")
+                    .videoUrl("https://www.youtube.com/embed/Cr3zIEMk9Nk")
+                    .independentPostType(IndependentPostType.HEALTH)
+                    .views(15)
+                    .build();
+            videoRepository.save(healthVideo2);
+
+            Video healthVideo3 = Video.builder()
+                    .videoTitle("health3")
+                    .videoUrl("https://www.youtube.com/embed/Cr3zIEMk9Nk")
+                    .independentPostType(IndependentPostType.HEALTH)
+                    .views(15)
+                    .build();
+            videoRepository.save(healthVideo3);
+
+            Video etcVideo1 = Video.builder()
+                    .videoTitle("etc1")
+                    .videoUrl("https://www.youtube.com/embed/Cr3zIEMk9Nk")
+                    .independentPostType(IndependentPostType.ETC)
+                    .views(3)
+                    .build();
+            videoRepository.save(etcVideo1);
+
+            Video etcVideo2 = Video.builder()
+                    .videoTitle("etc2")
+                    .videoUrl("https://www.youtube.com/embed/Cr3zIEMk9Nk")
+                    .independentPostType(IndependentPostType.ETC)
+                    .views(3)
+                    .build();
+            videoRepository.save(etcVideo2);
+
+            Video etcVideo3 = Video.builder()
+                    .videoTitle("etc3")
+                    .videoUrl("https://www.youtube.com/embed/Cr3zIEMk9Nk")
+                    .independentPostType(IndependentPostType.ETC)
+                    .views(3)
+                    .build();
+            videoRepository.save(etcVideo3);
         }
     }
 }
