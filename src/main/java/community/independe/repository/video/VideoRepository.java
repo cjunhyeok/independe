@@ -12,6 +12,7 @@ import java.util.List;
 public interface VideoRepository extends JpaRepository<Video, Long>, VideoRepositoryCustom {
 
     @Query(value = "select v from Video v" +
-            " where v.independentPostType = :independentPostType")
+            " where v.independentPostType = :independentPostType" +
+            " order by v.views DESC")
     List<Video> findAllByIndependentPostType(@Param("independentPostType")IndependentPostType independentPostType);
 }
