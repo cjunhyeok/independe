@@ -1,10 +1,7 @@
 package community.independe.api;
 
 import community.independe.api.dtos.Result;
-import community.independe.api.dtos.post.CreateIndependentPostRequest;
-import community.independe.api.dtos.post.CreateRegionPostRequest;
-import community.independe.api.dtos.post.PostResponse;
-import community.independe.api.dtos.post.PostsResponse;
+import community.independe.api.dtos.post.*;
 import community.independe.api.dtos.post.main.*;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.keyword.KeywordDto;
@@ -53,12 +50,13 @@ public class PostApiController {
                                            sort = "createdDate",
                                            direction = Sort.Direction.DESC) Pageable pageable) {
 
+        // 게시글 불러오기
         Page<Post> allIndependentPosts =
                 postService.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
         List<Post> independentPosts = allIndependentPosts.getContent();
         long totalCount = allIndependentPosts.getTotalElements();
 
-        List<PostsResponse> collect = independentPosts.stream()
+        List<PostsResponse> postsCollect = independentPosts.stream()
                 .map(p -> new PostsResponse(
                         p.getMember().getNickname(),
                         p.getTitle(),
@@ -69,7 +67,21 @@ public class PostApiController {
                 ))
                 .collect(Collectors.toList());
 
-        return new Result(collect, totalCount);
+        // 영상 불러오기
+        List<Video> findAllByIndependentPostType = videoService.findAllByIndependentPostType(independentPostType);
+        List<IndependentPostVideoDto> videoCollect = findAllByIndependentPostType.stream()
+                .map(v -> new IndependentPostVideoDto(
+                        v.getVideoTitle(),
+                        v.getVideoUrl()
+                ))
+                .collect(Collectors.toList());
+
+        PostsResponseDto postsResponseDto = new PostsResponseDto(
+                postsCollect,
+                videoCollect
+        );
+
+        return new Result(postsResponseDto, totalCount);
     }
 
     // 자취 게시글 생성
@@ -94,6 +106,7 @@ public class PostApiController {
                                       sort = "createdDate",
                                       direction = Sort.Direction.DESC)Pageable pageable) {
 
+        // 게시글 가져오기
         Page<Post> allRegionPosts = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
         List<Post> regionPosts = allRegionPosts.getContent();
         long totalCount = allRegionPosts.getTotalElements();
@@ -140,6 +153,14 @@ public class PostApiController {
         PostResponse postResponse = new PostResponse(findPost, findComments);
         return new Result(postResponse);
     }
+
+//    @PostMapping("/api/posts/recommendCount/{postId}")
+//    public ResponseEntity increaseOrDecreaseRecommendCount(@PathVariable(name = "postId") Long postId,
+//                                                           @RequestBody Boolean isUp) {
+//        postService.increaseOrDecreaseRecommendCount(postId, isUp);
+//
+//        return ResponseEntity.ok("Ok");
+//    }
 
     @GetMapping("/api/posts/main")
     public Result mainPost() {
