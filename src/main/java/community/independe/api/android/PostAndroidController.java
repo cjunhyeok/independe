@@ -35,8 +35,8 @@ public class PostAndroidController {
         LocalDateTime today = LocalDateTime.now(); // 오늘
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1); // 어제
 
-        // 인기 게시글(10개)
-        List<Post> findAllPopularPosts = postApiRepository.findAllPopularPosts(yesterday, today);
+        // 인기 게시글(5개)
+        List<Post> findAllPopularPosts = postApiRepository.findAllPopularPosts(yesterday, today, 0, 5);
         List<PopularPostDto> popularPostDto = findAllPopularPosts.stream()
                 .map(p -> new PopularPostDto(
                         p.getId(),
@@ -50,8 +50,8 @@ public class PostAndroidController {
                         true
                 )).collect(Collectors.toList());
 
-        // 추천수 자취 게시글 10개
-        List<Post> findAllIndependentPostByRecommendCount = postApiRepository.findAllIndependentPostByRecommendCount(yesterday, today);
+        // 추천수 자취 게시글 3개
+        List<Post> findAllIndependentPostByRecommendCount = postApiRepository.findAllIndependentPostByRecommendCount(yesterday, today, 0, 3);
         List<PopularIndependentPostsDto> popularIndependentPostsDto = findAllIndependentPostByRecommendCount.stream()
                 .map(p -> new PopularIndependentPostsDto(
                         p.getId(),
@@ -62,8 +62,8 @@ public class PostAndroidController {
                         , true
                 )).collect(Collectors.toList());
 
-        // 전체 지역 게시글 5개
-        List<Post> findAllRegionPostByRecommendCount = postApiRepository.findAllRegionAllPostByRecommendCount(yesterday, today);
+        // 전체 지역 게시글 3개
+        List<Post> findAllRegionPostByRecommendCount = postApiRepository.findAllRegionAllPostByRecommendCount(yesterday, today, 0, 3);
         List<RegionAllPostDto> regionAllPostDto = findAllRegionPostByRecommendCount.stream()
                 .map(p -> new RegionAllPostDto(
                         p.getId(),
@@ -73,8 +73,8 @@ public class PostAndroidController {
                         false
                 )).collect(Collectors.toList());
 
-        // 전체 아닌 지역 게시글 5개
-        List<Post> findRegionNotAllPostByRecommendCount = postApiRepository.findRegionNotAllPostByRecommendCount(yesterday, today);
+        // 전체 아닌 지역 게시글 3개
+        List<Post> findRegionNotAllPostByRecommendCount = postApiRepository.findRegionNotAllPostByRecommendCount(yesterday, today, 0, 3);
         List<RegionNotAllPostDto> regionNotAllPostDto = findRegionNotAllPostByRecommendCount.stream()
                 .map(p -> new RegionNotAllPostDto(
                         p.getId(),
@@ -108,7 +108,8 @@ public class PostAndroidController {
 
     @GetMapping("/api/android/test")
     public TestDto mainTest() {
-        TestDto connection = new TestDto("connection");
+        log.info("in android main");
+        TestDto connection = new TestDto("connection Test Ment");
         return connection;
     }
 }

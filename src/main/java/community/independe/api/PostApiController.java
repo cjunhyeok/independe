@@ -170,7 +170,7 @@ public class PostApiController {
         LocalDateTime lastWeek = LocalDateTime.now().minusDays(7);
 
         // 인기 게시글(10개)
-        List<Post> findAllPopularPosts = postApiRepository.findAllPopularPosts(yesterday, today);
+        List<Post> findAllPopularPosts = postApiRepository.findAllPopularPosts(yesterday, today, 0, 10);
         List<PopularPostDto> popularPostDto = findAllPopularPosts.stream()
                 .map(p -> new PopularPostDto(
                         p.getId(),
@@ -185,7 +185,7 @@ public class PostApiController {
                 )).collect(Collectors.toList());
 
         // 추천수 자취 게시글 10개
-        List<Post> findAllIndependentPostByRecommendCount = postApiRepository.findAllIndependentPostByRecommendCount(yesterday, today);
+        List<Post> findAllIndependentPostByRecommendCount = postApiRepository.findAllIndependentPostByRecommendCount(yesterday, today, 0, 10);
         List<PopularIndependentPostsDto> popularIndependentPostsDto = findAllIndependentPostByRecommendCount.stream()
                 .map(p -> new PopularIndependentPostsDto(
                         p.getId(),
@@ -197,7 +197,7 @@ public class PostApiController {
                 )).collect(Collectors.toList());
 
         // 전체 지역 게시글 5개
-        List<Post> findAllRegionPostByRecommendCount = postApiRepository.findAllRegionAllPostByRecommendCount(yesterday, today);
+        List<Post> findAllRegionPostByRecommendCount = postApiRepository.findAllRegionAllPostByRecommendCount(yesterday, today, 0, 5);
         List<RegionAllPostDto> regionAllPostDto = findAllRegionPostByRecommendCount.stream()
                 .map(p -> new RegionAllPostDto(
                         p.getId(),
@@ -208,7 +208,7 @@ public class PostApiController {
                 )).collect(Collectors.toList());
 
         // 전체 아닌 지역 게시글 5개
-        List<Post> findRegionNotAllPostByRecommendCount = postApiRepository.findRegionNotAllPostByRecommendCount(yesterday, today);
+        List<Post> findRegionNotAllPostByRecommendCount = postApiRepository.findRegionNotAllPostByRecommendCount(yesterday, today, 0, 5);
         List<RegionNotAllPostDto> regionNotAllPostDto = findRegionNotAllPostByRecommendCount.stream()
                 .map(p -> new RegionNotAllPostDto(
                         p.getId(),
