@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PostsResponse {
 
+    private Long postId;
     private String nickName;
     private String title;
     private LocalDateTime lastModifiedDate;
