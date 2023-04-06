@@ -19,13 +19,16 @@ import community.independe.service.VideoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,6 +44,9 @@ public class PostApiController {
     private final KeywordService keywordService;
     private final VideoService videoService;
     private final PostApiRepository postApiRepository;
+
+    @Value("${file.dir}")
+    private String fileDir;
 
     // 자취 게시글 카테고리로 불러오기
     @GetMapping("/api/posts/independent/{type}")
@@ -58,6 +64,7 @@ public class PostApiController {
 
         List<PostsResponse> postsCollect = independentPosts.stream()
                 .map(p -> new PostsResponse(
+                        p.getId(),
                         p.getMember().getNickname(),
                         p.getTitle(),
                         p.getLastModifiedDate(),
@@ -113,6 +120,7 @@ public class PostApiController {
 
         List<PostsResponse> collect = regionPosts.stream()
                 .map(p -> new PostsResponse(
+                        p.getId(),
                         p.getMember().getNickname(),
                         p.getTitle(),
                         p.getLastModifiedDate(),
@@ -126,15 +134,25 @@ public class PostApiController {
     }
 
     // 지역 게시글 생성
-    @PostMapping("/api/posts/region/new")
-    public ResponseEntity<Long> createRegionPost(@RequestBody @Valid CreateRegionPostRequest request,
-                                                 @AuthenticationPrincipal Member member) {
+    @PostMapping(value = "/api/posts/region/new", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<Long> createRegionPost(@RequestParam String title,
+                                                 @RequestParam String content,
+                                                 @RequestParam RegionType regionType,
+                                                 @RequestParam RegionPostType regionPostType,
+                                                 @RequestParam(required = false) List<MultipartFile> files,
+                                                 @AuthenticationPrincipal Member member){
+
+        log.info("fileDir : {}", fileDir);
+        if (!files.isEmpty()) {
+        }
+
         Long regionPost = postService.createRegionPost(
-                member.getId(),
-                request.getTitle(),
-                request.getContent(),
-                request.getRegionType(),
-                request.getRegionPostType()
+//                member.getId(),
+                1L,
+                title,
+                content,
+                regionType,
+                regionPostType
         );
 
         return ResponseEntity.ok(regionPost);
@@ -178,6 +196,9 @@ public class PostApiController {
                         (p.getIndependentPostType() == null) ? null : p.getIndependentPostType().getDescription(),
                         (p.getRegionType() == null) ? null : p.getRegionType().getDescription(),
                         (p.getRegionPostType() == null) ? null : p.getRegionPostType().getDescription(),
+                        p.getIndependentPostType(),
+                        p.getRegionType(),
+                        p.getRegionPostType(),
                         p.getViews(),
                         p.getRecommendCount(),
                         commentService.countAllByPostId(p.getId()),
@@ -191,6 +212,7 @@ public class PostApiController {
                         p.getId(),
                         p.getTitle(),
                         p.getIndependentPostType().getDescription(),
+                        p.getIndependentPostType(),
                         p.getRecommendCount(),
                         commentService.countAllByPostId(p.getId())
                         , true
@@ -215,6 +237,8 @@ public class PostApiController {
                         p.getTitle(),
                         p.getRegionType().getDescription(),
                         p.getRegionPostType().getDescription(),
+                        p.getRegionType(),
+                        p.getRegionPostType(),
                         p.getRecommendCount(),
                         commentService.countAllByPostId(p.getId()),
                         true

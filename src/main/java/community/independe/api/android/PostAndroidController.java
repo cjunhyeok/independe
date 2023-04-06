@@ -44,6 +44,9 @@ public class PostAndroidController {
                         (p.getIndependentPostType() == null) ? null : p.getIndependentPostType().getDescription(),
                         (p.getRegionType() == null) ? null : p.getRegionType().getDescription(),
                         (p.getRegionPostType() == null) ? null : p.getRegionPostType().getDescription(),
+                        p.getIndependentPostType(),
+                        p.getRegionType(),
+                        p.getRegionPostType(),
                         p.getViews(),
                         p.getRecommendCount(),
                         commentService.countAllByPostId(p.getId()),
@@ -57,6 +60,7 @@ public class PostAndroidController {
                         p.getId(),
                         p.getTitle(),
                         p.getIndependentPostType().getDescription(),
+                        p.getIndependentPostType(),
                         p.getRecommendCount(),
                         commentService.countAllByPostId(p.getId())
                         , true
@@ -81,6 +85,8 @@ public class PostAndroidController {
                         p.getTitle(),
                         p.getRegionType().getDescription(),
                         p.getRegionPostType().getDescription(),
+                        p.getRegionType(),
+                        p.getRegionPostType(),
                         p.getRecommendCount(),
                         commentService.countAllByPostId(p.getId()),
                         true
