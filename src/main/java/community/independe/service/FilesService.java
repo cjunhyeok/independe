@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
-public interface FileService {
+public interface FilesService {
 
     List<Files> saveFiles(List<MultipartFile> multipartFiles, Long postId) throws IOException;
 }

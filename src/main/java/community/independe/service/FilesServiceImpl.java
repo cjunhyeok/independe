@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class FileServiceImpl implements FileService{
+public class FilesServiceImpl implements FilesService {
 
     private final String fileDir;
     private final FilesRepository filesRepository;
     private final PostRepository postRepository;
 
-    public FileServiceImpl(@Value("${file.dir}") String fileDir, FilesRepository filesRepository, PostRepository postRepository) {
+    public FilesServiceImpl(@Value("${file.dir}") String fileDir, FilesRepository filesRepository, PostRepository postRepository) {
         this.fileDir = fileDir;
         this.filesRepository = filesRepository;
         this.postRepository = postRepository;
