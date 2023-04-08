@@ -31,11 +31,12 @@ public class FilesServiceImpl implements FilesService {
         this.postRepository = postRepository;
     }
 
-    public String getFullPath(String filename, Long postId) {
-        return fileDir + "/" + postId + "/" + filename;
+    public String getFullPath(String filename) {
+        return fileDir + filename;
     }
 
     @Override
+    @Transactional
     public List<Files> saveFiles(List<MultipartFile> multipartFiles, Long postId) throws IOException {
 
         Post findPost = postRepository.findById(postId)
@@ -66,7 +67,7 @@ public class FilesServiceImpl implements FilesService {
 
         String originalFilename = multipartFile.getOriginalFilename();
         String storeFilename = createStoreFilename(originalFilename);
-        String fullPath = getFullPath(storeFilename, findPost.getId());
+        String fullPath = getFullPath(storeFilename);
         multipartFile.transferTo(new File(fullPath));
         return Files.builder()
                 .uploadFilename(originalFilename)

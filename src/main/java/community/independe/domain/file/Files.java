@@ -14,8 +14,7 @@ import static jakarta.persistence.FetchType.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Files {
 
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue
     @Column(name = "file_id")
     private Long id;
 
