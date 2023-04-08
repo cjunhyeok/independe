@@ -12,14 +12,10 @@ import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.domain.video.Video;
 import community.independe.repository.query.PostApiRepository;
-import community.independe.service.CommentService;
-import community.independe.service.KeywordService;
-import community.independe.service.PostService;
-import community.independe.service.VideoService;
+import community.independe.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,6 +26,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,9 +41,7 @@ public class PostApiController {
     private final KeywordService keywordService;
     private final VideoService videoService;
     private final PostApiRepository postApiRepository;
-
-    @Value("${file.dir}")
-    private String fileDir;
+    private final FilesService filesService;
 
     // 자취 게시글 카테고리로 불러오기
     @GetMapping("/api/posts/independent/{type}")
@@ -140,20 +135,18 @@ public class PostApiController {
                                                  @RequestParam RegionType regionType,
                                                  @RequestParam RegionPostType regionPostType,
                                                  @RequestParam(required = false) List<MultipartFile> files,
-                                                 @AuthenticationPrincipal Member member){
-
-        log.info("fileDir : {}", fileDir);
-        if (!files.isEmpty()) {
-        }
+                                                 @AuthenticationPrincipal Member member) throws IOException {
 
         Long regionPost = postService.createRegionPost(
 //                member.getId(),
-                1L,
+                1L, // for test
                 title,
                 content,
                 regionType,
                 regionPostType
         );
+
+        filesService.saveFiles(files, regionPost);
 
         return ResponseEntity.ok(regionPost);
     }
