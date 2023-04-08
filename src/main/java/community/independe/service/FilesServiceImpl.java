@@ -4,7 +4,10 @@ import community.independe.domain.file.Files;
 import community.independe.domain.post.Post;
 import community.independe.repository.PostRepository;
 import community.independe.repository.file.FilesRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -13,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Service
+@Transactional(readOnly = true)
+@Slf4j
 public class FilesServiceImpl implements FilesService {
 
     private final String fileDir;
@@ -38,7 +44,7 @@ public class FilesServiceImpl implements FilesService {
         List<Files> files = new ArrayList<>();
 
         for (MultipartFile multipartFile : multipartFiles) {
-            if (multipartFile.isEmpty()) {
+            if (!multipartFile.isEmpty()) {
                 Files saveFilesBeforeRepository = saveFile(multipartFile, findPost);
                 Files saveFiles = filesRepository.save(saveFilesBeforeRepository);
                 files.add(saveFiles);
@@ -46,6 +52,11 @@ public class FilesServiceImpl implements FilesService {
         }
 
         return files;
+    }
+
+    @Override
+    public List<Files> findAllFilesByPostId(Long postId) {
+        return filesRepository.findAllFilesByPostId(postId);
     }
 
     private Files saveFile(MultipartFile multipartFile, Post findPost) throws IOException {
