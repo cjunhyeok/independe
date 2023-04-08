@@ -4,6 +4,7 @@ import community.independe.api.dtos.Result;
 import community.independe.api.dtos.post.*;
 import community.independe.api.dtos.post.main.*;
 import community.independe.domain.comment.Comment;
+import community.independe.domain.file.Files;
 import community.independe.domain.keyword.KeywordDto;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
@@ -160,8 +161,9 @@ public class PostApiController {
         // 증가 이후 찾기
         Post findPost = postService.findById(postId);
         List<Comment> findComments = commentService.findAllByPostId(postId);
+        List<Files> findFiles = filesService.findAllFilesByPostId(postId);
 
-        PostResponse postResponse = new PostResponse(findPost, findComments);
+        PostResponse postResponse = new PostResponse(findPost, findComments, findFiles);
         return new Result(postResponse);
     }
 
