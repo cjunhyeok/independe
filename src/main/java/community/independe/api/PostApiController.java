@@ -165,7 +165,7 @@ public class PostApiController {
     // 게시글 1개 구체정보 가져오기
     @Operation(summary = "게시글 상세 조회")
     @GetMapping("/api/posts/{postId}")
-    public Result post(@PathVariable(name = "postId") Long postId) {
+    public Result post(@Parameter(description = "게시글 ID(PK)")@PathVariable(name = "postId") Long postId) {
 
         postService.increaseViews(postId); // 조회수 증가
 
