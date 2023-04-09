@@ -2,6 +2,7 @@ package community.independe.api;
 
 import community.independe.api.dtos.member.CreateMemberRequest;
 import community.independe.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ public class MemberApiController {
 
     private final MemberService memberService;
 
+    @Operation(summary = "회원 등록 요청")
     @PostMapping("/api/members/new")
     public ResponseEntity<Long> createMember(@RequestBody @Valid CreateMemberRequest request) {
 
