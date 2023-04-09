@@ -14,6 +14,8 @@ import community.independe.domain.post.enums.RegionType;
 import community.independe.domain.video.Video;
 import community.independe.repository.query.PostApiRepository;
 import community.independe.service.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +47,7 @@ public class PostApiController {
     private final FilesService filesService;
 
     // 자취 게시글 카테고리로 불러오기
+    @Operation(summary = "자취 게시글 타입별 조회")
     @GetMapping("/api/posts/independent/{type}")
     public Result independentPosts(@PathVariable(name = "type") IndependentPostType independentPostType,
                                    @PageableDefault(
@@ -88,6 +91,7 @@ public class PostApiController {
     }
 
     // 자취 게시글 생성
+    @Operation(summary = "자취 게시글 생성")
     @PostMapping("/api/posts/independent/new")
     public ResponseEntity<Long> createIndependentPost(@RequestBody @Valid CreateIndependentPostRequest request,
                                                       @AuthenticationPrincipal Member member) {
@@ -102,6 +106,7 @@ public class PostApiController {
     }
 
     // 지역 게시글 카테고리 별로 가져오기
+    @Operation(summary = "지역 게시글 타입별 조회")
     @GetMapping("/api/posts/region/{regionType}/{regionPostType}")
     public Result regionPosts(@PathVariable(name = "regionType") RegionType regionType,
                               @PathVariable(name = "regionPostType") RegionPostType regionPostType,
@@ -130,12 +135,13 @@ public class PostApiController {
     }
 
     // 지역 게시글 생성
+    @Operation(summary = "지역 게시글 생성")
     @PostMapping(value = "/api/posts/region/new", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Long> createRegionPost(@RequestParam String title,
-                                                 @RequestParam String content,
-                                                 @RequestParam RegionType regionType,
-                                                 @RequestParam RegionPostType regionPostType,
-                                                 @RequestParam(required = false) List<MultipartFile> files,
+    public ResponseEntity<Long> createRegionPost(@Parameter(description = "제목") @RequestParam String title,
+                                                 @Parameter(description = "내용") @RequestParam String content,
+                                                 @Parameter(description = "지역 타입") @RequestParam RegionType regionType,
+                                                 @Parameter(description = "지역 게시글 타입") @RequestParam RegionPostType regionPostType,
+                                                 @Parameter(description = "이미지") @RequestParam(required = false) List<MultipartFile> files,
                                                  @AuthenticationPrincipal Member member) throws IOException {
 
         Long regionPost = postService.createRegionPost(
@@ -153,6 +159,7 @@ public class PostApiController {
     }
 
     // 게시글 1개 구체정보 가져오기
+    @Operation(summary = "게시글 상세 조회")
     @GetMapping("/api/posts/{postId}")
     public Result post(@PathVariable(name = "postId") Long postId) {
 
@@ -175,6 +182,7 @@ public class PostApiController {
 //        return ResponseEntity.ok("Ok");
 //    }
 
+    @Operation(summary = "메인화면 조회")
     @GetMapping("/api/posts/main")
     public Result mainPost() {
 
