@@ -24,19 +24,21 @@ public class PostResponse {
     private String title;
     private String content;
     private String nickname;
-    private LocalDateTime lastModifiedDate;
+    private LocalDateTime createdDate;
     private Integer views;
     private Integer recommendCount;
+    private Long commentCount;
     private List<PostCommentResponse> comments;
     private List<byte[]> files;
 
-    public PostResponse(Post post, List<Comment> comments, List<Files> files) {
+    public PostResponse(Post post, List<Comment> comments, List<Files> files, Long commentCount) {
         this.title = post.getTitle();
         this.content = post.getContent();
         this.nickname = post.getMember().getNickname();
-        this.lastModifiedDate = post.getLastModifiedDate();
+        this.createdDate = post.getCreatedDate();
         this.views = post.getViews();
         this.recommendCount = post.getRecommendCount();
+        this.commentCount = commentCount;
         this.comments = comments.stream()
                 .map(PostCommentResponse::new)
                 .collect(Collectors.toList());

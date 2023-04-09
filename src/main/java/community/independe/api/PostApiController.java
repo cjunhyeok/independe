@@ -174,7 +174,7 @@ public class PostApiController {
         List<Comment> findComments = commentService.findAllByPostId(postId);
         List<Files> findFiles = filesService.findAllFilesByPostId(postId);
 
-        PostResponse postResponse = new PostResponse(findPost, findComments, findFiles);
+        PostResponse postResponse = new PostResponse(findPost, findComments, findFiles, commentService.countAllByPostId(postId));
         return new Result(postResponse);
     }
 
