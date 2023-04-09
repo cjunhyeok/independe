@@ -16,7 +16,6 @@ import community.independe.repository.query.PostApiRepository;
 import community.independe.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -93,14 +92,19 @@ public class PostApiController {
     // 자취 게시글 생성
     @Operation(summary = "자취 게시글 생성")
     @PostMapping("/api/posts/independent/new")
-    public ResponseEntity<Long> createIndependentPost(@RequestBody @Valid CreateIndependentPostRequest request,
-                                                      @AuthenticationPrincipal Member member) {
+    public ResponseEntity<Long> createIndependentPost(@Parameter(description = "제목") @RequestParam String title,
+                                                      @Parameter(description = "내용") @RequestParam String content,
+                                                      @Parameter(description = "자취 타입") @RequestParam IndependentPostType independentPostType,
+                                                      @Parameter(description = "이미지") @RequestParam(required = false) List<MultipartFile> files,
+                                                      @AuthenticationPrincipal Member member) throws IOException {
 
         Long independentPost = postService.createIndependentPost(
                 member.getId(),
-                request.getTitle(),
-                request.getContent(),
-                request.getIndependentPostType());
+                title,
+                content,
+                independentPostType);
+
+        filesService.saveFiles(files, independentPost);
 
         return ResponseEntity.ok(independentPost);
     }
