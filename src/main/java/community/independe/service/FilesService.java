@@ -11,4 +11,6 @@ public interface FilesService {
     List<Files> saveFiles(List<MultipartFile> multipartFiles, Long postId) throws IOException;
 
     List<Files> findAllFilesByPostId(Long postId);
+
+    Files findById(Long filesId);
 }

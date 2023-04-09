@@ -60,6 +60,12 @@ public class FilesServiceImpl implements FilesService {
         return filesRepository.findAllFilesByPostId(postId);
     }
 
+    @Override
+    public Files findById(Long filesId) {
+        return filesRepository.findById(filesId)
+                .orElseThrow(() -> new IllegalArgumentException("post not exist"));
+    }
+
     private Files saveFile(MultipartFile multipartFile, Post findPost) throws IOException {
         if (multipartFile.isEmpty()) {
             return null;
