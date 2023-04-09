@@ -65,7 +65,7 @@ public class PostApiController {
                         p.getId(),
                         p.getMember().getNickname(),
                         p.getTitle(),
-                        p.getLastModifiedDate(),
+                        p.getCreatedDate(),
                         p.getViews(),
                         p.getRecommendCount(),
                         commentService.countAllByPostId(p.getId())
@@ -128,7 +128,7 @@ public class PostApiController {
                         p.getId(),
                         p.getMember().getNickname(),
                         p.getTitle(),
-                        p.getLastModifiedDate(),
+                        p.getCreatedDate(),
                         p.getViews(),
                         p.getRecommendCount(),
                         commentService.countAllByPostId(p.getId())

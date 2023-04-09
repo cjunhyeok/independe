@@ -13,7 +13,7 @@ public class PostCommentResponse {
     private Long commentId;
     private String nickname;
     private String content;
-    private LocalDateTime lastModifiedDate;
+    private LocalDateTime createdDate;
     private Integer recommendCount;
     private Long parentId;
 
@@ -21,7 +21,7 @@ public class PostCommentResponse {
         this.commentId = comment.getId();
         this.nickname = comment.getMember().getNickname();
         this.content = comment.getContent();
-        this.lastModifiedDate = comment.getLastModifiedDate();
+        this.createdDate = comment.getCreatedDate();
         this.recommendCount = comment.getRecommendCount();
         if (comment.getParent() == null) {
             this.parentId = null;
