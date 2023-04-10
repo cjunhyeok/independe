@@ -47,8 +47,8 @@ public class PostApiController {
 
     // 자취 게시글 카테고리로 불러오기
     @Operation(summary = "자취 게시글 타입별 조회")
-    @GetMapping("/api/posts/independent/{type}")
-    public Result independentPosts(@PathVariable(name = "type") IndependentPostType independentPostType,
+    @GetMapping("/api/posts/independent/{independentPostType}")
+    public Result independentPosts(@PathVariable(name = "independentPostType") IndependentPostType independentPostType,
                                    @PageableDefault(
                                            size = 10,
                                            sort = "createdDate",

@@ -36,8 +36,8 @@ public class PostAndroidController {
     private final VideoService videoService;
     private final PostApiRepository postApiRepository;
 
-    @GetMapping("/api/android/posts/independent/{type}")
-    public Result androidIndependentPosts(@PathVariable(name = "type")IndependentPostType independentPostType,
+    @GetMapping("/api/android/posts/independent/{independentPostType}")
+    public Result androidIndependentPosts(@PathVariable(name = "independentPostType")IndependentPostType independentPostType,
                                           @PageableDefault(
                                            size = 10,
                                            sort = "createdDate",
