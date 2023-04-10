@@ -166,6 +166,17 @@ public class InitDB {
                 );
             }
 
+            for (int i = 1; i <= 22; i++) {
+                postRepository.save(
+                        Post.builder()
+                                .title("testIndependent" + i)
+                                .content("independentContent" + i)
+                                .member(member2)
+                                .independentPostType(IndependentPostType.HEALTH)
+                                .build()
+                );
+            }
+
             Comment comment1 = Comment.builder()
                     .content("comment1")
                     .member(member)
