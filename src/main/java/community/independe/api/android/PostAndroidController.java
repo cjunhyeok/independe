@@ -1,10 +1,12 @@
 package community.independe.api.android;
 
 import community.independe.api.android.dto.AndroidMainPostDto;
+import community.independe.api.android.dto.AndroidIndependentPostsResponse;
 import community.independe.api.android.dto.TestDto;
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.post.main.*;
 import community.independe.domain.post.Post;
+import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.video.Video;
 import community.independe.repository.query.PostApiRepository;
 import community.independe.service.CommentService;
@@ -12,7 +14,12 @@ import community.independe.service.PostService;
 import community.independe.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -29,8 +36,57 @@ public class PostAndroidController {
     private final VideoService videoService;
     private final PostApiRepository postApiRepository;
 
+    @GetMapping("/api/android/posts/independent/{type}")
+    public Result androidIndependentPosts(@PathVariable(name = "type")IndependentPostType independentPostType,
+                                          @PageableDefault(
+                                           size = 10,
+                                           sort = "createdDate",
+                                           direction = Sort.Direction.DESC)Pageable pageable) {
+
+        // 게시글 불러오기
+        Slice allIndependentPostsSlice = postService.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
+
+        // 현재 페이지에 나올 데이터 수
+        int numberOfElements = allIndependentPostsSlice.getNumberOfElements();
+        // 조회된 데이터
+        List<Post> allIndependentPosts = allIndependentPostsSlice.getContent();
+        // 다음 페이지 여부
+        boolean hasLastPage = allIndependentPostsSlice.hasNext();
+        // 마지막 페이지 여부
+        boolean isLastPage = allIndependentPostsSlice.isLast();
+        // 현재 페이지 여부
+        boolean isFirstPage = allIndependentPostsSlice.isFirst();
+        // 현재 페이지 넘버
+        Integer pageNumber = pageable.getPageNumber();
+
+        // 마지막 페이지가 아니고 다음 페이지가 있으면 다음 페이지 ++
+        if (hasLastPage) {
+            pageNumber++;
+        }
+
+        Integer finalPageNumber = pageNumber;
+        List<AndroidIndependentPostsResponse> collect = allIndependentPosts.stream()
+                .map(c -> new AndroidIndependentPostsResponse(
+                        c.getId(),
+                        c.getMember().getNickname(),
+                        c.getTitle(),
+                        c.getCreatedDate(),
+                        c.getViews(),
+                        c.getRecommendCount(),
+                        commentService.countAllByPostId(c.getId()),
+                        numberOfElements,
+                        hasLastPage,
+                        isFirstPage,
+                        isLastPage,
+                        finalPageNumber
+                )).collect(Collectors.toList());
+
+        return new Result(collect);
+
+    }
+
     @GetMapping("/api/android/posts/main")
-    public Result mainPost() {
+    public Result androidMainPost() {
 
         LocalDateTime today = LocalDateTime.now(); // 오늘
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1); // 어제
