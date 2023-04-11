@@ -104,7 +104,9 @@ public class PostApiController {
                 content,
                 independentPostType);
 
-        filesService.saveFiles(files, independentPost);
+        if (files != null) {
+            filesService.saveFiles(files, independentPost);
+        }
 
         return ResponseEntity.ok(independentPost);
     }
@@ -157,7 +159,9 @@ public class PostApiController {
                 regionPostType
         );
 
-        filesService.saveFiles(files, regionPost);
+        if(files != null) {
+            filesService.saveFiles(files, regionPost);
+        }
 
         return ResponseEntity.ok(regionPost);
     }
