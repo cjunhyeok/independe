@@ -18,4 +18,5 @@ public class PostsResponse {
     private Integer views; // 조회수
     private Integer recommendCount; // 추천수
     private Long commentCount; // 댓글수
+    private boolean isPicture;
 }

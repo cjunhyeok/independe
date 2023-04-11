@@ -68,7 +68,8 @@ public class PostApiController {
                         p.getCreatedDate(),
                         p.getViews(),
                         p.getRecommendCount(),
-                        commentService.countAllByPostId(p.getId())
+                        commentService.countAllByPostId(p.getId()),
+                        !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 ))
                 .collect(Collectors.toList());
 
@@ -133,7 +134,8 @@ public class PostApiController {
                         p.getCreatedDate(),
                         p.getViews(),
                         p.getRecommendCount(),
-                        commentService.countAllByPostId(p.getId())
+                        commentService.countAllByPostId(p.getId()),
+                        !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 ))
                 .collect(Collectors.toList());
 
