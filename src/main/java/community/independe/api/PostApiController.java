@@ -92,7 +92,7 @@ public class PostApiController {
 
     // 자취 게시글 생성
     @Operation(summary = "자취 게시글 생성")
-    @PostMapping("/api/posts/independent/new")
+    @PostMapping(value = "/api/posts/independent/new", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Long> createIndependentPost(@Parameter(description = "제목") @RequestParam String title,
                                                       @Parameter(description = "내용") @RequestParam String content,
                                                       @Parameter(description = "자취 타입") @RequestParam IndependentPostType independentPostType,
@@ -100,7 +100,8 @@ public class PostApiController {
                                                       @AuthenticationPrincipal Member member) throws IOException {
 
         Long independentPost = postService.createIndependentPost(
-                member.getId(),
+//                member.getId(),
+                2L,
                 title,
                 content,
                 independentPostType);
@@ -184,13 +185,13 @@ public class PostApiController {
         return new Result(postResponse);
     }
 
-//    @PostMapping("/api/posts/recommendCount/{postId}")
-//    public ResponseEntity increaseOrDecreaseRecommendCount(@PathVariable(name = "postId") Long postId,
-//                                                           @RequestBody Boolean isUp) {
-//        postService.increaseOrDecreaseRecommendCount(postId, isUp);
-//
-//        return ResponseEntity.ok("Ok");
-//    }
+    @PostMapping("/api/posts/recommend/{postId}")
+    public ResponseEntity increaseOrDecreaseRecommendCount(@PathVariable(name = "postId") Long postId,
+                                                           @RequestBody Boolean isUp) {
+        postService.increaseOrDecreaseRecommendCount(postId, isUp);
+
+        return ResponseEntity.ok("Ok");
+    }
 
     @Operation(summary = "메인화면 조회")
     @GetMapping("/api/posts/main")
