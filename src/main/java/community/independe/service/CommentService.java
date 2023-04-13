@@ -1,5 +1,6 @@
 package community.independe.service;
 
+import community.independe.api.dtos.IsUpDto;
 import community.independe.domain.comment.Comment;
 
 import java.util.List;
@@ -16,5 +17,5 @@ public interface CommentService {
 
     List<Comment> findAllByPostId(Long postId);
 
-    void increaseOrDecreaseRecommendCount(Long commentId ,boolean isUp);
+    void increaseOrDecreaseRecommendCount(Long commentId , IsUpDto isUp);
 }

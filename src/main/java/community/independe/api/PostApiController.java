@@ -1,5 +1,6 @@
 package community.independe.api;
 
+import community.independe.api.dtos.IsUpDto;
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.post.*;
 import community.independe.api.dtos.post.main.*;
@@ -188,7 +189,7 @@ public class PostApiController {
     @Operation(summary = "추천수 증감")
     @PostMapping("/api/posts/recommend/{postId}")
     public ResponseEntity increaseOrDecreaseRecommendCount(@PathVariable(name = "postId") Long postId,
-                                                           @RequestBody Boolean isUp) {
+                                                           @RequestBody IsUpDto isUp) {
         postService.increaseOrDecreaseRecommendCount(postId, isUp);
 
         return ResponseEntity.ok("Ok");
