@@ -82,4 +82,18 @@ public class CommentServiceImpl implements CommentService{
     public List<Comment> findAllByPostId(Long postId) {
         return commentRepository.findAllByPostId(postId);
     }
+
+    @Override
+    public void increaseOrDecreaseRecommendCount(Long commentId, boolean isUp) {
+        Comment findComment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not exist"));
+
+        if (isUp) {
+            findComment.increaseRecommendCount(findComment.getRecommendCount() + 1);
+        } else if (isUp == false && (findComment.getRecommendCount() <= 0)){
+            throw new IllegalArgumentException("Recommend Count can't be negative number");
+        } else if (isUp == false && (findComment.getRecommendCount()) > 0) {
+            findComment.decreaseRecommendCount(findComment.getRecommendCount() - 1);
+        }
+    }
 }

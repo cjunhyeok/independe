@@ -15,4 +15,6 @@ public interface CommentService {
     Long countAllByPostId(Long postId);
 
     List<Comment> findAllByPostId(Long postId);
+
+    void increaseOrDecreaseRecommendCount(Long commentId ,boolean isUp);
 }
