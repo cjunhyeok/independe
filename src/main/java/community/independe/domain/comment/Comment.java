@@ -26,7 +26,7 @@ public class Comment extends BaseEntity {
     @Column(columnDefinition = "text") // 텍스트 타입
     private String content;
 
-    private Integer recommendCount; // 추천수
+    private int recommendCount; // 추천수
 
     //== 계층형 댓글 ==//
     @ManyToOne(fetch = LAZY)
@@ -48,11 +48,21 @@ public class Comment extends BaseEntity {
 
     //== 생성 ==//
     @Builder
-    public Comment(String content, Integer recommendCount, Member member, Post post, Comment parent) {
+    public Comment(String content, Member member, Post post, Comment parent) {
         this.content = content;
-        this.recommendCount = recommendCount;
         this.member = member;
         this.post = post;
         this.parent = parent;
+        this.recommendCount = 0;
+    }
+
+    // 추천수 증가
+    public void increaseRecommendCount(int recommendCount) {
+        this.recommendCount = recommendCount;
+    }
+
+    // 추천주 감소
+    public void decreaseRecommendCount(int recommendCount) {
+        this.recommendCount = recommendCount;
     }
 }
