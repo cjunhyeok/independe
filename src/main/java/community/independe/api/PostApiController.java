@@ -1,6 +1,5 @@
 package community.independe.api;
 
-import community.independe.api.dtos.IsUpDto;
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.post.*;
 import community.independe.api.dtos.post.main.*;
@@ -68,7 +67,7 @@ public class PostApiController {
                         p.getTitle(),
                         p.getCreatedDate(),
                         p.getViews(),
-                        p.getRecommendCount(),
+                        0,
                         commentService.countAllByPostId(p.getId()),
                         !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 ))
@@ -135,7 +134,7 @@ public class PostApiController {
                         p.getTitle(),
                         p.getCreatedDate(),
                         p.getViews(),
-                        p.getRecommendCount(),
+                        0,
                         commentService.countAllByPostId(p.getId()),
                         !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 ))
@@ -186,15 +185,6 @@ public class PostApiController {
         return new Result(postResponse);
     }
 
-    @Operation(summary = "추천수 증감")
-    @PostMapping("/api/posts/recommend/{postId}")
-    public ResponseEntity increaseOrDecreaseRecommendCount(@PathVariable(name = "postId") Long postId,
-                                                           @RequestBody IsUpDto isUp) {
-        postService.increaseOrDecreaseRecommendCount(postId, isUp);
-
-        return ResponseEntity.ok("Ok");
-    }
-
     @Operation(summary = "메인화면 조회")
     @GetMapping("/api/posts/main")
     public Result mainPost() {
@@ -216,7 +206,7 @@ public class PostApiController {
                         p.getRegionType(),
                         p.getRegionPostType(),
                         p.getViews(),
-                        p.getRecommendCount(),
+                        0,
                         commentService.countAllByPostId(p.getId()),
                         !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 )).collect(Collectors.toList());
@@ -229,7 +219,7 @@ public class PostApiController {
                         p.getTitle(),
                         p.getIndependentPostType().getDescription(),
                         p.getIndependentPostType(),
-                        p.getRecommendCount(),
+                        0,
                         commentService.countAllByPostId(p.getId()),
                         !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 )).collect(Collectors.toList());
@@ -240,7 +230,7 @@ public class PostApiController {
                 .map(p -> new RegionAllPostDto(
                         p.getId(),
                         p.getTitle(),
-                        p.getRecommendCount(),
+                        0,
                         commentService.countAllByPostId(p.getId()),
                         !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 )).collect(Collectors.toList());
@@ -255,7 +245,7 @@ public class PostApiController {
                         p.getRegionPostType().getDescription(),
                         p.getRegionType(),
                         p.getRegionPostType(),
-                        p.getRecommendCount(),
+                        0,
                         commentService.countAllByPostId(p.getId()),
                         !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 )).collect(Collectors.toList());

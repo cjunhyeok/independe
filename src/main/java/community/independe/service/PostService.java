@@ -1,6 +1,5 @@
 package community.independe.service;
 
-import community.independe.api.dtos.IsUpDto;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
@@ -28,6 +27,4 @@ public interface PostService {
                                                    Pageable pageable);
 
     void increaseViews(Long postId);
-
-    void increaseOrDecreaseRecommendCount(Long postId , IsUpDto isUp);
 }

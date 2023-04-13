@@ -22,8 +22,7 @@ public class Post extends BaseEntity {
 
     private String title;
     private int views; // 조회수
-    private int recommendCount; // 추천수
-    private int reportCount;
+
     @Column(columnDefinition = "text") // 텍스트 타입
     private String content;
 
@@ -50,22 +49,10 @@ public class Post extends BaseEntity {
         this.regionPostType = regionPostType;
         this.member = member;
         this.views = 0;
-        this.recommendCount = 0;
-        this.reportCount = 0;
     }
 
     // 조회수 증가
     public void increaseViews(int views) {
         this.views = views;
-    }
-
-    // 추천수 증감
-    public void increaseOrDecreaseRecommendCount(int recommendCount) {
-        this.recommendCount = recommendCount;
-    }
-
-    // 신고수 증감
-    public void increaseOrDecreaseReportCount(int reportCount) {
-        this.reportCount = reportCount;
     }
 }

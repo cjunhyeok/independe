@@ -1,6 +1,5 @@
 package community.independe.service;
 
-import community.independe.api.dtos.IsUpDto;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
@@ -86,21 +85,5 @@ public class PostServiceImpl implements PostService{
                 .orElseThrow(() -> new IllegalArgumentException("Id not exist"));
 
         findPost.increaseViews(findPost.getViews() + 1);
-    }
-
-    @Override
-    @Transactional
-    public void increaseOrDecreaseRecommendCount(Long postId, IsUpDto isUp) {
-        Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Id not exist"));
-
-        if (isUp.getIsUp()) {
-            log.info("recommendCount = ");
-            findPost.increaseOrDecreaseRecommendCount(findPost.getRecommendCount() + 1);
-        } else if (isUp.getIsUp() == false && (findPost.getRecommendCount() <= 0)){
-            throw new IllegalArgumentException("Recommend Count can't be negative number");
-        } else if (isUp.getIsUp() == false && (findPost.getRecommendCount()) > 0) {
-            findPost.increaseOrDecreaseRecommendCount(findPost.getRecommendCount() - 1);
-        }
     }
 }
