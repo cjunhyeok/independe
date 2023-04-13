@@ -1,6 +1,6 @@
 package community.independe.repository;
 
-import community.independe.domain.favorite.FavoritePost;
+import community.independe.domain.manytomany.FavoritePost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.RegionPostType;

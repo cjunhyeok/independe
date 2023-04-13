@@ -1,4 +1,4 @@
-package community.independe.domain.favorite;
+package community.independe.domain.manytomany;
 
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
