@@ -29,6 +29,8 @@ public class Member extends BaseEntity {
     @Embedded // 값 타입
     private Address address; // 주소
 
+    private Long favorites; // 즐겨찾기
+
     //== 생성 메서드 ==//
     @Builder
     public Member(String username, String password, String nickname, String role,
