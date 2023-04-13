@@ -185,6 +185,7 @@ public class PostApiController {
         return new Result(postResponse);
     }
 
+    @Operation(summary = "추천수 증감")
     @PostMapping("/api/posts/recommend/{postId}")
     public ResponseEntity increaseOrDecreaseRecommendCount(@PathVariable(name = "postId") Long postId,
                                                            @RequestBody Boolean isUp) {
