@@ -96,11 +96,11 @@ public class PostServiceImpl implements PostService{
 
         if (isUp.getIsUp()) {
             log.info("recommendCount = ");
-            findPost.increaseRecommendCount(findPost.getRecommendCount() + 1);
+            findPost.increaseOrDecreaseRecommendCount(findPost.getRecommendCount() + 1);
         } else if (isUp.getIsUp() == false && (findPost.getRecommendCount() <= 0)){
             throw new IllegalArgumentException("Recommend Count can't be negative number");
         } else if (isUp.getIsUp() == false && (findPost.getRecommendCount()) > 0) {
-            findPost.decreaseRecommendCount(findPost.getRecommendCount() - 1);
+            findPost.increaseOrDecreaseRecommendCount(findPost.getRecommendCount() - 1);
         }
     }
 }
