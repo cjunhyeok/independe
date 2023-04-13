@@ -59,7 +59,7 @@ public class Post extends BaseEntity {
 
     // 추천수 증가
     public void increaseRecommendCount(int recommendCount) {
-        this.recommendCount = recommendCount + 1;
+        this.recommendCount = recommendCount;
     }
 
     // 추천주 감소

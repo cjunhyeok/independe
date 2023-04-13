@@ -79,6 +79,7 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
+    @Transactional
     public void increaseViews(Long postId) {
         Post findPost = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Id not exist"));
@@ -87,15 +88,17 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
+    @Transactional
     public void increaseOrDecreaseRecommendCount(Long postId, boolean isUp) {
         Post findPost = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Id not exist"));
 
         if (isUp) {
+            log.info("recommendCount = ");
             findPost.increaseRecommendCount(findPost.getRecommendCount() + 1);
-        } else if (isUp != true && (findPost.getRecommendCount() <= 0)){
+        } else if (isUp == false && (findPost.getRecommendCount() <= 0)){
             throw new IllegalArgumentException("Recommend Count can't be negative number");
-        } else if (isUp != true && (findPost.getRecommendCount()) > 0) {
+        } else if (isUp == false && (findPost.getRecommendCount()) > 0) {
             findPost.decreaseRecommendCount(findPost.getRecommendCount() - 1);
         }
     }
