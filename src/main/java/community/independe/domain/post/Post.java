@@ -63,4 +63,9 @@ public class Post extends BaseEntity {
     public void increaseOrDecreaseRecommendCount(int recommendCount) {
         this.recommendCount = recommendCount;
     }
+
+    // 신고수 증감
+    public void increaseOrDecreaseReportCount(int reportCount) {
+        this.reportCount = reportCount;
+    }
 }
