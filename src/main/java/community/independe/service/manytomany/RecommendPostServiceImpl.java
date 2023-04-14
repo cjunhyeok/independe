@@ -40,4 +40,10 @@ public class RecommendPostServiceImpl implements RecommendPostService {
 
         return savedRecommendPost.getId();
     }
+
+    @Override
+    public RecommendPost findById(Long recommendPostId) {
+        return recommendPostRepository.findById(recommendPostId)
+                .orElseThrow(() -> new IllegalArgumentException("recommendPost not exist"));
+    }
 }
