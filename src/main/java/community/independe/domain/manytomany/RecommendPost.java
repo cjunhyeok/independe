@@ -36,4 +36,8 @@ public class RecommendPost extends BaseManyToManyEntity{
         this.post = post;
         this.isRecommend = isRecommend;
     }
+
+    public void updateIsRecommend(Boolean isRecommend) {
+        this.isRecommend = isRecommend;
+    }
 }
