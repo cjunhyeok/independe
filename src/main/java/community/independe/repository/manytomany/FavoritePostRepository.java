@@ -1,4 +1,4 @@
-package community.independe.repository;
+package community.independe.repository.manytomany;
 
 import community.independe.domain.manytomany.FavoritePost;
 import org.springframework.data.jpa.repository.JpaRepository;

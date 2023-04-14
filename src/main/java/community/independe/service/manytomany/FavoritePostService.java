@@ -1,4 +1,4 @@
-package community.independe.service;
+package community.independe.service.manytomany;
 
 public interface FavoritePostService {
 

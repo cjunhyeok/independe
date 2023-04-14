@@ -1,6 +1,7 @@
 package community.independe.service;
 
 import community.independe.domain.post.enums.IndependentPostType;
+import community.independe.service.manytomany.FavoritePostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +17,8 @@ public class FavoritePostServiceTest {
     private PostService postService;
     @Autowired
     private MemberService memberService;
-    @Autowired FavoritePostService favoritePostService;
+    @Autowired
+    FavoritePostService favoritePostService;
 
     @Test
     public void saveTest() {

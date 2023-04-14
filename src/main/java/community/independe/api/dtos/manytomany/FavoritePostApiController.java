@@ -1,7 +1,7 @@
-package community.independe.api;
+package community.independe.api.dtos.manytomany;
 
 import community.independe.domain.member.Member;
-import community.independe.service.FavoritePostService;
+import community.independe.service.manytomany.FavoritePostService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

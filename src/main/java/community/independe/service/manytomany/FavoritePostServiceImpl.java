@@ -1,9 +1,9 @@
-package community.independe.service;
+package community.independe.service.manytomany;
 
 import community.independe.domain.manytomany.FavoritePost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
-import community.independe.repository.FavoritePostRepository;
+import community.independe.repository.manytomany.FavoritePostRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class FavoritePostServiceImpl implements FavoritePostService{
+public class FavoritePostServiceImpl implements FavoritePostService {
 
     private final FavoritePostRepository favoritePostRepository;
     private final MemberRepository memberRepository;
