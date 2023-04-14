@@ -64,4 +64,9 @@ public class RecommendPostServiceImpl implements RecommendPostService {
         return recommendPostRepository.countAllByPostIdAndIsRecommend(postId);
     }
 
+    @Override
+    public RecommendPost findByPostIdAndMemberIdAndIsRecommend(Long postId, Long memberId) {
+        return recommendPostRepository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId);
+    }
+
 }

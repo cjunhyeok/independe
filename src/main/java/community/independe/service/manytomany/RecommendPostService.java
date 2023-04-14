@@ -13,4 +13,6 @@ public interface RecommendPostService {
     void updateIsRecommend(RecommendPost recommendPost ,Boolean isRecommend);
 
     Long countAllByPostIdAndIsRecommend(Long postId);
+
+    RecommendPost findByPostIdAndMemberIdAndIsRecommend(Long postId, Long memberId);
 }
