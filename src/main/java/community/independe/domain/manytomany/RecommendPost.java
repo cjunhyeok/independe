@@ -28,12 +28,12 @@ public class RecommendPost extends BaseManyToManyEntity{
     @JoinColumn(name = "post_id")
     private Post post;
 
-    private Boolean isFavorite;
+    private Boolean isRecommend;
 
     @Builder
     public RecommendPost(Member member, Post post) {
         this.member = member;
         this.post = post;
-        this.isFavorite = true;
+        this.isRecommend = true;
     }
 }
