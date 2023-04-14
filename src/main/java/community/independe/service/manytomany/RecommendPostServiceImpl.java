@@ -59,4 +59,9 @@ public class RecommendPostServiceImpl implements RecommendPostService {
         recommendPost.updateIsRecommend(isRecommend);
     }
 
+    @Override
+    public Long countAllByPostIdAndIsRecommend(Long postId) {
+        return recommendPostRepository.countAllByPostIdAndIsRecommend(postId);
+    }
+
 }
