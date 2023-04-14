@@ -23,7 +23,7 @@ public class RecommendPostApiController {
 
     @Operation(summary = "게시글 추천")
     @PostMapping("/api/recommendPost/{postId}")
-    public ResponseEntity<Long> addRecommendPost(@PathVariable(name = "postId") Long postId,
+    public ResponseEntity addRecommendPost(@PathVariable(name = "postId") Long postId,
                                                  @AuthenticationPrincipal Member member) {
 
 //        RecommendPost findRecommendPostByPost = recommendPostService.findByPostIdAndMemberId(postId, member.getId());
@@ -38,6 +38,6 @@ public class RecommendPostApiController {
             recommendPostService.updateIsRecommend(findRecommendPostByPost, false);
         }
 
-        return null;
+        return ResponseEntity.ok("OK");
     }
 }
