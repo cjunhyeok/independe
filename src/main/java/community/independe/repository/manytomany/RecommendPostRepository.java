@@ -7,12 +7,13 @@ import org.springframework.data.repository.query.Param;
 
 public interface RecommendPostRepository extends JpaRepository<RecommendPost, Long> {
 
-    @Query("select count(r) from RecommendPost r" +
+    @Query("select count(r) from RecommendPost r join fetch r.post" +
             " where r.post.id = :postId" +
             " and r.isRecommend = true")
     Long countAllByPostIdAndIsRecommend(@Param("postId") Long postId);
 
-    @Query(value = "select r from RecommendPost  r" +
+    @Query(value = "select r from RecommendPost  r join fetch r.post" +
+            " join fetch r.member" +
             " where r.post.id = :postId" +
             " and r.member.id = :memberId",
     countQuery = "select r from RecommendPost  r" +
@@ -20,4 +21,15 @@ public interface RecommendPostRepository extends JpaRepository<RecommendPost, Lo
             " and r.member.id = :memberId")
     RecommendPost findByPostIdAndMemberId(@Param("postId") Long postId,
                                           @Param("memberId") Long memberId);
+
+    @Query(value = "select r from RecommendPost  r" +
+            " where r.isRecommend = true" +
+            " and r.post.id = :postId" +
+            " and r.member.id = :memberId",
+    countQuery = "select r from RecommendPost r" +
+            " where r.isRecommend = true" +
+            " and r.post.id = :postId" +
+            " and r.member.id = :memberId")
+    RecommendPost findByPostIdAndMemberIdAndIsRecommend(@Param("postId") Long postId,
+                                                        @Param("memberId") Long memberId);
 }
