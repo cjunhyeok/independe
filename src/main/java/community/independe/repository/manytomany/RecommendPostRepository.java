@@ -11,4 +11,13 @@ public interface RecommendPostRepository extends JpaRepository<RecommendPost, Lo
             " where r.post.id = :postId" +
             " and r.isRecommend = true")
     Long countAllByPostIdAndIsRecommend(@Param("postId") Long postId);
+
+    @Query(value = "select r from RecommendPost  r" +
+            " where r.post.id = :postId" +
+            " and r.member.id = :memberId",
+    countQuery = "select r from RecommendPost  r" +
+            " where r.post.id = :postId" +
+            " and r.member.id = :memberId")
+    RecommendPost findByPostIdAndMemberId(@Param("postId") Long postId,
+                                          @Param("memberId") Long memberId);
 }
