@@ -8,14 +8,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FavoritePost {
+public class FavoritePost extends BaseManyToManyEntity {
 
     @Id @GeneratedValue
     @Column(name = "favorite_post_id")
@@ -29,14 +27,12 @@ public class FavoritePost {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    private LocalDateTime createdDate;
     private Boolean isFavorite;
 
     @Builder
     public FavoritePost(Member member, Post post) {
         this.member = member;
         this.post = post;
-        this.createdDate = LocalDateTime.now();
         this.isFavorite = true;
     }
 }
