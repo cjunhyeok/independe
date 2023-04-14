@@ -22,6 +22,7 @@ public class FavoritePostServiceImpl implements FavoritePostService {
     private final PostRepository postRepository;
 
     @Override
+    @Transactional
     public Long save(Long postId, Long memberId) {
 
         Post findPost = postRepository.findById(postId)
