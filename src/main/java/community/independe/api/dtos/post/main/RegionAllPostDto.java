@@ -11,7 +11,7 @@ public class RegionAllPostDto {
 
     private Long postId;
     private String title;
-    private int recommendCount;
+    private Long recommendCount;
     private Long commentCount;
     private boolean isPicture;
 }

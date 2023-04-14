@@ -16,7 +16,7 @@ public class AndroidIndependentPostsResponse {
     private String title;
     private LocalDateTime createdDate;
     private Integer views; // 조회수
-    private Integer recommendCount; // 추천수
+    private Long recommendCount; // 추천수
     private Long commentCount; // 댓글수
     private Integer numberOfElements; // 현재 페이지에 나올 데이터 수
     private Boolean hasNextPage; // 다음 페이지 존재 여부

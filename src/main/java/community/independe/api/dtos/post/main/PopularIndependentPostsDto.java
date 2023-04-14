@@ -14,7 +14,7 @@ public class PopularIndependentPostsDto {
     private String title;
     private String independentPostType;
     private IndependentPostType independentPostTypeEn;
-    private int recommendCount;
+    private Long recommendCount;
     private Long commentCount;
     private boolean isPicture;
 }

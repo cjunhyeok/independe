@@ -14,6 +14,7 @@ import community.independe.domain.post.enums.RegionType;
 import community.independe.domain.video.Video;
 import community.independe.repository.query.PostApiRepository;
 import community.independe.service.*;
+import community.independe.service.manytomany.RecommendPostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,7 @@ public class PostApiController {
     private final VideoService videoService;
     private final PostApiRepository postApiRepository;
     private final FilesService filesService;
+    private final RecommendPostService recommendPostService;
 
     // 자취 게시글 카테고리로 불러오기
     @Operation(summary = "자취 게시글 타입별 조회")
@@ -67,7 +69,7 @@ public class PostApiController {
                         p.getTitle(),
                         p.getCreatedDate(),
                         p.getViews(),
-                        0,
+                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
                         !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 ))
@@ -134,7 +136,7 @@ public class PostApiController {
                         p.getTitle(),
                         p.getCreatedDate(),
                         p.getViews(),
-                        0,
+                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
                         !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 ))
@@ -180,8 +182,9 @@ public class PostApiController {
         Post findPost = postService.findById(postId);
         List<Comment> findComments = commentService.findAllByPostId(postId);
         List<Files> findFiles = filesService.findAllFilesByPostId(postId);
+        Long recommendCount = recommendPostService.countAllByPostIdAndIsRecommend(findPost.getId());
 
-        PostResponse postResponse = new PostResponse(findPost, findComments, findFiles, commentService.countAllByPostId(postId));
+        PostResponse postResponse = new PostResponse(findPost, findComments, findFiles, commentService.countAllByPostId(postId), recommendCount);
         return new Result(postResponse);
     }
 
@@ -206,7 +209,7 @@ public class PostApiController {
                         p.getRegionType(),
                         p.getRegionPostType(),
                         p.getViews(),
-                        0,
+                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
                         !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 )).collect(Collectors.toList());
@@ -219,7 +222,7 @@ public class PostApiController {
                         p.getTitle(),
                         p.getIndependentPostType().getDescription(),
                         p.getIndependentPostType(),
-                        0,
+                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
                         !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 )).collect(Collectors.toList());
@@ -230,7 +233,7 @@ public class PostApiController {
                 .map(p -> new RegionAllPostDto(
                         p.getId(),
                         p.getTitle(),
-                        0,
+                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
                         !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 )).collect(Collectors.toList());
@@ -245,7 +248,7 @@ public class PostApiController {
                         p.getRegionPostType().getDescription(),
                         p.getRegionType(),
                         p.getRegionPostType(),
-                        0,
+                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
                         !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 )).collect(Collectors.toList());

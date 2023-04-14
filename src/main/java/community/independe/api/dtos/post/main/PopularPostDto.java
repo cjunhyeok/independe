@@ -21,7 +21,7 @@ public class PopularPostDto {
     private RegionType regionTypeEn;
     private RegionPostType regionPostTypeEn;
     private int views;
-    private int recommendCount;
+    private Long recommendCount;
     private Long commentCount;
     private boolean isPicture;
 }

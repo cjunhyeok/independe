@@ -17,7 +17,7 @@ public class RegionNotAllPostDto {
     private String regionPostType;
     private RegionType regionTypeEn;
     private RegionPostType regionPostTypeEn;
-    private int recommendCount;
+    private Long recommendCount;
     private Long commentCount;
     private boolean isPicture;
 }

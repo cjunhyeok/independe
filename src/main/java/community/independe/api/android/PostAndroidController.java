@@ -12,6 +12,7 @@ import community.independe.repository.query.PostApiRepository;
 import community.independe.service.CommentService;
 import community.independe.service.PostService;
 import community.independe.service.VideoService;
+import community.independe.service.manytomany.RecommendPostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,7 @@ public class PostAndroidController {
     private final CommentService commentService;
     private final VideoService videoService;
     private final PostApiRepository postApiRepository;
+    private final RecommendPostService recommendPostService;
 
     @GetMapping("/api/android/posts/independent/{independentPostType}")
     public Result androidIndependentPosts(@PathVariable(name = "independentPostType")IndependentPostType independentPostType,
@@ -66,14 +68,14 @@ public class PostAndroidController {
 
         Integer finalPageNumber = pageNumber;
         List<AndroidIndependentPostsResponse> collect = allIndependentPosts.stream()
-                .map(c -> new AndroidIndependentPostsResponse(
-                        c.getId(),
-                        c.getMember().getNickname(),
-                        c.getTitle(),
-                        c.getCreatedDate(),
-                        c.getViews(),
-                        c.getRecommendCount(),
-                        commentService.countAllByPostId(c.getId()),
+                .map(p -> new AndroidIndependentPostsResponse(
+                        p.getId(),
+                        p.getMember().getNickname(),
+                        p.getTitle(),
+                        p.getCreatedDate(),
+                        p.getViews(),
+                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
+                        commentService.countAllByPostId(p.getId()),
                         numberOfElements,
                         hasLastPage,
                         isFirstPage,
@@ -104,7 +106,7 @@ public class PostAndroidController {
                         p.getRegionType(),
                         p.getRegionPostType(),
                         p.getViews(),
-                        p.getRecommendCount(),
+                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
                         true
                 )).collect(Collectors.toList());
@@ -117,7 +119,7 @@ public class PostAndroidController {
                         p.getTitle(),
                         p.getIndependentPostType().getDescription(),
                         p.getIndependentPostType(),
-                        p.getRecommendCount(),
+                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId())
                         , true
                 )).collect(Collectors.toList());
@@ -128,7 +130,7 @@ public class PostAndroidController {
                 .map(p -> new RegionAllPostDto(
                         p.getId(),
                         p.getTitle(),
-                        p.getRecommendCount(),
+                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
                         false
                 )).collect(Collectors.toList());
@@ -143,7 +145,7 @@ public class PostAndroidController {
                         p.getRegionPostType().getDescription(),
                         p.getRegionType(),
                         p.getRegionPostType(),
-                        p.getRecommendCount(),
+                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
                         true
                 )).collect(Collectors.toList());
