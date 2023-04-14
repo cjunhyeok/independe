@@ -30,11 +30,13 @@ public class FavoritePost {
     private Post post;
 
     private LocalDateTime createdDate;
+    private Boolean isFavorite;
 
     @Builder
     public FavoritePost(Member member, Post post) {
         this.member = member;
         this.post = post;
         this.createdDate = LocalDateTime.now();
+        this.isFavorite = true;
     }
 }
