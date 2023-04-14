@@ -31,9 +31,9 @@ public class RecommendPost extends BaseManyToManyEntity{
     private Boolean isRecommend;
 
     @Builder
-    public RecommendPost(Member member, Post post) {
+    public RecommendPost(Member member, Post post, Boolean isRecommend) {
         this.member = member;
         this.post = post;
-        this.isRecommend = true;
+        this.isRecommend = isRecommend;
     }
 }

@@ -30,9 +30,9 @@ public class FavoritePost extends BaseManyToManyEntity {
     private Boolean isFavorite;
 
     @Builder
-    public FavoritePost(Member member, Post post) {
+    public FavoritePost(Member member, Post post, Boolean isFavorite) {
         this.member = member;
         this.post = post;
-        this.isFavorite = true;
+        this.isFavorite = isFavorite;
     }
 }
