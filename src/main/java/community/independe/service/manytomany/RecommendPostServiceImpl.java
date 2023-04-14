@@ -35,6 +35,7 @@ public class RecommendPostServiceImpl implements RecommendPostService {
                 RecommendPost.builder()
                         .member(findMember)
                         .post(findPost)
+                        .isRecommend(true)
                         .build()
         );
 
@@ -46,4 +47,16 @@ public class RecommendPostServiceImpl implements RecommendPostService {
         return recommendPostRepository.findById(recommendPostId)
                 .orElseThrow(() -> new IllegalArgumentException("recommendPost not exist"));
     }
+
+    @Override
+    public RecommendPost findByPostIdAndMemberId(Long postId, Long memberId) {
+        return recommendPostRepository.findByPostIdAndMemberId(postId, memberId);
+    }
+
+    @Override
+    @Transactional
+    public void updateIsRecommend(RecommendPost recommendPost, Boolean isRecommend) {
+        recommendPost.updateIsRecommend(isRecommend);
+    }
+
 }

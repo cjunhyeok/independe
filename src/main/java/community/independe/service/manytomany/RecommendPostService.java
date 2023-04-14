@@ -7,4 +7,8 @@ public interface RecommendPostService {
     Long save(Long postId, Long memberId);
 
     RecommendPost findById(Long recommendPostId);
+
+    RecommendPost findByPostIdAndMemberId(Long postId, Long memberId);
+
+    void updateIsRecommend(RecommendPost recommendPost ,Boolean isRecommend);
 }
