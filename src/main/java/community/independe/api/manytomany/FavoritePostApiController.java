@@ -1,4 +1,4 @@
-package community.independe.api.dtos.manytomany;
+package community.independe.api.manytomany;
 
 import community.independe.domain.member.Member;
 import community.independe.service.manytomany.FavoritePostService;
