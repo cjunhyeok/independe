@@ -23,7 +23,7 @@ public class FavoritePostApiController {
     public ResponseEntity<Long> addFavoritePost(@PathVariable(name = "postId") Long postId,
                                           @AuthenticationPrincipal Member member) {
 
-        Long savedFavoritePost = favoritePostService.save(postId, member.getId());
+        Long savedFavoritePost = favoritePostService.save(postId, 1L);
         return ResponseEntity.ok(savedFavoritePost);
     }
 
