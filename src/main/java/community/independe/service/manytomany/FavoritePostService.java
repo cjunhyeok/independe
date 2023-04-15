@@ -7,4 +7,6 @@ public interface FavoritePostService {
     Long save(Long postId, Long memberId);
 
     FavoritePost findByPostIdAndMemberId(Long postId, Long memberId);
+
+    void updateIsFavorite(FavoritePost favoritePost, Boolean isFavorite);
 }

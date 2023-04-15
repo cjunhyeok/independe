@@ -45,4 +45,10 @@ public class FavoritePostServiceImpl implements FavoritePostService {
     public FavoritePost findByPostIdAndMemberId(Long postId, Long memberId) {
         return favoritePostRepository.findByPostIdAndMemberId(postId, memberId);
     }
+
+    @Override
+    @Transactional
+    public void updateIsFavorite(FavoritePost favoritePost, Boolean isFavorite) {
+        favoritePost.updateFavorite(isFavorite);
+    }
 }
