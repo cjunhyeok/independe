@@ -40,4 +40,9 @@ public class FavoritePostServiceImpl implements FavoritePostService {
 
         return savedFavoritePost.getId();
     }
+
+    @Override
+    public FavoritePost findByPostIdAndMemberId(Long postId, Long memberId) {
+        return favoritePostRepository.findByPostIdAndMemberId(postId, memberId);
+    }
 }
