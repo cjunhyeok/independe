@@ -16,6 +16,7 @@ import community.independe.repository.query.PostApiRepository;
 import community.independe.service.*;
 import community.independe.service.manytomany.FavoritePostService;
 import community.independe.service.manytomany.RecommendPostService;
+import community.independe.service.manytomany.ReportPostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,7 @@ public class PostApiController {
     private final FilesService filesService;
     private final RecommendPostService recommendPostService;
     private final FavoritePostService favoritePostService;
+    private final ReportPostService reportPostService;
 
     // 자취 게시글 카테고리로 불러오기
     @Operation(summary = "자취 게시글 타입별 조회")
@@ -194,7 +196,8 @@ public class PostApiController {
                 commentService.countAllByPostId(postId),
                 recommendCount,
                 isRecommend(findPost.getId(), member),
-                isFavorite(findPost.getId(), member)
+                isFavorite(findPost.getId(), member),
+                isReport(findPost.getId(), member)
         );
         return new Result(postResponse);
     }
@@ -305,6 +308,18 @@ public class PostApiController {
             return false;
         } else {
             if(favoritePostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
+    private boolean isReport(Long postId, Member member) {
+        if(member == null) {
+            return false;
+        } else {
+            if(reportPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
                 return false;
             } else {
                 return true;
