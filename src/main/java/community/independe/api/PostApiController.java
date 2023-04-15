@@ -174,7 +174,8 @@ public class PostApiController {
     // 게시글 1개 구체정보 가져오기
     @Operation(summary = "게시글 상세 조회")
     @GetMapping("/api/posts/{postId}")
-    public Result post(@Parameter(description = "게시글 ID(PK)")@PathVariable(name = "postId") Long postId) {
+    public Result post(@Parameter(description = "게시글 ID(PK)")@PathVariable(name = "postId") Long postId,
+                       @AuthenticationPrincipal Member member) {
 
         postService.increaseViews(postId); // 조회수 증가
 
@@ -184,7 +185,15 @@ public class PostApiController {
         List<Files> findFiles = filesService.findAllFilesByPostId(postId);
         Long recommendCount = recommendPostService.countAllByPostIdAndIsRecommend(findPost.getId());
 
-        PostResponse postResponse = new PostResponse(findPost, findComments, findFiles, commentService.countAllByPostId(postId), recommendCount);
+        PostResponse postResponse = new PostResponse(
+                findPost,
+                findComments,
+                findFiles,
+                commentService.countAllByPostId(postId),
+                recommendCount,
+                isRecommend(findPost.getId(),
+                member)
+        );
         return new Result(postResponse);
     }
 
@@ -275,5 +284,17 @@ public class PostApiController {
         );
 
         return new Result(mainPostDto);
+    }
+
+    private boolean isRecommend(Long postId, Member member) {
+        if(member == null) {
+            return false;
+        } else {
+            if(recommendPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
+                return false;
+            } else {
+                return true;
+            }
+        }
     }
 }
