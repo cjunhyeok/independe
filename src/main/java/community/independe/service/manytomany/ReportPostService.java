@@ -2,7 +2,7 @@ package community.independe.service.manytomany;
 
 import community.independe.domain.manytomany.ReportPost;
 
-public interface ReportService {
+public interface ReportPostService {
 
     Long save(Long postId, Long memberId);
 

@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ReportServiceImpl implements ReportService{
+public class ReportPostServiceImpl implements ReportPostService {
 
     private final ReportPostRepository reportPostRepository;
     private final PostRepository postRepository;
