@@ -50,7 +50,7 @@ public class FavoritePostServiceImpl implements FavoritePostService {
     @Override
     @Transactional
     public void updateIsFavorite(FavoritePost favoritePost, Boolean isFavorite) {
-        favoritePost.updateFavorite(isFavorite);
+        favoritePost.updateIsFavorite(isFavorite);
     }
 
     @Override
