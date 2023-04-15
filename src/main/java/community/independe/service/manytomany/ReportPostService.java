@@ -9,4 +9,6 @@ public interface ReportPostService {
     ReportPost findByPostIdAndMemberId(Long postId, Long memberId);
 
     ReportPost findByPostIdAndMemberIdAndIsRecommend(Long postId, Long memberId);
+
+    void updateIsReport(ReportPost reportPost , Boolean isRecommend);
 }

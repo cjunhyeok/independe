@@ -52,4 +52,9 @@ public class ReportPostServiceImpl implements ReportPostService {
     public ReportPost findByPostIdAndMemberIdAndIsRecommend(Long postId, Long memberId) {
         return reportPostRepository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId);
     }
+
+    @Override
+    public void updateIsReport(ReportPost reportPost, Boolean isRecommend) {
+        reportPost.updateIsReport(isRecommend);
+    }
 }
