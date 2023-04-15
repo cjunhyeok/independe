@@ -35,6 +35,7 @@ public class FavoritePostServiceImpl implements FavoritePostService {
                 FavoritePost.builder()
                         .member(findMember)
                         .post(findPost)
+                        .isFavorite(true)
                         .build()
         );
 
