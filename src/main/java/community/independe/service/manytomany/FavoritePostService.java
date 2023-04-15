@@ -9,4 +9,6 @@ public interface FavoritePostService {
     FavoritePost findByPostIdAndMemberId(Long postId, Long memberId);
 
     void updateIsFavorite(FavoritePost favoritePost, Boolean isFavorite);
+
+    FavoritePost findByPostIdAndMemberIdAndIsRecommend(Long postId, Long memberId);
 }
