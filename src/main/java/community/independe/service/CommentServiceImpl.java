@@ -1,6 +1,5 @@
 package community.independe.service;
 
-import community.independe.api.dtos.IsUpDto;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
@@ -82,20 +81,5 @@ public class CommentServiceImpl implements CommentService{
     @Override
     public List<Comment> findAllByPostId(Long postId) {
         return commentRepository.findAllByPostId(postId);
-    }
-
-    @Override
-    @Transactional
-    public void increaseOrDecreaseRecommendCount(Long commentId, IsUpDto isUp) {
-        Comment findComment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("Comment not exist"));
-
-        if (isUp.getIsUp()) {
-            findComment.increaseRecommendCount(findComment.getRecommendCount() + 1);
-        } else if (isUp.getIsUp() == false && (findComment.getRecommendCount() <= 0)){
-            throw new IllegalArgumentException("Recommend Count can't be negative number");
-        } else if (isUp.getIsUp() == false && (findComment.getRecommendCount()) > 0) {
-            findComment.decreaseRecommendCount(findComment.getRecommendCount() - 1);
-        }
     }
 }

@@ -1,15 +1,12 @@
 package community.independe.api;
 
-import community.independe.api.dtos.IsUpDto;
 import community.independe.api.dtos.comment.CreateChildCommentRequest;
 import community.independe.api.dtos.comment.CreateParentCommentRequest;
 import community.independe.service.CommentService;
-import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,14 +39,5 @@ public class CommentApiController {
         );
 
         return ResponseEntity.ok(childComment);
-    }
-
-    @Operation(summary = "추천수 증감")
-    @PostMapping("/api/comments/recommend/{commentId}")
-    public ResponseEntity increaseOrDecreaseRecommendCount(@PathVariable(name = "commentId") Long commentId,
-                                                           @RequestBody IsUpDto isUp) {
-        commentService.increaseOrDecreaseRecommendCount(commentId, isUp);
-
-        return ResponseEntity.ok("OK");
     }
 }
