@@ -16,4 +16,12 @@ public interface FavoritePostRepository extends JpaRepository<FavoritePost, Long
             " and f.member.id = :memberId")
     FavoritePost findByPostIdAndMemberId(@Param("postId") Long postId,
                                          @Param("memberId") Long memberId);
+
+    @Query(value = "select f from FavoritePost f join fetch f.post" +
+            " join fetch f.member" +
+            " where f.isFavorite = true" +
+            " and f.post.id = :postId" +
+            " and f.member.id = :memberId")
+    FavoritePost findByPostIdAndMemberIdAndIsRecommend(@Param("postId") Long postId,
+                                                        @Param("memberId") Long memberId);
 }
