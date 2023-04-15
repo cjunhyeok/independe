@@ -14,6 +14,7 @@ import community.independe.domain.post.enums.RegionType;
 import community.independe.domain.video.Video;
 import community.independe.repository.query.PostApiRepository;
 import community.independe.service.*;
+import community.independe.service.manytomany.FavoritePostService;
 import community.independe.service.manytomany.RecommendPostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -46,6 +47,7 @@ public class PostApiController {
     private final PostApiRepository postApiRepository;
     private final FilesService filesService;
     private final RecommendPostService recommendPostService;
+    private final FavoritePostService favoritePostService;
 
     // 자취 게시글 카테고리로 불러오기
     @Operation(summary = "자취 게시글 타입별 조회")
@@ -191,8 +193,8 @@ public class PostApiController {
                 findFiles,
                 commentService.countAllByPostId(postId),
                 recommendCount,
-                isRecommend(findPost.getId(),
-                member)
+                isRecommend(findPost.getId(), member),
+                isFavorite(findPost.getId(), member)
         );
         return new Result(postResponse);
     }
@@ -291,6 +293,18 @@ public class PostApiController {
             return false;
         } else {
             if(recommendPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
+    private boolean isFavorite(Long postId, Member member) {
+        if(member == null) {
+            return false;
+        } else {
+            if(favoritePostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
                 return false;
             } else {
                 return true;
