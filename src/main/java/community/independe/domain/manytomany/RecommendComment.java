@@ -37,7 +37,7 @@ public class RecommendComment {
         this.isRecommend = isRecommend;
     }
 
-    public void UpdateIsRecommend(Boolean isRecommend) {
+    public void updateIsRecommend(Boolean isRecommend) {
         this.isRecommend = isRecommend;
     }
 }
