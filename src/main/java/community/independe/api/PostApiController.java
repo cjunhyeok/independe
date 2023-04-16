@@ -191,6 +191,25 @@ public class PostApiController {
         List<Files> findFiles = filesService.findAllFilesByPostId(postId);
         Long recommendCount = recommendPostService.countAllByPostIdAndIsRecommend(findPost.getId());
 
+        // 베스트 댓글 찾기
+        BestCommentDto bestCommentDto = null;
+        List<Object[]> bestCommentList = recommendCommentService.findBestComment();
+        if (bestCommentList.isEmpty()) {
+            bestCommentDto = null;
+        } else {
+            Object[] bestCommentObject = bestCommentList.get(0);
+            Comment bestComment = (Comment) bestCommentObject[0];
+            Long bestCommentRecommendCount = (Long) bestCommentObject[1];
+            bestCommentDto = new BestCommentDto(
+                    bestComment.getId(),
+                    bestComment.getMember().getNickname(),
+                    bestComment.getContent(),
+                    bestComment.getCreatedDate(),
+                    bestCommentRecommendCount
+            );
+        }
+
+        // 댓글 Dto 생성
         List<PostCommentResponse> commentsDto = findComments.stream()
                 .map(c -> new PostCommentResponse(
                         c.getId(),
@@ -202,8 +221,10 @@ public class PostApiController {
                         isRecommendComment(c.getId(), findPost.getId(), member)
                 )).collect(Collectors.toList());
 
+        // 게시글 Dto 생성
         PostResponse postResponse = new PostResponse(
                 findPost,
+                bestCommentDto,
                 commentsDto,
                 findFiles,
                 commentService.countAllByPostId(postId),
