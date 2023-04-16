@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface RecommendCommentRepository extends JpaRepository<RecommendComment, Long> {
 
     @Query(value = "select r from RecommendComment r join fetch r.comment" +
@@ -40,8 +42,9 @@ public interface RecommendCommentRepository extends JpaRepository<RecommendComme
                                                                        @Param("postId") Long postId,
                                                                        @Param("memberId") Long memberId);
 
-    @Query(value = "select r, count(r) as recommendCount from RecommendComment r" +
+    @Query(value = "select r.comment, count(r) as recommendCount from RecommendComment r" +
             " group by r.comment" +
+            " having count(r.id) > 5" +
             " order by recommendCount desc")
-    Object[] findBestComment();
+    List<Object[]> findBestComment();
 }
