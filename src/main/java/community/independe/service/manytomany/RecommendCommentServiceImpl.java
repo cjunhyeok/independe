@@ -56,4 +56,9 @@ public class RecommendCommentServiceImpl implements RecommendCommentService{
     public Long countAllByCommentIdAndIsRecommend(Long commentId) {
         return recommendCommentRepository.countAllByCommentIdAndIsRecommend(commentId);
     }
+
+    @Override
+    public RecommendComment findByCommentIdAndPostIdAndMemberIdAndIsRecommend(Long commentId, Long postId, Long memberId) {
+        return recommendCommentRepository.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, memberId);
+    }
 }

@@ -11,4 +11,6 @@ public interface RecommendCommentService {
     void updateIsRecommend(RecommendComment recommendComment, Boolean isRecommend);
 
     Long countAllByCommentIdAndIsRecommend(Long commentId);
+
+    RecommendComment findByCommentIdAndPostIdAndMemberIdAndIsRecommend(Long commentId, Long postId, Long memberId);
 }
