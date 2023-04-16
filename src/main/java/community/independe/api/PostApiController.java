@@ -15,6 +15,7 @@ import community.independe.domain.video.Video;
 import community.independe.repository.query.PostApiRepository;
 import community.independe.service.*;
 import community.independe.service.manytomany.FavoritePostService;
+import community.independe.service.manytomany.RecommendCommentService;
 import community.independe.service.manytomany.RecommendPostService;
 import community.independe.service.manytomany.ReportPostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,9 +37,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
-@Slf4j
 public class PostApiController {
 
     private final PostService postService;
@@ -50,6 +51,7 @@ public class PostApiController {
     private final RecommendPostService recommendPostService;
     private final FavoritePostService favoritePostService;
     private final ReportPostService reportPostService;
+    private final RecommendCommentService recommendCommentService;
 
     // 자취 게시글 카테고리로 불러오기
     @Operation(summary = "자취 게시글 타입별 조회")
@@ -189,9 +191,20 @@ public class PostApiController {
         List<Files> findFiles = filesService.findAllFilesByPostId(postId);
         Long recommendCount = recommendPostService.countAllByPostIdAndIsRecommend(findPost.getId());
 
+        List<PostCommentResponse> commentsDto = findComments.stream()
+                .map(c -> new PostCommentResponse(
+                        c.getId(),
+                        c.getMember().getNickname(),
+                        c.getContent(),
+                        c.getCreatedDate(),
+                        recommendCommentService.countAllByCommentIdAndIsRecommend(c.getId()),
+                        (c.getParent() == null) ? null : c.getParent().getId(),
+                        isRecommendComment(c.getId(), findPost.getId(), member)
+                )).collect(Collectors.toList());
+
         PostResponse postResponse = new PostResponse(
                 findPost,
-                findComments,
+                commentsDto,
                 findFiles,
                 commentService.countAllByPostId(postId),
                 recommendCount,
@@ -291,39 +304,72 @@ public class PostApiController {
         return new Result(mainPostDto);
     }
 
-    private boolean isRecommend(Long postId, Member member) {
-        if(member == null) {
+    private boolean isRecommendComment(Long commentId, Long postId, Member member) {
+//        if (member == null) {
+//            return false;
+//        } else {
+//            if (recommendCommentService.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, member.getId()) == null) {
+//                return false;
+//            } else {
+//                return true;
+//            }
+//        }
+
+        if (recommendCommentService.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, 1L) == null) {
             return false;
         } else {
-            if(recommendPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
-                return false;
-            } else {
-                return true;
-            }
+            return true;
+        }
+    }
+
+    private boolean isRecommend(Long postId, Member member) {
+//        if(member == null) {
+//            return false;
+//        } else {
+//            if(recommendPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
+//                return false;
+//            } else {
+//                return true;
+//            }
+//        }
+        if(recommendPostService.findByPostIdAndMemberIdAndIsRecommend(postId, 1L) == null) {
+            return false;
+        } else {
+            return true;
         }
     }
 
     private boolean isFavorite(Long postId, Member member) {
-        if(member == null) {
+//        if(member == null) {
+//            return false;
+//        } else {
+//            if(favoritePostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
+//                return false;
+//            } else {
+//                return true;
+//            }
+//        }
+        if(favoritePostService.findByPostIdAndMemberIdAndIsRecommend(postId, 1L) == null) {
             return false;
         } else {
-            if(favoritePostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
-                return false;
-            } else {
-                return true;
-            }
+            return true;
         }
     }
 
     private boolean isReport(Long postId, Member member) {
-        if(member == null) {
+//        if(member == null) {
+//            return false;
+//        } else {
+//            if(reportPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
+//                return false;
+//            } else {
+//                return true;
+//            }
+//        }
+        if(reportPostService.findByPostIdAndMemberIdAndIsRecommend(postId, 1L) == null) {
             return false;
         } else {
-            if(reportPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
-                return false;
-            } else {
-                return true;
-            }
+            return true;
         }
     }
 }

@@ -1,6 +1,5 @@
 package community.independe.api.dtos.post;
 
-import community.independe.domain.comment.Comment;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,19 +13,21 @@ public class PostCommentResponse {
     private String nickname;
     private String content;
     private LocalDateTime createdDate;
-    private Integer recommendCount;
+    private Long recommendCount;
     private Long parentId;
+    private Boolean isRecommend;
 
-    public PostCommentResponse(Comment comment){
-        this.commentId = comment.getId();
-        this.nickname = comment.getMember().getNickname();
-        this.content = comment.getContent();
-        this.createdDate = comment.getCreatedDate();
-        this.recommendCount = comment.getRecommendCount();
-        if (comment.getParent() == null) {
+    public PostCommentResponse(Long commentId, String nickname, String content, LocalDateTime createdDate, Long recommendCount, Long parentId, Boolean isRecommend) {
+        this.commentId = commentId;
+        this.nickname = nickname;
+        this.content = content;
+        this.createdDate = createdDate;
+        this.recommendCount = recommendCount;
+        if (parentId == null) {
             this.parentId = null;
         } else {
-            this.parentId = comment.getParent().getId();
+            this.parentId = parentId;
         }
+        this.isRecommend = isRecommend;
     }
 }
