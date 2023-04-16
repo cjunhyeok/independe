@@ -39,4 +39,9 @@ public interface RecommendCommentRepository extends JpaRepository<RecommendComme
     RecommendComment findByCommentIdAndPostIdAndMemberIdAndIsRecommend(@Param("commentId") Long commentId,
                                                                        @Param("postId") Long postId,
                                                                        @Param("memberId") Long memberId);
+
+    @Query(value = "select r, count(r) as recommendCount from RecommendComment r" +
+            " group by r.comment" +
+            " order by recommendCount desc")
+    Object[] findBestComment();
 }
