@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class PostAndroidController {
+public class PostAndroidApiController {
 
     private final PostService postService;
     private final CommentService commentService;
