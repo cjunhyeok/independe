@@ -1,10 +1,9 @@
 package community.independe.api.android;
 
-import community.independe.api.android.dto.AndroidMainPostDto;
-import community.independe.api.android.dto.AndroidIndependentPostsResponse;
-import community.independe.api.android.dto.AndroidRegionPostsDto;
+import community.independe.api.android.dto.*;
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.post.main.*;
+import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
@@ -23,9 +22,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -92,6 +91,22 @@ public class PostAndroidApiController {
         return new Result(collect);
     }
 
+    @Operation(summary = "자취 게시글 작성 (안드로이드")
+    @PostMapping("/api/android/posts/independent/new")
+    public ResponseEntity<Long> createIndependentPost(@RequestBody AndroidCreateIndependentPostRequest request,
+                                                      @AuthenticationPrincipal Member member) {
+
+        Long independentPost = postService.createIndependentPost(
+//                member.getId(),
+                1L,
+                request.getTitle(),
+                request.getContent(),
+                request.getIndependentPostType()
+        );
+
+        return ResponseEntity.ok(independentPost);
+    }
+
     @Operation(summary = "지역 게시글 타입별 조회 (안드로이드)")
     @GetMapping("/api/android/posts/region/{regionType}/{regionPostType}")
     public Result androidRegionPosts(@PathVariable("regionType")RegionType regionType,
@@ -131,6 +146,23 @@ public class PostAndroidApiController {
                 )).collect(Collectors.toList());
 
         return new Result(collect);
+    }
+
+    @Operation(summary = "지역 게시글 작성 (안드로이드")
+    @PostMapping("/api/android/posts/region/new")
+    public ResponseEntity<Long> createRegionPost(@RequestBody AndroidCreateRegionPostRequest request,
+                                                      @AuthenticationPrincipal Member member) {
+
+        Long regionPost = postService.createRegionPost(
+//                member.getId(),
+                1L,
+                request.getTitle(),
+                request.getContent(),
+                request.getRegionType(),
+                request.getRegionPostType()
+        );
+
+        return ResponseEntity.ok(regionPost);
     }
 
     @Operation(summary = "메인화면 조회 (안드로이드)")
