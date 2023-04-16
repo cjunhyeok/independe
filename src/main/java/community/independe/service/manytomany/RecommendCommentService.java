@@ -2,6 +2,8 @@ package community.independe.service.manytomany;
 
 import community.independe.domain.manytomany.RecommendComment;
 
+import java.util.List;
+
 public interface RecommendCommentService {
 
     Long save(Long commentId, Long memberId);
@@ -13,4 +15,6 @@ public interface RecommendCommentService {
     Long countAllByCommentIdAndIsRecommend(Long commentId);
 
     RecommendComment findByCommentIdAndPostIdAndMemberIdAndIsRecommend(Long commentId, Long postId, Long memberId);
+
+    List<Object[]> findBestComment();
 }
