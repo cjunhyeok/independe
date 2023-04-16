@@ -23,10 +23,13 @@ public class ReportPostApiController {
     @PostMapping("/api/reportPost/{postId}")
     public ResponseEntity addReportPost(@PathVariable(name = "postId") Long postId,
                                         @AuthenticationPrincipal Member member) {
-        ReportPost findReportPost = reportPostService.findByPostIdAndMemberId(postId, member.getId());
+
+//        ReportPost findReportPost = reportPostService.findByPostIdAndMemberId(postId, member.getId());
+        ReportPost findReportPost = reportPostService.findByPostIdAndMemberId(postId, 1L);
 
         if (findReportPost == null) {
-            reportPostService.save(postId, member.getId());
+//            reportPostService.save(postId, member.getId());
+            reportPostService.save(postId, 1L);
         } else if (findReportPost.getIsReport() == false) {
             reportPostService.updateIsReport(findReportPost, true);
         } else if (findReportPost.getIsReport() == true) {

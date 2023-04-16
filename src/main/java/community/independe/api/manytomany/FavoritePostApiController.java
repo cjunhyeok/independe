@@ -24,10 +24,12 @@ public class FavoritePostApiController {
     public ResponseEntity addFavoritePost(@PathVariable(name = "postId") Long postId,
                                           @AuthenticationPrincipal Member member) {
 
-        FavoritePost findFavoritePost = favoritePostService.findByPostIdAndMemberId(postId, member.getId());
+//        FavoritePost findFavoritePost = favoritePostService.findByPostIdAndMemberId(postId, member.getId());
+        FavoritePost findFavoritePost = favoritePostService.findByPostIdAndMemberId(postId, 1L);
 
         if (findFavoritePost == null) {
-            favoritePostService.save(postId, member.getId());
+//            favoritePostService.save(postId, member.getId());
+            favoritePostService.save(postId, 1L);
         } else if (findFavoritePost.getIsFavorite() == false) {
             favoritePostService.updateIsFavorite(findFavoritePost, true);
         } else if (findFavoritePost.getIsFavorite() == true) {

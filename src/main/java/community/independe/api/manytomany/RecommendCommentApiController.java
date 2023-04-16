@@ -26,7 +26,6 @@ public class RecommendCommentApiController {
 
 //        RecommendComment findRecommendComment = recommendCommentService.findByCommentIdAndMemberId(
 //                commentId, member.getId());
-
         RecommendComment findRecommendComment = recommendCommentService.findByCommentIdAndMemberId(
                 commentId, 1L);
 

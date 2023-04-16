@@ -27,11 +27,11 @@ public class RecommendPostApiController {
                                                  @AuthenticationPrincipal Member member) {
 
 //        RecommendPost findRecommendPostByPost = recommendPostService.findByPostIdAndMemberId(postId, member.getId());
-        RecommendPost findRecommendPostByPost = recommendPostService.findByPostIdAndMemberId(postId,2L);
+        RecommendPost findRecommendPostByPost = recommendPostService.findByPostIdAndMemberId(postId,1L);
 
         if (findRecommendPostByPost == null) {
 //            recommendPostService.save(postId, member.getId());
-            recommendPostService.save(postId, 2L);
+            recommendPostService.save(postId, 1L);
         } else if(findRecommendPostByPost.getIsRecommend() == false) {
             recommendPostService.updateIsRecommend(findRecommendPostByPost, true);
         } else if(findRecommendPostByPost.getIsRecommend() == true) {
