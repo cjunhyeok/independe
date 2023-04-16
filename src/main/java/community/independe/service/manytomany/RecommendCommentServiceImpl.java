@@ -51,4 +51,9 @@ public class RecommendCommentServiceImpl implements RecommendCommentService{
     public void updateIsRecommend(RecommendComment recommendComment, Boolean isRecommend) {
         recommendComment.updateIsRecommend(isRecommend);
     }
+
+    @Override
+    public Long countAllByCommentIdAndIsRecommend(Long commentId) {
+        return recommendCommentRepository.countAllByCommentIdAndIsRecommend(commentId);
+    }
 }
