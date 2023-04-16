@@ -7,4 +7,6 @@ public interface RecommendCommentService {
     Long save(Long commentId, Long memberId);
 
     RecommendComment findByCommentIdAndMemberId(Long commentId, Long memberId);
+
+    void updateIsRecommend(RecommendComment recommendComment, Boolean isRecommend);
 }

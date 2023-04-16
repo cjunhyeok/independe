@@ -45,4 +45,10 @@ public class RecommendCommentServiceImpl implements RecommendCommentService{
     public RecommendComment findByCommentIdAndMemberId(Long commentId, Long memberId) {
         return recommendCommentRepository.findByCommentIdAndMemberId(commentId, memberId);
     }
+
+    @Override
+    @Transactional
+    public void updateIsRecommend(RecommendComment recommendComment, Boolean isRecommend) {
+        recommendComment.updateIsRecommend(isRecommend);
+    }
 }
