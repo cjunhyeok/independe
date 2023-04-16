@@ -17,7 +17,7 @@ public interface RecommendCommentRepository extends JpaRepository<RecommendComme
     RecommendComment findByCommentIdAndMemberId(@Param("commentId") Long commentId,
                                                 @Param("memberId") Long memberId);
 
-    @Query(value = "select count(r) from RecommendComment r join fetch r.comment" +
+    @Query(value = "select count(r) from RecommendComment r" +
             " where r.comment.id = :commentId" +
             " and r.isRecommend = true")
     Long countAllByCommentIdAndIsRecommend(@Param("commentId") Long commentId);
