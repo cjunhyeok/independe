@@ -2,17 +2,21 @@ package community.independe.api.android;
 
 import community.independe.api.android.dto.AndroidMainPostDto;
 import community.independe.api.android.dto.AndroidIndependentPostsResponse;
-import community.independe.api.android.dto.TestDto;
+import community.independe.api.android.dto.AndroidRegionPostsDto;
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.post.main.*;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
+import community.independe.domain.post.enums.RegionPostType;
+import community.independe.domain.post.enums.RegionType;
 import community.independe.domain.video.Video;
 import community.independe.repository.query.PostApiRepository;
 import community.independe.service.CommentService;
+import community.independe.service.FilesService;
 import community.independe.service.PostService;
 import community.independe.service.VideoService;
 import community.independe.service.manytomany.RecommendPostService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -36,8 +40,10 @@ public class PostAndroidController {
     private final CommentService commentService;
     private final VideoService videoService;
     private final PostApiRepository postApiRepository;
+    private final FilesService filesService;
     private final RecommendPostService recommendPostService;
 
+    @Operation(summary = "자취 게시글 타입별 조회 (안드로이드)")
     @GetMapping("/api/android/posts/independent/{independentPostType}")
     public Result androidIndependentPosts(@PathVariable(name = "independentPostType")IndependentPostType independentPostType,
                                           @PageableDefault(
@@ -46,14 +52,14 @@ public class PostAndroidController {
                                            direction = Sort.Direction.DESC)Pageable pageable) {
 
         // 게시글 불러오기
-        Slice allIndependentPostsSlice = postService.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
+        Slice<Post> allIndependentPostsSlice = postService.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
 
         // 현재 페이지에 나올 데이터 수
         int numberOfElements = allIndependentPostsSlice.getNumberOfElements();
         // 조회된 데이터
         List<Post> allIndependentPosts = allIndependentPostsSlice.getContent();
         // 다음 페이지 여부
-        boolean hasLastPage = allIndependentPostsSlice.hasNext();
+        boolean hasNextPage = allIndependentPostsSlice.hasNext();
         // 마지막 페이지 여부
         boolean isLastPage = allIndependentPostsSlice.isLast();
         // 현재 페이지 여부
@@ -62,7 +68,7 @@ public class PostAndroidController {
         Integer pageNumber = pageable.getPageNumber();
 
         // 마지막 페이지가 아니고 다음 페이지가 있으면 다음 페이지 ++
-        if (hasLastPage) {
+        if (hasNextPage) {
             pageNumber++;
         }
 
@@ -77,16 +83,57 @@ public class PostAndroidController {
                         recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
                         numberOfElements,
-                        hasLastPage,
+                        hasNextPage,
                         isFirstPage,
                         isLastPage,
                         finalPageNumber
                 )).collect(Collectors.toList());
 
         return new Result(collect);
-
     }
 
+    @Operation(summary = "지역 게시글 타입별 조회 (안드로이드)")
+    @GetMapping("/api/android/posts/region/{regionType}/{regionPostType}")
+    public Result androidRegionPosts(@PathVariable("regionType")RegionType regionType,
+                                     @PathVariable("regionPostType")RegionPostType regionPostType,
+                                     @PageableDefault(
+                                             size = 10,
+                                             sort = "createdDate",
+                                             direction = Sort.Direction.DESC)Pageable pageable) {
+
+        Slice<Post> allRegionPostsSlice = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
+        int numberOfElements = allRegionPostsSlice.getNumberOfElements();
+        List<Post> allRegionPosts = allRegionPostsSlice.getContent();
+        boolean hasNextPage = allRegionPostsSlice.hasNext();
+        boolean isLastPage = allRegionPostsSlice.isLast();
+        boolean isFirstPage = allRegionPostsSlice.isFirst();
+        int pageNumber = pageable.getPageNumber();
+
+        if (hasNextPage) {
+            pageNumber++;
+        }
+
+        int finalPageNumber = pageNumber;
+        List<AndroidRegionPostsDto> collect = allRegionPosts.stream()
+                .map(p -> new AndroidRegionPostsDto(
+                        p.getId(),
+                        p.getMember().getNickname(),
+                        p.getTitle(),
+                        p.getCreatedDate(),
+                        p.getViews(),
+                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
+                        commentService.countAllByPostId(p.getId()),
+                        numberOfElements,
+                        hasNextPage,
+                        isFirstPage,
+                        isLastPage,
+                        finalPageNumber
+                )).collect(Collectors.toList());
+
+        return new Result(collect);
+    }
+
+    @Operation(summary = "메인화면 조회 (안드로이드)")
     @GetMapping("/api/android/posts/main")
     public Result androidMainPost() {
 
@@ -108,7 +155,7 @@ public class PostAndroidController {
                         p.getViews(),
                         recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
-                        true
+                        !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 )).collect(Collectors.toList());
 
         // 추천수 자취 게시글 3개
@@ -120,8 +167,8 @@ public class PostAndroidController {
                         p.getIndependentPostType().getDescription(),
                         p.getIndependentPostType(),
                         recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
-                        commentService.countAllByPostId(p.getId())
-                        , true
+                        commentService.countAllByPostId(p.getId()),
+                        !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 )).collect(Collectors.toList());
 
         // 전체 지역 게시글 3개
@@ -147,7 +194,7 @@ public class PostAndroidController {
                         p.getRegionPostType(),
                         recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
-                        true
+                        !filesService.findAllFilesByPostId(p.getId()).isEmpty()
                 )).collect(Collectors.toList());
 
         // 영상
@@ -168,12 +215,5 @@ public class PostAndroidController {
         );
 
         return new Result(mainPostDto);
-    }
-
-    @GetMapping("/api/android/test")
-    public TestDto mainTest() {
-        log.info("in android main");
-        TestDto connection = new TestDto("connection Test Ment");
-        return connection;
     }
 }
