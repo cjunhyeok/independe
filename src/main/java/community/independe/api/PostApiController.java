@@ -4,7 +4,6 @@ import community.independe.api.dtos.Result;
 import community.independe.api.dtos.post.*;
 import community.independe.api.dtos.post.main.*;
 import community.independe.domain.comment.Comment;
-import community.independe.domain.file.Files;
 import community.independe.domain.keyword.KeywordDto;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
@@ -188,7 +187,6 @@ public class PostApiController {
         // 증가 이후 찾기
         Post findPost = postService.findById(postId);
         List<Comment> findComments = commentService.findAllByPostId(postId);
-        List<Files> findFiles = filesService.findAllFilesByPostId(postId);
         Long recommendCount = recommendPostService.countAllByPostIdAndIsRecommend(findPost.getId());
 
         // 베스트 댓글 찾기
@@ -226,7 +224,6 @@ public class PostApiController {
                 findPost,
                 bestCommentDto,
                 commentsDto,
-                findFiles,
                 commentService.countAllByPostId(postId),
                 recommendCount,
                 isRecommend(findPost.getId(), member),
