@@ -2,7 +2,11 @@ package community.independe.api.android;
 
 import community.independe.api.android.dto.*;
 import community.independe.api.dtos.Result;
+import community.independe.api.dtos.post.BestCommentDto;
+import community.independe.api.dtos.post.PostCommentResponse;
+import community.independe.api.dtos.post.PostResponse;
 import community.independe.api.dtos.post.main.*;
+import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
@@ -14,15 +18,18 @@ import community.independe.service.CommentService;
 import community.independe.service.FilesService;
 import community.independe.service.PostService;
 import community.independe.service.VideoService;
+import community.independe.service.manytomany.FavoritePostService;
+import community.independe.service.manytomany.RecommendCommentService;
 import community.independe.service.manytomany.RecommendPostService;
+import community.independe.service.manytomany.ReportPostService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +48,9 @@ public class PostAndroidApiController {
     private final PostApiRepository postApiRepository;
     private final FilesService filesService;
     private final RecommendPostService recommendPostService;
+    private final FavoritePostService favoritePostService;
+    private final ReportPostService reportPostService;
+    private final RecommendCommentService recommendCommentService;
 
     @Operation(summary = "자취 게시글 타입별 조회 (안드로이드)")
     @GetMapping("/api/android/posts/independent/{independentPostType}")
@@ -93,7 +103,7 @@ public class PostAndroidApiController {
 
     @Operation(summary = "자취 게시글 작성 (안드로이드")
     @PostMapping("/api/android/posts/independent/new")
-    public ResponseEntity<Long> createIndependentPost(@RequestBody AndroidCreateIndependentPostRequest request,
+    public AndroidCreateResponse createIndependentPost(@RequestBody AndroidCreateIndependentPostRequest request,
                                                       @AuthenticationPrincipal Member member) {
 
         Long independentPost = postService.createIndependentPost(
@@ -104,7 +114,11 @@ public class PostAndroidApiController {
                 request.getIndependentPostType()
         );
 
-        return ResponseEntity.ok(independentPost);
+        AndroidCreateResponse response = new AndroidCreateResponse(
+                200
+        );
+
+        return response;
     }
 
     @Operation(summary = "지역 게시글 타입별 조회 (안드로이드)")
@@ -150,7 +164,7 @@ public class PostAndroidApiController {
 
     @Operation(summary = "지역 게시글 작성 (안드로이드")
     @PostMapping("/api/android/posts/region/new")
-    public ResponseEntity<Long> createRegionPost(@RequestBody AndroidCreateRegionPostRequest request,
+    public AndroidCreateResponse createRegionPost(@RequestBody AndroidCreateRegionPostRequest request,
                                                       @AuthenticationPrincipal Member member) {
 
         Long regionPost = postService.createRegionPost(
@@ -162,7 +176,66 @@ public class PostAndroidApiController {
                 request.getRegionPostType()
         );
 
-        return ResponseEntity.ok(regionPost);
+        AndroidCreateResponse response = new AndroidCreateResponse(
+                200
+        );
+
+        return response;
+    }
+
+    @GetMapping("/api/android/posts/{postId}")
+    public Result post(@Parameter(description = "게시글 ID(PK)") @PathVariable(name = "postId") Long postId,
+                       @AuthenticationPrincipal Member member) {
+
+        postService.increaseViews(postId);
+
+        // 증가 이후 찾기
+        Post findPost = postService.findById(postId);
+        List<Comment> findComments = commentService.findAllByPostId(postId);
+        Long recommendCount = recommendPostService.countAllByPostIdAndIsRecommend(findPost.getId());
+
+        // 베스트 댓글 찾기
+        BestCommentDto bestCommentDto = null;
+        List<Object[]> bestCommentList = recommendCommentService.findBestComment();
+        if (bestCommentList.isEmpty()) {
+            bestCommentDto = null;
+        } else {
+            Object[] bestCommentObject = bestCommentList.get(0);
+            Comment bestComment = (Comment) bestCommentObject[0];
+            Long bestCommentRecommendCount = (Long) bestCommentObject[1];
+            bestCommentDto = new BestCommentDto(
+                    bestComment.getId(),
+                    bestComment.getMember().getNickname(),
+                    bestComment.getContent(),
+                    bestComment.getCreatedDate(),
+                    bestCommentRecommendCount
+            );
+        }
+
+        // 댓글 Dto 생성
+        List<PostCommentResponse> commentsDto = findComments.stream()
+                .map(c -> new PostCommentResponse(
+                        c.getId(),
+                        c.getMember().getNickname(),
+                        c.getContent(),
+                        c.getCreatedDate(),
+                        recommendCommentService.countAllByCommentIdAndIsRecommend(c.getId()),
+                        (c.getParent() == null) ? null : c.getParent().getId(),
+                        isRecommendComment(c.getId(), findPost.getId(), member)
+                )).collect(Collectors.toList());
+
+        // 게시글 Dto 생성
+        PostResponse postResponse = new PostResponse(
+                findPost,
+                bestCommentDto,
+                commentsDto,
+                commentService.countAllByPostId(postId),
+                recommendCount,
+                isRecommend(findPost.getId(), member),
+                isFavorite(findPost.getId(), member),
+                isReport(findPost.getId(), member)
+        );
+        return new Result(postResponse);
     }
 
     @Operation(summary = "메인화면 조회 (안드로이드)")
@@ -247,5 +320,74 @@ public class PostAndroidApiController {
         );
 
         return new Result(mainPostDto);
+    }
+
+    private boolean isRecommendComment(Long commentId, Long postId, Member member) {
+//        if (member == null) {
+//            return false;
+//        } else {
+//            if (recommendCommentService.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, member.getId()) == null) {
+//                return false;
+//            } else {
+//                return true;
+//            }
+//        }
+
+        if (recommendCommentService.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, 1L) == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private boolean isRecommend(Long postId, Member member) {
+//        if(member == null) {
+//            return false;
+//        } else {
+//            if(recommendPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
+//                return false;
+//            } else {
+//                return true;
+//            }
+//        }
+        if(recommendPostService.findByPostIdAndMemberIdAndIsRecommend(postId, 1L) == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private boolean isFavorite(Long postId, Member member) {
+//        if(member == null) {
+//            return false;
+//        } else {
+//            if(favoritePostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
+//                return false;
+//            } else {
+//                return true;
+//            }
+//        }
+        if(favoritePostService.findByPostIdAndMemberIdAndIsRecommend(postId, 1L) == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private boolean isReport(Long postId, Member member) {
+//        if(member == null) {
+//            return false;
+//        } else {
+//            if(reportPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
+//                return false;
+//            } else {
+//                return true;
+//            }
+//        }
+        if(reportPostService.findByPostIdAndMemberIdAndIsRecommend(postId, 1L) == null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }
