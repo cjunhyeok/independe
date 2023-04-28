@@ -29,8 +29,7 @@ public class PostApiRepository {
     public List<Post> findAllIndependentPostByRecommendCount(LocalDateTime yesterday, LocalDateTime today, int first, int max) {
         return em.createQuery("select p from Post p" +
                 " where p.createdDate BETWEEN :yesterday AND :today" +
-                " and p.independentPostType IS NOT NULL" +
-                " order by p.recommendCount DESC", Post.class)
+                " and p.independentPostType IS NOT NULL", Post.class)
                 .setParameter("yesterday", yesterday)
                 .setParameter("today", today)
                 .setFirstResult(first)
@@ -43,8 +42,7 @@ public class PostApiRepository {
                 " where p.createdDate BETWEEN :yesterday AND :today" +
                 " and p.regionType IS NOT NULL" +
                 " and p.regionPostType IS NOT NULL" +
-                " and p.regionType = :regionType" +
-                " order by p.recommendCount DESC", Post.class)
+                " and p.regionType = :regionType", Post.class)
                 .setFirstResult(first)
                 .setMaxResults(max)
                 .setParameter("yesterday", yesterday)
@@ -57,8 +55,7 @@ public class PostApiRepository {
         return em.createQuery("select p from Post p" +
                 " where p.createdDate BETWEEN :yesterday AND :today" +
                 " and p.independentPostType IS NULL" +
-                " and p.regionType <> :regionType" +
-                " order by p.recommendCount DESC", Post.class)
+                " and p.regionType <> :regionType", Post.class)
                 .setFirstResult(first)
                 .setMaxResults(max)
                 .setParameter("yesterday", yesterday)
