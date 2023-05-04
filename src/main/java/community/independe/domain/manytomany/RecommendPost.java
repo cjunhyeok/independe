@@ -33,11 +33,17 @@ public class RecommendPost extends BaseManyToManyEntity{
     @Builder
     public RecommendPost(Member member, Post post, Boolean isRecommend) {
         this.member = member;
-        this.post = post;
+        addPost(post);
         this.isRecommend = isRecommend;
     }
 
     public void updateIsRecommend(Boolean isRecommend) {
         this.isRecommend = isRecommend;
+    }
+
+    // 연관관계 메서드
+    public void addPost(Post post) {
+        this.post = post;
+        post.getRecommendPosts().add(this);
     }
 }
