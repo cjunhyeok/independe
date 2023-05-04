@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateParentCommentRequest {
 
-    private Long memberId;
     private Long postId;
     private String content;
 }
