@@ -1,6 +1,7 @@
 package community.independe.domain.post;
 
 import community.independe.domain.BaseEntity;
+import community.independe.domain.manytomany.RecommendPost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
@@ -10,6 +11,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -39,6 +43,9 @@ public class Post extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member; // 게시글, 회원 N : 1 다대일 단방향 매핑
+
+    @OneToMany(mappedBy = "post") // 게시글, 게시글 추천
+    private List<RecommendPost> recommendPosts = new ArrayList<>();
 
     @Builder
     public Post(String title, String content, IndependentPostType independentPostType, RegionType regionType, RegionPostType regionPostType, Member member) {
