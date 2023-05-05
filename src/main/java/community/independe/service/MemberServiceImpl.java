@@ -22,6 +22,11 @@ public class MemberServiceImpl implements MemberService{
     @Override
     @Transactional
     public Long join(String username, String password, String nickname, String email, String number, String city, String street, String zipcode) {
+
+        if (checkUsername(username) == false) {
+            throw new IllegalArgumentException("중복된 Id");
+        }
+
         Member member = Member.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
@@ -39,5 +44,14 @@ public class MemberServiceImpl implements MemberService{
     public Member findById(Long id) {
         return memberRepository.findById(id).orElseThrow(()
                 -> new IllegalArgumentException("Member not exist"));
+    }
+
+    private boolean checkUsername(String username) {
+        Member findUsername = memberRepository.findByUsername(username);
+
+        if (findUsername != null) {
+            return false;
+        }
+        return true;
     }
 }
