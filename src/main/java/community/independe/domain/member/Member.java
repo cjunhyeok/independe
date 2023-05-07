@@ -24,15 +24,20 @@ public class Member extends BaseEntity {
     private String role; // 사용자 권한
 
     //== 선택 사항 == //
-    private String email; // 이메일
     private String number; // 전화번호
     @Embedded // 값 타입
     private Address address; // 주소
 
+    //== Oauth2 ==//
+    private String registrationId; // 인가서버 식별자
+    private String provider; // 인가서버
+    private String email; // 이메일
+
     //== 생성 메서드 ==//
     @Builder
     public Member(String username, String password, String nickname, String role,
-                               String email, String number, Address address) {
+                               String email, String number, Address address,
+                               String registrationId, String provider) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
@@ -40,5 +45,7 @@ public class Member extends BaseEntity {
         this.email = email;
         this.number = number;
         this.address = address;
+        this.registrationId = registrationId;
+        this.provider = provider;
     }
 }
