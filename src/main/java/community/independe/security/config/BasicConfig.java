@@ -1,5 +1,9 @@
 package community.independe.security.config;
 
+import com.nimbusds.jose.jwk.OctetSequenceKey;
+import community.independe.security.handler.OAuth2AuthenticationSuccessHandler;
+import community.independe.security.service.oauth2.CustomOAuth2UserService;
+import community.independe.security.signature.MacSecuritySigner;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +22,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class BasicConfig {
 
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final MacSecuritySigner macSecuritySigner;
+    private final OctetSequenceKey octetSequenceKey;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -25,6 +33,11 @@ public class BasicConfig {
 
         http.authorizeHttpRequests().anyRequest().permitAll();
         http.formLogin();
+
+        http.oauth2Login(oauth2 ->
+                oauth2.userInfoEndpoint(userInfoEndpointConfig ->
+                        userInfoEndpointConfig.userService(customOAuth2UserService))
+                        .successHandler(oAuth2AuthenticationSuccessHandler()));
 
         http.cors().configurationSource(corsConfigurationSource()); // cors 설정
 
@@ -37,16 +50,22 @@ public class BasicConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
-//        config.addAllowedOrigin("http://192.168.0.13:8080"); // vue
-        config.addAllowedOrigin("http://192.168.0.5:8080"); // android
-        config.setAllowCredentials(true);
+//        config.addAllowedOrigin("*");
+        config.addAllowedOrigin("http://localhost:8081");
+//        config.setAllowCredentials(true);
 
-        source.registerCorsConfiguration("/api/**", config);
+        source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean
+    public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+        return new OAuth2AuthenticationSuccessHandler(macSecuritySigner, octetSequenceKey);
     }
 }
