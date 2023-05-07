@@ -8,8 +8,10 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Date;
+import java.util.Map;
 
 public abstract class SecuritySigner {
 
@@ -32,5 +34,27 @@ public abstract class SecuritySigner {
         return jwtToken;
     }
 
+    protected String getTokenOAuth2(MACSigner jwsSigner, OAuth2User oAuth2User, JWK jwk) throws JOSEException {
+
+        Map<String, Object> attributes = (Map<String, Object>) oAuth2User.getAttributes().get("response");
+
+        JWSHeader header = new JWSHeader.Builder((JWSAlgorithm)jwk.getAlgorithm()).keyID(jwk.getKeyID()).build();
+
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject("user")
+                .issuer("http://localhost:8080")
+                .claim("username", attributes.get("email")) // 사용자 Id
+                .claim("authority", "ROLE_USER") // 사용자 권한
+                .expirationTime(new Date(new Date().getTime() + 60 * 1000 * 10)) // 10분
+                .build();
+        SignedJWT signedJWT = new SignedJWT(header, jwtClaimsSet);
+        signedJWT.sign(jwsSigner); // mac signer를 이용해 서명
+        String jwtToken = signedJWT.serialize();
+
+        return jwtToken;
+    }
+
     public abstract String getJwtToken(UserDetails user, JWK jwk) throws JOSEException;
+
+    public abstract String getOAuth2JwtToken(OAuth2User oAuth2User, JWK jwk) throws JOSEException;
 }
