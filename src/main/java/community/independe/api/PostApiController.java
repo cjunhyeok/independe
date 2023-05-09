@@ -12,6 +12,7 @@ import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.domain.video.Video;
 import community.independe.repository.query.PostApiRepository;
+import community.independe.security.service.MemberContext;
 import community.independe.service.*;
 import community.independe.service.manytomany.FavoritePostService;
 import community.independe.service.manytomany.RecommendCommentService;
@@ -104,7 +105,7 @@ public class PostApiController {
                                                       @Parameter(description = "내용") @RequestParam String content,
                                                       @Parameter(description = "자취 타입") @RequestParam IndependentPostType independentPostType,
                                                       @Parameter(description = "이미지") @RequestParam(required = false) List<MultipartFile> files,
-                                                      @AuthenticationPrincipal Member member) throws IOException {
+                                                      @AuthenticationPrincipal MemberContext memberContext) throws IOException {
 
         Long independentPost = postService.createIndependentPost(
 //                member.getId(),
@@ -158,7 +159,7 @@ public class PostApiController {
                                                  @Parameter(description = "지역 타입") @RequestParam RegionType regionType,
                                                  @Parameter(description = "지역 게시글 타입") @RequestParam RegionPostType regionPostType,
                                                  @Parameter(description = "이미지") @RequestParam(required = false) List<MultipartFile> files,
-                                                 @AuthenticationPrincipal Member member) throws IOException {
+                                                 @AuthenticationPrincipal MemberContext memberContext) throws IOException {
 
         Long regionPost = postService.createRegionPost(
 //                member.getId(),
@@ -180,7 +181,7 @@ public class PostApiController {
     @Operation(summary = "게시글 상세 조회")
     @GetMapping("/api/posts/{postId}")
     public Result post(@Parameter(description = "게시글 ID(PK)")@PathVariable(name = "postId") Long postId,
-                       @AuthenticationPrincipal Member member) {
+                       @AuthenticationPrincipal MemberContext memberContext) {
 
         postService.increaseViews(postId); // 조회수 증가
 
@@ -216,7 +217,7 @@ public class PostApiController {
                         c.getCreatedDate(),
                         recommendCommentService.countAllByCommentIdAndIsRecommend(c.getId()),
                         (c.getParent() == null) ? null : c.getParent().getId(),
-                        isRecommendComment(c.getId(), findPost.getId(), member)
+                        isRecommendComment(c.getId(), findPost.getId(), memberContext.getMember())
                 )).collect(Collectors.toList());
 
         // 게시글 Dto 생성
@@ -226,9 +227,9 @@ public class PostApiController {
                 commentsDto,
                 commentService.countAllByPostId(postId),
                 recommendCount,
-                isRecommend(findPost.getId(), member),
-                isFavorite(findPost.getId(), member),
-                isReport(findPost.getId(), member)
+                isRecommend(findPost.getId(), memberContext.getMember()),
+                isFavorite(findPost.getId(), memberContext.getMember()),
+                isReport(findPost.getId(), memberContext.getMember())
         );
         return new Result(postResponse);
     }
