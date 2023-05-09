@@ -3,6 +3,7 @@ package community.independe.api;
 import community.independe.api.dtos.comment.CreateChildCommentRequest;
 import community.independe.api.dtos.comment.CreateParentCommentRequest;
 import community.independe.domain.member.Member;
+import community.independe.security.service.MemberContext;
 import community.independe.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class CommentApiController {
 
     @PostMapping("/api/comments/parent/new")
     public ResponseEntity<Long> createParentComment(@RequestBody @Valid CreateParentCommentRequest request,
-                                                    @AuthenticationPrincipal Member member) {
+                                                    @AuthenticationPrincipal MemberContext memberContext) {
         Long parentComment = commentService.createParentComment(
 //                member.getId(),
                 1L,
