@@ -126,12 +126,15 @@ public class PostApiController {
     @GetMapping("/api/posts/region/{regionType}/{regionPostType}")
     public Result regionPosts(@PathVariable(name = "regionType") RegionType regionType,
                               @PathVariable(name = "regionPostType") RegionPostType regionPostType,
+                              @RequestParam(name = "condition") String condition,
+                              @RequestParam(name = "keyword") String keyword,
                               @PageableDefault(size = 10,
                                       sort = "createdDate",
                                       direction = Sort.Direction.DESC)Pageable pageable) {
 
         // 게시글 가져오기
-        Page<Post> allRegionPosts = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
+//        Page<Post> allRegionPosts = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
+        Page<Post> allRegionPosts = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, condition, keyword, pageable);
         List<Post> regionPosts = allRegionPosts.getContent();
         long totalCount = allRegionPosts.getTotalElements();
 

@@ -22,6 +22,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -107,10 +108,13 @@ public class PostController {
     @GetMapping("/posts/region/{regionType}/{regionPostType}")
     public String regionPosts(@PathVariable(value = "regionType") RegionType regionType,
                               @PathVariable(value = "regionPostType") RegionPostType regionPostType,
+                              @RequestParam(name = "condition") String condition,
+                              @RequestParam(name = "keyword") String keyword,
                               @PageableDefault(size = 3) Pageable pageable,
                               Model model) {
 
-        Page<Post> allRegionPosts = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
+//        Page<Post> allRegionPosts = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
+        Page<Post> allRegionPosts = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, condition, keyword, pageable);
         List<Post> content = allRegionPosts.getContent();
         long totalElements = allRegionPosts.getTotalElements();
 

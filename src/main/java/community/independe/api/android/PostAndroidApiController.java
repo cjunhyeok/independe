@@ -125,12 +125,15 @@ public class PostAndroidApiController {
     @GetMapping("/api/android/posts/region/{regionType}/{regionPostType}")
     public Result androidRegionPosts(@PathVariable("regionType")RegionType regionType,
                                      @PathVariable("regionPostType")RegionPostType regionPostType,
+                                     @RequestParam(name = "condition") String condition,
+                                     @RequestParam(name = "keyword") String keyword,
                                      @PageableDefault(
                                              size = 10,
                                              sort = "createdDate",
                                              direction = Sort.Direction.DESC)Pageable pageable) {
 
-        Slice<Post> allRegionPostsSlice = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
+//        Slice<Post> allRegionPostsSlice = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
+        Slice<Post> allRegionPostsSlice = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, condition, keyword, pageable);
         int numberOfElements = allRegionPostsSlice.getNumberOfElements();
         List<Post> allRegionPosts = allRegionPostsSlice.getContent();
         boolean hasNextPage = allRegionPostsSlice.hasNext();
