@@ -70,12 +70,14 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public Page<Post> findAllIndependentPostsByTypeWithMember(IndependentPostType independentPostType, Pageable pageable) {
+//        return postRepository.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
         return postRepository.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
     }
 
     @Override
-    public Page<Post> findAllRegionPostsByTypesWithMember(RegionType regionType, RegionPostType regionPostType, Pageable pageable) {
-        return postRepository.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
+    public Page<Post> findAllRegionPostsByTypesWithMember(RegionType regionType, RegionPostType regionPostType, String condition, String keyword, Pageable pageable) {
+//        return postRepository.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
+        return postRepository.findAllRegionPostsByTypesWithMemberDynamic(regionType, regionPostType, condition, keyword, pageable);
     }
 
     @Override

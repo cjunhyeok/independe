@@ -24,6 +24,8 @@ public interface PostService {
 
     Page<Post> findAllRegionPostsByTypesWithMember(RegionType regionType,
                                                    RegionPostType regionPostType,
+                                                   String condition,
+                                                   String keyword,
                                                    Pageable pageable);
 
     void increaseViews(Long postId);
