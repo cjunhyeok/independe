@@ -1,4 +1,4 @@
-package community.independe.repository;
+package community.independe.repository.post;
 
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
