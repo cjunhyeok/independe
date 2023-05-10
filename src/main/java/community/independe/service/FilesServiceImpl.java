@@ -2,7 +2,7 @@ package community.independe.service;
 
 import community.independe.domain.file.Files;
 import community.independe.domain.post.Post;
-import community.independe.repository.PostRepository;
+import community.independe.repository.post.PostRepository;
 import community.independe.repository.file.FilesRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

@@ -4,7 +4,7 @@ import community.independe.domain.manytomany.ReportPost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.repository.MemberRepository;
-import community.independe.repository.PostRepository;
+import community.independe.repository.post.PostRepository;
 import community.independe.repository.manytomany.ReportPostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

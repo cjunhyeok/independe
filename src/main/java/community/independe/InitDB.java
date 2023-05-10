@@ -11,7 +11,7 @@ import community.independe.domain.video.Video;
 import community.independe.repository.CommentRepository;
 import community.independe.repository.keyword.KeywordRepository;
 import community.independe.repository.MemberRepository;
-import community.independe.repository.PostRepository;
+import community.independe.repository.post.PostRepository;
 import community.independe.repository.video.VideoRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;

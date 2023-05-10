@@ -8,6 +8,7 @@ import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.repository.manytomany.FavoritePostRepository;
 import community.independe.repository.manytomany.RecommendPostRepository;
+import community.independe.repository.post.PostRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

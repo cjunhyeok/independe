@@ -5,7 +5,7 @@ import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.repository.CommentRepository;
 import community.independe.repository.MemberRepository;
-import community.independe.repository.PostRepository;
+import community.independe.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
