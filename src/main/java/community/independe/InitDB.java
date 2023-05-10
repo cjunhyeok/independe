@@ -206,33 +206,62 @@ public class InitDB {
                     .build();
             commentRepository.save(comment4);
 
-            Keyword keyword = new Keyword("자취");
+//            Keyword keyword = new Keyword("자취");
+            Keyword keyword = Keyword.builder()
+                    .keyword("자취")
+                    .build();
             keywordRepository.save(keyword);
-            Keyword keyword2 = new Keyword("자취");
+            Keyword keyword2 = Keyword.builder()
+                    .keyword("자취")
+                    .build();
             keywordRepository.save(keyword2);
-            Keyword keyword3 = new Keyword("생활");
+            Keyword keyword3 = Keyword.builder()
+                    .keyword("생활")
+                    .build();
             keywordRepository.save(keyword3);
-            Keyword keyword4 = new Keyword("생활");
+            Keyword keyword4 = Keyword.builder()
+                    .keyword("생활")
+                    .build();
             keywordRepository.save(keyword4);
-            Keyword keyword5 = new Keyword("생활");
+            Keyword keyword5 = Keyword.builder()
+                    .keyword("생활")
+                    .build();
             keywordRepository.save(keyword5);
-            Keyword keyword6 = new Keyword("꿀팁");
+            Keyword keyword6 = Keyword.builder()
+                    .keyword("꿀팁")
+                    .build();
             keywordRepository.save(keyword6);
-            Keyword keyword7 = new Keyword("건강");
+            Keyword keyword7 = Keyword.builder()
+                    .keyword("건강")
+                    .build();
             keywordRepository.save(keyword7);
-            Keyword keyword8 = new Keyword("청소");
+            Keyword keyword8 = Keyword.builder()
+                    .keyword("청소")
+                    .build();
             keywordRepository.save(keyword8);
-            Keyword keyword9 = new Keyword("빨레");
+            Keyword keyword9 = Keyword.builder()
+                    .keyword("빨레")
+                    .build();
             keywordRepository.save(keyword9);
-            Keyword keyword10 = new Keyword("요리");
+            Keyword keyword10 = Keyword.builder()
+                    .keyword("요리")
+                    .build();
             keywordRepository.save(keyword10);
-            Keyword keyword11 = new Keyword("울산");
+            Keyword keyword11 = Keyword.builder()
+                    .keyword("울산")
+                    .build();
             keywordRepository.save(keyword11);
-            Keyword keyword12 = new Keyword("부산");
+            Keyword keyword12 = Keyword.builder()
+                    .keyword("부산")
+                    .build();
             keywordRepository.save(keyword12);
-            Keyword keyword13 = new Keyword("경남");
+            Keyword keyword13 = Keyword.builder()
+                    .keyword("경남")
+                    .build();
             keywordRepository.save(keyword13);
-            Keyword keyword14 = new Keyword("만남");
+            Keyword keyword14 = Keyword.builder()
+                    .keyword("만남")
+                    .build();
             keywordRepository.save(keyword14);
 
             Video cookVideo = Video.builder()

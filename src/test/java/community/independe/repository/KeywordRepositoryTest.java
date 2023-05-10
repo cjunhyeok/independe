@@ -26,17 +26,23 @@ public class KeywordRepositoryTest {
 
     @Test
     public void basicTest() {
-        Keyword keyword = new Keyword("자취");
+        Keyword keyword = Keyword.builder()
+                .keyword("자취")
+                .build();
 
         Keyword savedKeyword = keywordRepository.save(keyword);
 
-        Assertions.assertThat(savedKeyword.getKeywordName()).isEqualTo("자취");
+        Assertions.assertThat(savedKeyword.getKeyword()).isEqualTo("자취");
     }
 
     @Test
     public void basicFindAllByKeywordNameTest() {
-        Keyword keyword = new Keyword("자취");
-        Keyword keyword2 = new Keyword("자취");
+        Keyword keyword = Keyword.builder()
+                .keyword("자취")
+                .build();
+        Keyword keyword2 = Keyword.builder()
+                .keyword("자취")
+                .build();
 
         Keyword savedKeyword = keywordRepository.save(keyword);
         Keyword savedKeyword2 = keywordRepository.save(keyword2);
@@ -44,14 +50,18 @@ public class KeywordRepositoryTest {
         em.flush();
         em.clear();
 
-        List<Keyword> keywords = keywordRepository.findAllByKeywordName("자취");
-        Assertions.assertThat(keywords.get(1).getKeywordName()).isEqualTo("자취");
+        List<Keyword> keywords = keywordRepository.findAllByKeyword("자취");
+        Assertions.assertThat(keywords.get(1).getKeyword()).isEqualTo("자취");
     }
 
     @Test
     public void countAllByKeywordNameTest() {
-        Keyword keyword = new Keyword("자취");
-        Keyword keyword2 = new Keyword("자취");
+        Keyword keyword = Keyword.builder()
+                .keyword("자취")
+                .build();
+        Keyword keyword2 = Keyword.builder()
+                .keyword("자취")
+                .build();
 
         Keyword savedKeyword = keywordRepository.save(keyword);
         Keyword savedKeyword2 = keywordRepository.save(keyword2);
@@ -59,18 +69,30 @@ public class KeywordRepositoryTest {
         em.flush();
         em.clear();
 
-        Long count = keywordRepository.countAllByKeywordName("자취");
+        Long count = keywordRepository.countAllByKeyword("자취");
         Assertions.assertThat(count).isEqualTo(2);
     }
 
     @Test
     public void groupByTest() {
-        Keyword keyword = new Keyword("자취");
-        Keyword keyword2 = new Keyword("자취");
-        Keyword keyword3 = new Keyword("생활");
-        Keyword keyword4 = new Keyword("생활");
-        Keyword keyword5 = new Keyword("생활");
-        Keyword keyword6 = new Keyword("꿀팁");
+        Keyword keyword = Keyword.builder()
+                .keyword("자취")
+                .build();
+        Keyword keyword2 = Keyword.builder()
+                .keyword("자취")
+                .build();
+        Keyword keyword3 = Keyword.builder()
+                .keyword("자취")
+                .build();
+        Keyword keyword4 = Keyword.builder()
+                .keyword("자취")
+                .build();
+        Keyword keyword5 = Keyword.builder()
+                .keyword("자취")
+                .build();
+        Keyword keyword6 = Keyword.builder()
+                .keyword("자취")
+                .build();
 
         keywordRepository.save(keyword);
         keywordRepository.save(keyword2);
@@ -84,7 +106,7 @@ public class KeywordRepositoryTest {
 
         List<KeywordDto> keywordsByGroup = keywordRepository.findKeywordsByGroup();
 
-        Assertions.assertThat(keywordsByGroup.get(0).getKeywordName()).isEqualTo("생활");
+        Assertions.assertThat(keywordsByGroup.get(0).getKeyword()).isEqualTo("생활");
         Assertions.assertThat(keywordsByGroup.get(0).getKeywordCount()).isEqualTo(3);
     }
 }
