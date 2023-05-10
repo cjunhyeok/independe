@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,9 +17,12 @@ public class Keyword extends BaseEntity{
     @Id @GeneratedValue
     private Long id;
 
-    private String keywordName;
+    private String condition;
+    private String keyword;
 
-    public Keyword(String keywordName) {
-        this.keywordName = keywordName;
+    @Builder
+    public Keyword(String condition, String keyword) {
+        this.condition = condition;
+        this.keyword = keyword;
     }
 }
