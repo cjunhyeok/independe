@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class KeywordDto {
 
-    private String keywordName;
+    private String keyword;
     private Long keywordCount;
 
-    public KeywordDto(String keywordName, Long keywordCount) {
-        this.keywordName = keywordName;
+    public KeywordDto(String keyword, Long keywordCount) {
+        this.keyword = keyword;
         this.keywordCount = keywordCount;
     }
 }
