@@ -21,11 +21,11 @@ public class KeywordRepositoryCustomImpl implements KeywordRepositoryCustom {
     public List<KeywordDto> findKeywordsByGroup() {
         return queryFactory
                 .select(Projections.constructor(KeywordDto.class,
-                        keyword.keywordName,
-                        keyword.count()))
-                .from(keyword)
-                .groupBy(keyword.keywordName)
-                .orderBy(keyword.count().desc())
+                        keyword1.keyword,
+                        keyword1.count()))
+                .from(keyword1)
+                .groupBy(keyword1.keyword)
+                .orderBy(keyword1.count().desc())
                 .offset(0)
                 .limit(10)
                 .fetch();
