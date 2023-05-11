@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface KeywordRepository extends JpaRepository<Keyword, Long>, KeywordRepositoryCustom {
 
-    Long countAllByKeywordName(String keywordName);
+    Long countAllByKeyword(String keyword);
 
-    List<Keyword> findAllByKeywordName(String keywordName);
+    List<Keyword> findAllByKeyword(String keyword);
 
 }
