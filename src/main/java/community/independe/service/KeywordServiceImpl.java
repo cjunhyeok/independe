@@ -1,5 +1,6 @@
 package community.independe.service;
 
+import community.independe.domain.keyword.Keyword;
 import community.independe.domain.keyword.KeywordDto;
 import community.independe.repository.keyword.KeywordRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,5 +21,18 @@ public class KeywordServiceImpl implements KeywordService{
     @Override
     public List<KeywordDto> findKeywordsByGroup() {
         return keywordRepository.findKeywordsByGroup();
+    }
+
+    @Override
+    @Transactional
+    public Long saveKeywordWithCondition(String condition, String keyword) {
+
+        Keyword createKeyword = Keyword.builder()
+                .condition(condition)
+                .keyword(keyword)
+                .build();
+        Keyword savedKeyword = keywordRepository.save(createKeyword);
+
+        return savedKeyword.getId();
     }
 }

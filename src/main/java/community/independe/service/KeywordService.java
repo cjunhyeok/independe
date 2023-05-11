@@ -7,4 +7,6 @@ import java.util.List;
 public interface KeywordService {
 
     List<KeywordDto> findKeywordsByGroup();
+
+    Long saveKeywordWithCondition(String condition, String keyword);
 }
