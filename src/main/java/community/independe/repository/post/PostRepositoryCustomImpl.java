@@ -86,7 +86,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
         if (!StringUtils.hasText(keyword)) {
             return null;
         } else {
-            return post.title.contains(keyword);
+            return post.title.like("%" + keyword + "%");
         }
     }
 
@@ -94,7 +94,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
         if (!StringUtils.hasText(keyword)) {
             return null;
         } else {
-            return post.member.nickname.contains(keyword);
+            return post.member.nickname.like("%" + keyword + "%");
         }
     }
 
