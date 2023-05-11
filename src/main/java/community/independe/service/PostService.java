@@ -20,6 +20,8 @@ public interface PostService {
                           RegionType regionType, RegionPostType regionPostType);
 
     Page<Post> findAllIndependentPostsByTypeWithMember(IndependentPostType independentPostType,
+                                                       String condition,
+                                                       String keyword,
                                                        Pageable pageable);
 
     Page<Post> findAllRegionPostsByTypesWithMember(RegionType regionType,
