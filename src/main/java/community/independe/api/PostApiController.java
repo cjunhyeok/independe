@@ -57,14 +57,20 @@ public class PostApiController {
     @Operation(summary = "자취 게시글 타입별 조회")
     @GetMapping("/api/posts/independent/{independentPostType}")
     public Result independentPosts(@PathVariable(name = "independentPostType") IndependentPostType independentPostType,
+                                   @RequestParam(name = "condition") String condition,
+                                   @RequestParam(name = "keyword") String keyword,
                                    @PageableDefault(
                                            size = 10,
                                            sort = "createdDate",
                                            direction = Sort.Direction.DESC) Pageable pageable) {
 
+        keywordService.saveKeywordWithCondition(condition, keyword);
+
         // 게시글 불러오기
+//        Page<Post> allIndependentPosts =
+//                postService.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
         Page<Post> allIndependentPosts =
-                postService.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
+                postService.findAllIndependentPostsByTypeWithMember(independentPostType, condition, keyword, pageable);
         List<Post> independentPosts = allIndependentPosts.getContent();
         long totalCount = allIndependentPosts.getTotalElements();
 
@@ -131,6 +137,9 @@ public class PostApiController {
                               @PageableDefault(size = 10,
                                       sort = "createdDate",
                                       direction = Sort.Direction.DESC)Pageable pageable) {
+
+        // 검색어 저장
+        keywordService.saveKeywordWithCondition(condition, keyword);
 
         // 게시글 가져오기
 //        Page<Post> allRegionPosts = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);

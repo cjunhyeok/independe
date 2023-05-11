@@ -64,10 +64,15 @@ public class PostController {
 
     @GetMapping("/posts/independent/{independentPostType}")
     public String independentPosts(@PathVariable IndependentPostType independentPostType,
+                                   @RequestParam(name = "condition") String condition,
+                                   @RequestParam(name = "keyword") String keyword,
                                    @PageableDefault(size = 3) Pageable pageable,
                                    Model model) {
 
-        Page<Post> allIndependentPosts = postService.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
+//        Page<Post> allIndependentPosts = postService.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
+        Page<Post> allIndependentPosts =
+                postService.findAllIndependentPostsByTypeWithMember(independentPostType, condition, keyword, pageable);
+
         List<Post> content = allIndependentPosts.getContent();
         long totalElements = allIndependentPosts.getTotalElements();
 

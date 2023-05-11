@@ -55,13 +55,17 @@ public class PostAndroidApiController {
     @Operation(summary = "자취 게시글 타입별 조회 (안드로이드)")
     @GetMapping("/api/android/posts/independent/{independentPostType}")
     public Result androidIndependentPosts(@PathVariable(name = "independentPostType")IndependentPostType independentPostType,
+                                          @RequestParam(name = "condition") String condition,
+                                          @RequestParam(name = "keyword") String keyword,
                                           @PageableDefault(
                                            size = 10,
                                            sort = "createdDate",
                                            direction = Sort.Direction.DESC)Pageable pageable) {
 
         // 게시글 불러오기
-        Slice<Post> allIndependentPostsSlice = postService.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
+//        Slice<Post> allIndependentPostsSlice = postService.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
+        Slice<Post> allIndependentPostsSlice =
+                postService.findAllIndependentPostsByTypeWithMember(independentPostType, condition, keyword, pageable);
 
         // 현재 페이지에 나올 데이터 수
         int numberOfElements = allIndependentPostsSlice.getNumberOfElements();
