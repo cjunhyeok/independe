@@ -71,6 +71,23 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
         return new PageImpl<>(posts, pageable, count);
     }
 
+    @Override
+    public Page<Post> findAllPostsBySearchWithMemberDynamic(String condition, String keyword, Pageable pageable) {
+        List<Post> posts = queryFactory.select(post)
+                .from(post).join(post.member, member).fetchJoin()
+                .where(judgeCondition(condition, keyword))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long count = queryFactory.select(post.count())
+                .from(post)
+                .where(judgeCondition(condition, keyword))
+                .fetchOne();
+
+        return new PageImpl<>(posts, pageable, count);
+    }
+
 
     private BooleanExpression judgeCondition(String condition, String keyword) {
         if (condition.equals("title")) {

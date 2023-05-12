@@ -20,4 +20,6 @@ public interface PostRepositoryCustom {
                                                        String keyword,
                                                        Pageable pageable);
 
+    Page<Post> findAllPostsBySearchWithMemberDynamic(String condition, String keyword, Pageable pageable);
+
 }
