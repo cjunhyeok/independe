@@ -30,5 +30,7 @@ public interface PostService {
                                                    String keyword,
                                                    Pageable pageable);
 
+    Page<Post> findAllPostsBySearchWithMember(String condition, String keyword, Pageable pageable);
+
     void increaseViews(Long postId);
 }

@@ -81,6 +81,11 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
+    public Page<Post> findAllPostsBySearchWithMember(String condition, String keyword, Pageable pageable) {
+        return postRepository.findAllPostsBySearchWithMemberDynamic(condition, keyword, pageable);
+    }
+
+    @Override
     @Transactional
     public void increaseViews(Long postId) {
         Post findPost = postRepository.findById(postId)
