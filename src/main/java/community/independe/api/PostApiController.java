@@ -20,6 +20,7 @@ import community.independe.service.manytomany.RecommendPostService;
 import community.independe.service.manytomany.ReportPostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -246,9 +247,40 @@ public class PostApiController {
         return new Result(postResponse);
     }
 
+    @Operation(summary = "통합검색")
+    @GetMapping("/api/posts/search")
+    public Result searchPost(@RequestParam(name = "condition") String condition,
+                             @RequestParam(name = "keyword") String keyword,
+                             @PageableDefault(size = 10,
+                                     sort = "createdDate",
+                                     direction = Sort.Direction.DESC)Pageable pageable) {
+
+        keywordService.saveKeywordWithCondition(condition, keyword);
+
+        Page<Post> findAllPostsBySearchWithMember = postService.findAllPostsBySearchWithMember(condition, keyword, pageable);
+
+        List<Post> posts = findAllPostsBySearchWithMember.getContent();
+        long totalCount = findAllPostsBySearchWithMember.getTotalElements();
+
+        List<PostsResponse> collect = posts.stream()
+                .map(p -> new PostsResponse(
+                        p.getId(),
+                        p.getMember().getNickname(),
+                        p.getTitle(),
+                        p.getCreatedDate(),
+                        p.getViews(),
+                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
+                        commentService.countAllByPostId(p.getId()),
+                        !filesService.findAllFilesByPostId(p.getId()).isEmpty()
+                ))
+                .collect(Collectors.toList());
+
+        return new Result(collect, totalCount);
+    }
+
     @Operation(summary = "메인화면 조회")
     @GetMapping("/api/posts/main")
-    public Result mainPost() {
+    public Result mainPost(HttpServletResponse response) {
 
         LocalDateTime today = LocalDateTime.now(); // 오늘
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1); // 어제
