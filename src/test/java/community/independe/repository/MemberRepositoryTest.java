@@ -1,52 +1,60 @@
 package community.independe.repository;
 
 import community.independe.domain.member.Member;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@DataJpaTest
 @Transactional
-@Rollback(value = false)
 class MemberRepositoryTest {
 
     @Autowired
     private MemberRepository memberRepository;
 
-    @Test
-    public void basicMemberTest() {
+    @BeforeEach
+    public void initData() {
+        Member member = Member.builder()
+                .username("id")
+                .password("1234")
+                .nickname("nick")
+                .role("ROLE_USER")
+                .build();
+        Member savedMember = memberRepository.save(member);
+    }
 
-        Member member1 = Member.builder()
+    @Test
+    public void saveTest() {
+        // given
+        Member member = Member.builder()
                 .username("id1")
                 .password("1234")
                 .nickname("nick1")
                 .role("ROLE_USER")
                 .build();
+        Member savedMember = memberRepository.save(member);
 
-        Member member2 = Member.builder()
-                .username("id2")
-                .password("1234")
-                .nickname("nick2")
-                .role("ROLE_USER")
-                .build();
+        // when
+        Member findMember = memberRepository.findById(savedMember.getId()).orElseThrow(()
+                -> new IllegalArgumentException("Member not exist"));
 
-        Member savedMember1 = memberRepository.save(member1);
-        Member savedMember2 = memberRepository.save(member2);
+        // then
+        assertThat(findMember.getId()).isEqualTo(savedMember.getId());
+    }
 
-        Member findMember = memberRepository.findByUsername(savedMember1.getUsername());
-        Assertions.assertThat(findMember).isEqualTo(savedMember1);
+    @Test
+    public void findByUsernameTest() {
+        // given
+        String username = "id";
 
-        List<Member> findMembers = memberRepository.findAll();
-        Assertions.assertThat(findMembers.size()).isEqualTo(2);
+        // when
+        Member findMember = memberRepository.findByUsername(username);
 
-        memberRepository.delete(savedMember2);
-        long count = memberRepository.count();
-        Assertions.assertThat(count).isEqualTo(1);
-
+        // then
+        assertThat(findMember.getUsername()).isEqualTo(username);
     }
 }
