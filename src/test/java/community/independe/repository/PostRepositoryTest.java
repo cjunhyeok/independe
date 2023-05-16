@@ -8,18 +8,20 @@ import community.independe.domain.post.enums.RegionType;
 import community.independe.repository.post.PostRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@SpringBootTest
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DataJpaTest
 @Transactional
-@Rollback(value = false)
 class PostRepositoryTest {
 
     @Autowired
@@ -29,126 +31,132 @@ class PostRepositoryTest {
     @PersistenceContext
     EntityManager em;
 
-    @Test
-    public void basicPostTest() {
+    @BeforeEach
+    public void initData() {
         Member member = Member.builder()
-                .username("id1")
+                .username("id")
                 .password("1234")
-                .nickname("nick1")
+                .nickname("nick")
                 .role("ROLE_USER")
                 .build();
-        memberRepository.save(member);
-
-        Post post = Post.builder()
-                .title("title")
-                .content("content")
-                .member(member)
-                .independentPostType(IndependentPostType.COOK)
-                .build();
+        Member savedMember = memberRepository.save(member);
 
         Post independentPost = Post.builder()
-                .title("title2")
-                .content("content2")
-                .member(member)
+                .title("independentTitle")
+                .content("independentContent")
                 .independentPostType(IndependentPostType.COOK)
+                .member(savedMember)
+                .build();
+        Post independentPost2 = Post.builder()
+                .title("independentTitle2")
+                .content("independentContent2")
+                .independentPostType(IndependentPostType.COOK)
+                .member(savedMember)
+                .build();
+        Post independentPost3 = Post.builder()
+                .title("independentTitle3")
+                .content("independentContent3")
+                .independentPostType(IndependentPostType.COOK)
+                .member(savedMember)
                 .build();
 
         Post regionPost = Post.builder()
-                .title("title3")
-                .content("content3")
-                .member(member)
+                .title("regionTitle")
+                .content("regionContent")
                 .regionType(RegionType.ALL)
-                .regionPostType(RegionPostType.RESTAURANT)
+                .regionPostType(RegionPostType.FREE)
+                .member(savedMember)
+                .build();
+        Post regionPost2 = Post.builder()
+                .title("regionTitle2")
+                .content("regionContent2")
+                .regionType(RegionType.ALL)
+                .regionPostType(RegionPostType.FREE)
+                .member(savedMember)
                 .build();
 
-        postRepository.save(post);
-        postRepository.save(independentPost);
-        postRepository.save(regionPost);
-
-        List<Post> findAllPost = postRepository.findAll();
-
-        Assertions.assertThat(findAllPost.size()).isEqualTo(3);
+        Post savedIndependentPost = postRepository.save(independentPost);
+        Post savedIndependentPost2 = postRepository.save(independentPost2);
+        Post savedIndependentPost3 = postRepository.save(independentPost3);
+        Post savedRegionPost = postRepository.save(regionPost);
+        Post savedRegionPost2 = postRepository.save(regionPost2);
     }
 
     @Test
-    public void findAllChildPostTest() {
-        Member member = Member.builder()
-                .username("id1")
-                .password("1234")
-                .nickname("nick1")
-                .role("ROLE_USER")
-                .build();
-        memberRepository.save(member);
-
-        Post post = Post.builder()
-                .title("title")
-                .content("content")
-                .member(member)
-                .independentPostType(IndependentPostType.COOK)
-                .build();
+    public void saveTest() {
+        // given
+        Long memberId = 1L;
+        Member findMember = memberRepository.findById(memberId).orElseThrow(()
+                -> new IllegalArgumentException("Member not exist"));
 
         Post independentPost = Post.builder()
-                .title("title2")
-                .content("content2")
-                .member(member)
+                .title("saveIndependentTitle")
+                .content("saveIndependentContent")
                 .independentPostType(IndependentPostType.COOK)
+                .member(findMember)
                 .build();
 
         Post regionPost = Post.builder()
-                .title("title3")
-                .content("content3")
-                .member(member)
+                .title("saveRegionTitle")
+                .content("saveRegionContent")
                 .regionType(RegionType.ALL)
-                .regionPostType(RegionPostType.RESTAURANT)
+                .regionPostType(RegionPostType.FREE)
+                .member(findMember)
                 .build();
 
-        postRepository.save(post);
-        postRepository.save(independentPost);
-        postRepository.save(regionPost);
+        // when
+        Post savedIndependentPost = postRepository.save(independentPost);
+        Post savedRegionPost = postRepository.save(regionPost);
 
-        List<Post> allIndependentPost = postRepository.findAllIndependentPosts();
-        List<Post> allRegionPost = postRepository.findAllRegionPosts();
-
-        for (Post independentPost1 : allIndependentPost) {
-            System.out.println(independentPost1.getIndependentPostType());
-        }
-
-        for (Post regionPost1 : allRegionPost) {
-            System.out.println(regionPost1.getRegionPostType());
-        }
-
-        Assertions.assertThat(allIndependentPost.size()).isEqualTo(2);
-        Assertions.assertThat(allRegionPost.size()).isEqualTo(1);
+        //then
+        assertThat(savedIndependentPost.getTitle()).isEqualTo("saveIndependentTitle");
+        assertThat(savedRegionPost.getTitle()).isEqualTo("saveRegionTitle");
     }
 
     @Test
-    public void basicFetchTest() {
-        Member member = Member.builder()
-                .username("id1")
-                .password("1234")
-                .nickname("nick1")
-                .role("ROLE_USER")
-                .build();
-        memberRepository.save(member);
+    public void findAllRegionAndIndependentPostsTest() {
+        // given
 
-        Post regionPost = Post.builder()
-                .title("title3")
-                .content("content3")
-                .member(member)
-                .regionType(RegionType.ALL)
-                .regionPostType(RegionPostType.RESTAURANT)
-                .build();
-        postRepository.save(regionPost);
+        // when
+        List<Post> findAllRegionPosts = postRepository.findAllRegionPosts();
+        List<Post> findAllIndependentPosts = postRepository.findAllIndependentPosts();
 
-        em.flush();
-        em.clear();
+        // then
+        assertThat(findAllRegionPosts.size()).isEqualTo(2);
+        assertThat(findAllIndependentPosts.size()).isEqualTo(3);
+    }
 
-        List<Post> allRegionPosts = postRepository.findAllRegionPosts();
+    @Test
+    public void simpleFindAllRegionPostsDynamicTest() {
+        // given
+        RegionType all = RegionType.ALL;
+        RegionPostType free = RegionPostType.FREE;
+        String condition = "title";
+        String keyword = "Title";
+        PageRequest page = PageRequest.of(0, 5);
 
-        for (Post allRegionPost : allRegionPosts) {
-            System.out.println(allRegionPost.getMember().getUsername());
-        }
+        // when
+        Page<Post> findAllRegionPostsByTypesWithMemberDynamicPaging = postRepository.findAllRegionPostsByTypesWithMemberDynamic(all, free, condition, keyword, page);
+        List<Post> findAllRegionPosts = findAllRegionPostsByTypesWithMemberDynamicPaging.getContent();
 
+        // then
+        assertThat(findAllRegionPosts.size()).isEqualTo(2);
+    }
+
+    @Test
+    public void simpleFindAllIndependentPostsDynamicTest() {
+        // given
+        IndependentPostType cook = IndependentPostType.COOK;
+        String condition = "title";
+        String keyword = "Title";
+        PageRequest page = PageRequest.of(0, 5);
+
+        // when
+        Page<Post> findAllIndependentPostsByTypesWithMemberDynamicPaging = postRepository.findAllIndependentPostsByTypeWithMemberDynamic(cook, condition, keyword, page);
+        List<Post> findAllIndependentPosts = findAllIndependentPostsByTypesWithMemberDynamicPaging.getContent();
+
+        // then
+        assertThat(findAllIndependentPosts.size()).isEqualTo(3);
     }
 
 }
