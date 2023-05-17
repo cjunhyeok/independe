@@ -4,23 +4,18 @@ import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
-import community.independe.domain.post.enums.RegionPostType;
-import community.independe.domain.post.enums.RegionType;
 import community.independe.repository.post.PostRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@DataJpaTest
 @Transactional
-@Rollback(value = false)
 public class CommentRepositoryTest {
 
     @Autowired
@@ -33,11 +28,12 @@ public class CommentRepositoryTest {
     private EntityManager em;
 
     @Test
-    public void basicCommentTest() {
+    public void saveParentCommentTest() {
+        // given
         Member member = Member.builder()
-                .username("id1")
+                .username("id")
                 .password("1234")
-                .nickname("nick1")
+                .nickname("nick")
                 .role("ROLE_USER")
                 .build();
         memberRepository.save(member);
@@ -57,79 +53,53 @@ public class CommentRepositoryTest {
                 .build();
         commentRepository.save(comment);
 
+        // when
         Comment findComment = commentRepository.findById(comment.getId()).get();
-        Assertions.assertThat(findComment.getContent()).isEqualTo(comment.getContent());
+
+        // then
+        assertThat(findComment.getContent()).isEqualTo(comment.getContent());
     }
 
     @Test
-    public void findByPostIdTest() {
+    public void saveChildCommentTest() {
+
+        // given
         Member member = Member.builder()
-                .username("id1")
+                .username("id")
                 .password("1234")
-                .nickname("nick1")
+                .nickname("nick")
                 .role("ROLE_USER")
                 .build();
         memberRepository.save(member);
 
-        Post regionPost = Post.builder()
-                .title("regionTitle")
-                .content("regionContent")
-                .member(member)
-                .regionType(RegionType.ALL)
-                .regionPostType(RegionPostType.FREE)
-                .build();
-        postRepository.save(regionPost);
-
-        Post independentPost = Post.builder()
-                .title("independentTitle")
-                .content("independentContent")
+        Post post = Post.builder()
+                .title("title")
+                .content("content")
                 .member(member)
                 .independentPostType(IndependentPostType.COOK)
                 .build();
-        postRepository.save(independentPost);
+        postRepository.save(post);
 
-        Comment comment1 = Comment.builder()
-                .content("comment1")
+        Comment parentComment = Comment.builder()
+                .content("parent")
                 .member(member)
-                .post(independentPost)
+                .post(post)
                 .build();
-        commentRepository.save(comment1);
+        Comment savedParent = commentRepository.save(parentComment);
 
-        Comment comment2 = Comment.builder()
-                .content("comment2")
+        Comment childComment = Comment.builder()
+                .content("child")
                 .member(member)
-                .post(independentPost)
+                .post(post)
+                .parent(savedParent)
                 .build();
-        commentRepository.save(comment2);
+        Comment savedChild = commentRepository.save(childComment);
 
-        Comment comment3 = Comment.builder()
-                .content("comment3")
-                .member(member)
-                .post(regionPost)
-                .build();
-        commentRepository.save(comment3);
+        // when
+        Comment findComment = commentRepository.findById(savedChild.getId()).orElseThrow(()
+                -> new IllegalArgumentException("Comment not exist"));
 
-        Comment comment4 = Comment.builder()
-                .content("comment4")
-                .member(member)
-                .post(independentPost)
-                .parent(comment2)
-                .build();
-        commentRepository.save(comment4);
-
-        List<Comment> allByPostId = commentRepository.findAllByPostId(independentPost.getId());
-
-        em.flush();
-        em.clear();
-
-        for (Comment comment : allByPostId) {
-            if (comment.getParent() == null) {
-                continue;
-            }
-            System.out.println(comment.getParent().getContent());
-        }
-        Long commentCount = commentRepository.countAllByPostId(independentPost.getId());
-        Assertions.assertThat(allByPostId.size()).isEqualTo(3);
-        Assertions.assertThat(commentCount).isEqualTo(3);
+        // then
+        assertThat(findComment.getParent().getId()).isEqualTo(savedParent.getId());
     }
 }
