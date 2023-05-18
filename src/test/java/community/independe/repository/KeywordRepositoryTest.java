@@ -5,18 +5,17 @@ import community.independe.domain.keyword.KeywordDto;
 import community.independe.repository.keyword.KeywordRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@SpringBootTest
+import static org.assertj.core.api.Assertions.*;
+
+@DataJpaTest
 @Transactional
-@Rollback(value = false)
 public class KeywordRepositoryTest {
 
     @Autowired
@@ -25,88 +24,49 @@ public class KeywordRepositoryTest {
     private EntityManager em;
 
     @Test
-    public void basicTest() {
+    public void saveTest() {
+        // given
+        String keywords = "자취";
+        String condition = "제목";
+
         Keyword keyword = Keyword.builder()
-                .keyword("자취")
+                .keyword(keywords)
+                .condition(condition)
                 .build();
 
+        // when
         Keyword savedKeyword = keywordRepository.save(keyword);
 
-        Assertions.assertThat(savedKeyword.getKeyword()).isEqualTo("자취");
-    }
-
-    @Test
-    public void basicFindAllByKeywordNameTest() {
-        Keyword keyword = Keyword.builder()
-                .keyword("자취")
-                .build();
-        Keyword keyword2 = Keyword.builder()
-                .keyword("자취")
-                .build();
-
-        Keyword savedKeyword = keywordRepository.save(keyword);
-        Keyword savedKeyword2 = keywordRepository.save(keyword2);
-
-        em.flush();
-        em.clear();
-
-        List<Keyword> keywords = keywordRepository.findAllByKeyword("자취");
-        Assertions.assertThat(keywords.get(1).getKeyword()).isEqualTo("자취");
-    }
-
-    @Test
-    public void countAllByKeywordNameTest() {
-        Keyword keyword = Keyword.builder()
-                .keyword("자취")
-                .build();
-        Keyword keyword2 = Keyword.builder()
-                .keyword("자취")
-                .build();
-
-        Keyword savedKeyword = keywordRepository.save(keyword);
-        Keyword savedKeyword2 = keywordRepository.save(keyword2);
-
-        em.flush();
-        em.clear();
-
-        Long count = keywordRepository.countAllByKeyword("자취");
-        Assertions.assertThat(count).isEqualTo(2);
+        // then
+        assertThat(savedKeyword.getKeyword()).isEqualTo(keywords);
+        assertThat(savedKeyword.getCondition()).isEqualTo(condition);
     }
 
     @Test
     public void groupByTest() {
-        Keyword keyword = Keyword.builder()
-                .keyword("자취")
-                .build();
-        Keyword keyword2 = Keyword.builder()
-                .keyword("자취")
-                .build();
-        Keyword keyword3 = Keyword.builder()
-                .keyword("자취")
-                .build();
-        Keyword keyword4 = Keyword.builder()
-                .keyword("자취")
-                .build();
-        Keyword keyword5 = Keyword.builder()
-                .keyword("자취")
-                .build();
-        Keyword keyword6 = Keyword.builder()
-                .keyword("자취")
-                .build();
+        // given
+        for(int i = 0; i < 5; i++) {
+            Keyword keyword = Keyword.builder()
+                    .keyword("자취")
+                    .condition("제목")
+                    .build();
+            keywordRepository.save(keyword);
+        }
+        for (int i = 0; i < 4; i++) {
+            Keyword keyword = Keyword.builder()
+                    .keyword("생활")
+                    .condition("제목")
+                    .build();
 
-        keywordRepository.save(keyword);
-        keywordRepository.save(keyword2);
-        keywordRepository.save(keyword3);
-        keywordRepository.save(keyword4);
-        keywordRepository.save(keyword5);
-        keywordRepository.save(keyword6);
+            keywordRepository.save(keyword);
+        }
 
-        em.flush();
-        em.clear();
-
+        // when
         List<KeywordDto> keywordsByGroup = keywordRepository.findKeywordsByGroup();
 
-        Assertions.assertThat(keywordsByGroup.get(0).getKeyword()).isEqualTo("생활");
-        Assertions.assertThat(keywordsByGroup.get(0).getKeywordCount()).isEqualTo(3);
+        // then
+        assertThat(keywordsByGroup.size()).isEqualTo(2);
+        assertThat(keywordsByGroup.get(0).getKeyword()).isEqualTo("자취");
+        assertThat(keywordsByGroup.get(0).getKeywordCount()).isEqualTo(5);
     }
 }
