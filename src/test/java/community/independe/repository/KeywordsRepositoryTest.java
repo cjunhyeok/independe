@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
 @Transactional
-public class KeywordRepositoryTest {
+public class KeywordsRepositoryTest {
 
     @Autowired
     private KeywordRepository keywordRepository;
@@ -35,30 +35,30 @@ public class KeywordRepositoryTest {
                 .build();
 
         // when
-        Keyword savedKeyword = keywordRepository.save(keyword);
+        Keyword savedKeywords = keywordRepository.save(keyword);
 
         // then
-        assertThat(savedKeyword.getKeyword()).isEqualTo(keywords);
-        assertThat(savedKeyword.getCondition()).isEqualTo(condition);
+        assertThat(savedKeywords.getKeyword()).isEqualTo(keywords);
+        assertThat(savedKeywords.getConditions()).isEqualTo(condition);
     }
 
     @Test
     public void groupByTest() {
         // given
         for(int i = 0; i < 5; i++) {
-            Keyword keyword = Keyword.builder()
+            Keyword keywords = Keyword.builder()
                     .keyword("자취")
                     .condition("제목")
                     .build();
-            keywordRepository.save(keyword);
+            keywordRepository.save(keywords);
         }
         for (int i = 0; i < 4; i++) {
-            Keyword keyword = Keyword.builder()
+            Keyword keywords = Keyword.builder()
                     .keyword("생활")
                     .condition("제목")
                     .build();
 
-            keywordRepository.save(keyword);
+            keywordRepository.save(keywords);
         }
 
         // when
