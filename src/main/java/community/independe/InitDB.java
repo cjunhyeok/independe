@@ -49,7 +49,7 @@ public class InitDB {
 
             Member member = Member.builder()
                     .username("id1")
-                    .password(passwordEncoder.encode("Wnsgur1214@"))
+                    .password(passwordEncoder.encode("abc12!"))
                     .nickname("nick1")
                     .role("ROLE_USER")
                     .build();
