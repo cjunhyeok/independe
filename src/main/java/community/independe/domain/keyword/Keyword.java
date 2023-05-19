@@ -17,12 +17,12 @@ public class Keyword extends BaseEntity{
     @Id @GeneratedValue
     private Long id;
 
-    private String condition;
+    private String conditions;
     private String keyword;
 
     @Builder
     public Keyword(String condition, String keyword) {
-        this.condition = condition;
+        this.conditions = condition;
         this.keyword = keyword;
     }
 }
