@@ -7,7 +7,8 @@ import jakarta.persistence.EntityManager;
 
 import java.util.List;
 
-import static community.independe.domain.keyword.QKeyword.*;
+import static community.independe.domain.keyword.QKeyword.keyword1;
+
 
 public class KeywordRepositoryCustomImpl implements KeywordRepositoryCustom {
 
