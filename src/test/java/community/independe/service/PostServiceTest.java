@@ -1,55 +1,148 @@
 package community.independe.service;
 
+import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
-import org.assertj.core.api.Assertions;
+import community.independe.repository.MemberRepository;
+import community.independe.repository.post.PostRepository;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@SpringBootTest
-@Rollback(value = false)
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
 public class PostServiceTest {
 
-    @Autowired
-    private PostService postService;
-    @Autowired
-    private MemberService memberService;
+    @InjectMocks
+    private PostServiceImpl postService;
+    @Mock
+    private PostRepository postRepository;
+    @Mock
+    private MemberRepository memberRepository;
 
     @Test
-    public void basicCreateIndependentPostTest() {
+    public void findByIdTest() {
+        // given
+        Long postId = 1L;
+        Post mockPost = Post.builder().build();
 
-        Long joinMemberId = memberService.join("id1", "1234", "nickname", null, null, null, null, null);
+        // stub
+        when(postRepository.findById(postId)).thenReturn(Optional.of(mockPost));
 
-        String title = "title";
-        String content = "content";
-        IndependentPostType independentPostType = IndependentPostType.COOK;
+        // when
+        Post findPost = postService.findById(postId);
 
-        Long independentPostId = postService.createIndependentPost(joinMemberId, title, content, independentPostType);
-
-        Post findPost = postService.findById(independentPostId);
-
-        Assertions.assertThat(findPost.getIndependentPostType()).isEqualTo(IndependentPostType.COOK);
+        // then
+        verify(postRepository, times(1)).findById(postId);
+        assertThat(findPost).isEqualTo(mockPost);
     }
 
     @Test
-    public void basicCreateRegionPostTest() {
+    public void findByIdFailTest() {
+        // given
+        Long postId = 1L;
 
-        Long joinMemberId = memberService.join("id1", "1234", "nickname", null, null, null, null, null);
+        // stub
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
 
-        String title = "title";
-        String content = "content";
+        // when
+        IllegalArgumentException exception = org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> postService.findById(postId));
+
+        // then
+        verify(postRepository, times(1)).findById(postId);
+        assertThat(exception).isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void createIndependentPostTest() {
+        // given
+        Long memberId = 1L;
+        String title = "independentTitle";
+        String content = "independentContent";
+        IndependentPostType independentPostType = IndependentPostType.COOK;
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(Member.builder().build()));
+        when(postRepository.save(any(Post.class))).thenReturn(Post.builder().build());
+
+        // when
+        Long independentPostId = postService.createIndependentPost(memberId, title, content, independentPostType);
+
+        verify(memberRepository).findById(memberId);
+        verify(postRepository).save(any(Post.class));
+    }
+
+    @Test
+    public void createRegionPostTest() {
+        // given
+        Long memberId = 1L;
+        String title = "regionTitle";
+        String content = "regionContent";
         RegionType regionType = RegionType.ALL;
-        RegionPostType regionPostType = RegionPostType.RESTAURANT;
+        RegionPostType regionPostType = RegionPostType.FREE;
 
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(Member.builder().build()));
+        when(postRepository.save(any(Post.class))).thenReturn(Post.builder().build());
 
-        Long regionPostId = postService.createRegionPost(joinMemberId, title, content, regionType, regionPostType);
+        // when
+        postService.createRegionPost(memberId, title, content, regionType, regionPostType);
 
-        Post findPost = postService.findById(regionPostId);
+        // then
+        verify(memberRepository).findById(memberId);
+        verify(postRepository).save(any(Post.class));
+    }
 
-        Assertions.assertThat(findPost.getRegionPostType()).isEqualTo(RegionPostType.RESTAURANT);
+    @Test
+    public void createPostFailTest() {
+        // given
+        Long memberId = 1L;
+        String title = "regionTitle";
+        String content = "regionContent";
+        RegionType regionType = RegionType.ALL;
+        RegionPostType regionPostType = RegionPostType.FREE;
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // when
+        IllegalArgumentException exception = org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> postService.createRegionPost(memberId, title, content, regionType, regionPostType));
+
+        // then
+        verify(memberRepository).findById(memberId);
+        verifyNoInteractions(postRepository);
+        assertThat(exception).isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void increaseViewTest() {
+        // given
+        Long postId = 1L;
+        Post mockPost = Post.builder()
+                .title("title")
+                .content("content")
+                .independentPostType(IndependentPostType.COOK)
+                .build();
+
+        // stub
+        when(postRepository.findById(postId)).thenReturn(Optional.of(mockPost));
+
+        // when
+        postService.increaseViews(postId);
+
+        // then
+        verify(postRepository, times(1)).findById(postId);
+        assertThat(1).isEqualTo(mockPost.getViews());
     }
 }
