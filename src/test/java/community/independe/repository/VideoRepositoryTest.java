@@ -7,15 +7,15 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@SpringBootTest
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DataJpaTest
 @Transactional
-@Rollback(value = false)
 public class VideoRepositoryTest {
 
     @Autowired
@@ -23,6 +23,59 @@ public class VideoRepositoryTest {
 
     @PersistenceContext
     private EntityManager em;
+
+    @Test
+    public void saveTest() {
+        // given
+        Video video = Video.builder()
+                .videoUrl("videoUrl")
+                .videoMasterUrl("masterUrl")
+                .materName("masterName")
+                .videoTitle("realTitle")
+                .independentPostType(IndependentPostType.COOK)
+                .views(1)
+                .build();
+
+        // when
+        Video savedVideo = videoRepository.save(video);
+
+        // then
+        assertThat(savedVideo.getVideoUrl()).isEqualTo(video.getVideoUrl());
+    }
+
+    @Test
+    public void findAllByIndependentPostTypeTest() {
+        // given
+        for (int i = 0; i < 5; i++) {
+            Video video = Video.builder()
+                    .videoUrl("videoUrl" + i)
+                    .videoMasterUrl("masterUrl" + i)
+                    .materName("masterName" + i)
+                    .videoTitle("realTitle" + i)
+                    .independentPostType(IndependentPostType.COOK)
+                    .views(i)
+                    .build();
+            Video savedVideo = videoRepository.save(video);
+        }
+        Video nextVideo = Video.builder()
+                .videoUrl("videoUrl")
+                .videoMasterUrl("masterUrl")
+                .materName("masterName")
+                .videoTitle("realTitle")
+                .independentPostType(IndependentPostType.WASH)
+                .views(1)
+                .build();
+        Video savedNextVideo = videoRepository.save(nextVideo);
+
+        // when
+        List<Video> findAllByIndependentPostType =
+                videoRepository.findAllByIndependentPostType(IndependentPostType.COOK);
+
+        // then
+        assertThat(findAllByIndependentPostType.size()).isEqualTo(5);
+        assertThat(findAllByIndependentPostType.get(4).getVideoUrl()).isEqualTo("videoUrl" + 0);
+        assertThat(findAllByIndependentPostType.get(0).getVideoUrl()).isEqualTo("videoUrl" + 4);
+    }
 
     @Test
     public void mainTest() {
@@ -74,17 +127,11 @@ public class VideoRepositoryTest {
                 .build();
         videoRepository.save(washVideo2);
 
-        em.flush();
-        em.clear();
-
         List<Video> allForMain = videoRepository.findAllForMain();
 
-        System.out.println(allForMain);
-
-        for (Video video : allForMain) {
-            System.out.println("title : " + video.getVideoTitle());
-            System.out.println("type : " + video.getIndependentPostType());
-            System.out.println("views : " + video.getViews());
-        }
+        assertThat(allForMain.size()).isEqualTo(3);
+        assertThat(allForMain.get(0).getVideoTitle()).isEqualTo("CBUM");
+        assertThat(allForMain.get(1).getVideoTitle()).isEqualTo("infinity challenge");
+        assertThat(allForMain.get(2).getVideoTitle()).isEqualTo("danuri");
     }
 }
