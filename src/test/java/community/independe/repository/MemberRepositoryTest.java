@@ -1,6 +1,8 @@
 package community.independe.repository;
 
 import community.independe.domain.member.Member;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,8 @@ class MemberRepositoryTest {
 
     @Autowired
     private MemberRepository memberRepository;
+    @PersistenceContext
+    EntityManager em;
 
     @BeforeEach
     public void initData() {
@@ -25,6 +29,7 @@ class MemberRepositoryTest {
                 .role("ROLE_USER")
                 .build();
         Member savedMember = memberRepository.save(member);
+        System.out.println(savedMember.getId());
     }
 
     @Test
@@ -56,5 +61,28 @@ class MemberRepositoryTest {
 
         // then
         assertThat(findMember.getUsername()).isEqualTo(username);
+    }
+
+    @Test
+    public void findByIdTest() {
+        // given
+        Member member = Member.builder()
+                .username("id")
+                .password("1234")
+                .nickname("nick")
+                .role("ROLE_USER")
+                .build();
+        Member savedMember = memberRepository.save(member);
+
+        Long id = savedMember.getId();
+
+        // when
+        Member findMember = memberRepository.findById(id).orElseThrow(()
+                -> new IllegalArgumentException("Member not exist"));
+
+        System.out.println(findMember.getId());
+
+        // then
+        assertThat(findMember.getId()).isEqualTo(id);
     }
 }
