@@ -50,7 +50,10 @@ public class FavoritePostServiceImpl implements FavoritePostService {
     @Override
     @Transactional
     public void updateIsFavorite(FavoritePost favoritePost, Boolean isFavorite) {
-        favoritePost.updateIsFavorite(isFavorite);
+        FavoritePost findFavoritePost = favoritePostRepository.findById(favoritePost.getId()).orElseThrow(
+                () -> new IllegalArgumentException("FavoritePost not exist")
+        );
+        findFavoritePost.updateIsFavorite(isFavorite);
     }
 
     @Override
