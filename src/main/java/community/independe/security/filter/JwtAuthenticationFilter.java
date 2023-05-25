@@ -14,17 +14,19 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.IOException;
 
 @Slf4j
-public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private final SecuritySigner securitySigner;
     private final JWK jwk;
 
     public JwtAuthenticationFilter(SecuritySigner securitySigner, JWK jwk) {
+        super(new AntPathRequestMatcher("/api/login"));
         this.securitySigner = securitySigner;
         this.jwk = jwk;
     }
