@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @Transactional
 class PostRepositoryTest {
+    // 추가 테스트 필요
 
     @Autowired
     private PostRepository postRepository;
@@ -85,15 +86,19 @@ class PostRepositoryTest {
     @Test
     public void saveTest() {
         // given
-        Long memberId = 1L;
-        Member findMember = memberRepository.findById(memberId).orElseThrow(()
-                -> new IllegalArgumentException("Member not exist"));
+        Member member = Member.builder()
+                .username("id")
+                .password("1234")
+                .nickname("nick")
+                .role("ROLE_USER")
+                .build();
+        Member savedMember = memberRepository.save(member);
 
         Post independentPost = Post.builder()
                 .title("saveIndependentTitle")
                 .content("saveIndependentContent")
                 .independentPostType(IndependentPostType.COOK)
-                .member(findMember)
+                .member(savedMember)
                 .build();
 
         Post regionPost = Post.builder()
@@ -101,7 +106,7 @@ class PostRepositoryTest {
                 .content("saveRegionContent")
                 .regionType(RegionType.ALL)
                 .regionPostType(RegionPostType.FREE)
-                .member(findMember)
+                .member(savedMember)
                 .build();
 
         // when
@@ -147,8 +152,8 @@ class PostRepositoryTest {
     public void simpleFindAllIndependentPostsDynamicTest() {
         // given
         IndependentPostType cook = IndependentPostType.COOK;
-        String condition = "title";
-        String keyword = "Title";
+        String condition = "ti";
+        String keyword = "Ti";
         PageRequest page = PageRequest.of(0, 5);
 
         // when
