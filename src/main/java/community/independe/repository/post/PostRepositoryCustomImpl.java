@@ -94,8 +94,38 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
             return titleEq(keyword);
         } else if (condition.equals("nickname")) {
             return nicknameEq(keyword);
+        } else if (condition.equals("all")) {
+            return allEq(keyword);
+        } else if (condition.equals("content")) {
+            return contentEq(keyword);
+        } else if (condition.equals("total")) {
+            return totalEq(keyword);
         } else {
             return null;
+        }
+    }
+
+    private BooleanExpression totalEq(String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            return null;
+        } else {
+            return post.title.like("%" + keyword + "%").or(post.content.like("%" + keyword + "%"));
+        }
+    }
+
+    private BooleanExpression allEq(String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            return null;
+        } else {
+            return post.title.like("%" + keyword + "%").or(post.content.like("%" + keyword + "%"));
+        }
+    }
+
+    private BooleanExpression contentEq(String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            return null;
+        } else {
+            return post.content.like("%" + keyword + "%");
         }
     }
 
