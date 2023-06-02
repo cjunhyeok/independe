@@ -58,8 +58,8 @@ public class PostApiController {
     @Operation(summary = "자취 게시글 타입별 조회")
     @GetMapping("/api/posts/independent/{independentPostType}")
     public Result independentPosts(@PathVariable(name = "independentPostType") IndependentPostType independentPostType,
-                                   @RequestParam(name = "condition") String condition,
-                                   @RequestParam(name = "keyword") String keyword,
+                                   @RequestParam(name = "condition", defaultValue = "no") String condition,
+                                   @RequestParam(name = "keyword", required = false) String keyword,
                                    @PageableDefault(
                                            size = 10,
                                            sort = "createdDate",
@@ -114,9 +114,15 @@ public class PostApiController {
                                                       @Parameter(description = "이미지") @RequestParam(required = false) List<MultipartFile> files,
                                                       @AuthenticationPrincipal MemberContext memberContext) throws IOException {
 
+        Long memberId = null;
+        if (memberContext == null) {
+            memberId = null;
+        } else {
+            memberId = memberContext.getMember().getId();
+        }
+
         Long independentPost = postService.createIndependentPost(
-//                member.getId(),
-                2L,
+                memberId,
                 title,
                 content,
                 independentPostType);
@@ -133,8 +139,8 @@ public class PostApiController {
     @GetMapping("/api/posts/region/{regionType}/{regionPostType}")
     public Result regionPosts(@PathVariable(name = "regionType") RegionType regionType,
                               @PathVariable(name = "regionPostType") RegionPostType regionPostType,
-                              @RequestParam(name = "condition") String condition,
-                              @RequestParam(name = "keyword") String keyword,
+                              @RequestParam(name = "condition", defaultValue = "no") String condition,
+                              @RequestParam(name = "keyword", required = false) String keyword,
                               @PageableDefault(size = 10,
                                       sort = "createdDate",
                                       direction = Sort.Direction.DESC)Pageable pageable) {
@@ -174,9 +180,15 @@ public class PostApiController {
                                                  @Parameter(description = "이미지") @RequestParam(required = false) List<MultipartFile> files,
                                                  @AuthenticationPrincipal MemberContext memberContext) throws IOException {
 
+        Long memberId = null;
+        if (memberContext == null) {
+            memberId = null;
+        } else {
+            memberId = memberContext.getMember().getId();
+        }
+
         Long regionPost = postService.createRegionPost(
-//                member.getId(),
-                1L, // for test
+                memberId,
                 title,
                 content,
                 regionType,
@@ -195,6 +207,14 @@ public class PostApiController {
     @GetMapping("/api/posts/{postId}")
     public Result post(@Parameter(description = "게시글 ID(PK)")@PathVariable(name = "postId") Long postId,
                        @AuthenticationPrincipal MemberContext memberContext) {
+
+        Member member = null;
+
+        if (memberContext == null) {
+            member = null;
+        } else {
+            member = memberContext.getMember();
+        }
 
         postService.increaseViews(postId); // 조회수 증가
 
@@ -240,17 +260,18 @@ public class PostApiController {
                 commentsDto,
                 commentService.countAllByPostId(postId),
                 recommendCount,
-                isRecommend(findPost.getId(), memberContext.getMember()),
-                isFavorite(findPost.getId(), memberContext.getMember()),
-                isReport(findPost.getId(), memberContext.getMember())
+                isRecommend(findPost.getId(), member),
+                isFavorite(findPost.getId(), member),
+                isReport(findPost.getId(), member)
         );
+
         return new Result(postResponse);
     }
 
     @Operation(summary = "통합검색")
     @GetMapping("/api/posts/search")
-    public Result searchPost(@RequestParam(name = "condition") String condition,
-                             @RequestParam(name = "keyword") String keyword,
+    public Result searchPost(@RequestParam(name = "condition", defaultValue = "total") String condition,
+                             @RequestParam(name = "keyword", required = false) String keyword,
                              @PageableDefault(size = 10,
                                      sort = "createdDate",
                                      direction = Sort.Direction.DESC)Pageable pageable) {
@@ -262,13 +283,12 @@ public class PostApiController {
         List<Post> posts = findAllPostsBySearchWithMember.getContent();
         long totalCount = findAllPostsBySearchWithMember.getTotalElements();
 
-        List<PostsResponse> collect = posts.stream()
-                .map(p -> new PostsResponse(
+        List<SearchResponse> collect = posts.stream()
+                .map(p -> new SearchResponse(
                         p.getId(),
-                        p.getMember().getNickname(),
                         p.getTitle(),
-                        p.getCreatedDate(),
-                        p.getViews(),
+                        p.getIndependentPostType().getDescription(),
+                        p.getIndependentPostType(),
                         recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
                         !filesService.findAllFilesByPostId(p.getId()).isEmpty()
@@ -344,7 +364,7 @@ public class PostApiController {
                 )).collect(Collectors.toList());
 
         // 인기 검색어 10개
-        List<KeywordDto> keywordDto = keywordService.findKeywordsByGroup();
+        List<KeywordDto> keywordsDto = keywordService.findKeywordsByGroup();
 
         // 영상
         List<Video> findAllForMain = videoService.findAllForMain();
@@ -360,7 +380,7 @@ public class PostApiController {
                 regionAllPostDto,
                 regionNotAllPostDto,
                 popularIndependentPostsDto,
-                keywordDto,
+                keywordsDto,
                 videoMainDto
         );
 
@@ -368,71 +388,50 @@ public class PostApiController {
     }
 
     private boolean isRecommendComment(Long commentId, Long postId, Member member) {
-//        if (member == null) {
-//            return false;
-//        } else {
-//            if (recommendCommentService.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, member.getId()) == null) {
-//                return false;
-//            } else {
-//                return true;
-//            }
-//        }
-
-        if (recommendCommentService.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, 1L) == null) {
+        if (member == null) {
             return false;
         } else {
-            return true;
+            if (recommendCommentService.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, member.getId()) == null) {
+                return false;
+            } else {
+                return true;
+            }
         }
     }
 
     private boolean isRecommend(Long postId, Member member) {
-//        if(member == null) {
-//            return false;
-//        } else {
-//            if(recommendPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
-//                return false;
-//            } else {
-//                return true;
-//            }
-//        }
-        if(recommendPostService.findByPostIdAndMemberIdAndIsRecommend(postId, 1L) == null) {
+        if(member == null) {
             return false;
         } else {
-            return true;
+            if(recommendPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
+                return false;
+            } else {
+                return true;
+            }
         }
     }
 
     private boolean isFavorite(Long postId, Member member) {
-//        if(member == null) {
-//            return false;
-//        } else {
-//            if(favoritePostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
-//                return false;
-//            } else {
-//                return true;
-//            }
-//        }
-        if(favoritePostService.findByPostIdAndMemberIdAndIsRecommend(postId, 1L) == null) {
+        if(member == null) {
             return false;
         } else {
-            return true;
+            if(favoritePostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
+                return false;
+            } else {
+                return true;
+            }
         }
     }
 
     private boolean isReport(Long postId, Member member) {
-//        if(member == null) {
-//            return false;
-//        } else {
-//            if(reportPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
-//                return false;
-//            } else {
-//                return true;
-//            }
-//        }
-        if(reportPostService.findByPostIdAndMemberIdAndIsRecommend(postId, 1L) == null) {
+        if(member == null) {
             return false;
         } else {
-            return true;
+            if(reportPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
+                return false;
+            } else {
+                return true;
+            }
         }
     }
 }
