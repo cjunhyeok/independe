@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Member findByUsername(String username); // 사용자 id 찾기
 
+    Member findByNickname(String nickname); // 사용자 넥네임찾기
+
 }
