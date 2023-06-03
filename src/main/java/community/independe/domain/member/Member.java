@@ -1,6 +1,7 @@
 package community.independe.domain.member;
 
 import community.independe.domain.BaseEntity;
+import community.independe.domain.post.enums.RegionType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,8 +26,8 @@ public class Member extends BaseEntity {
 
     //== 선택 사항 == //
     private String number; // 전화번호
-    @Embedded // 값 타입
-    private Address address; // 주소
+    @Enumerated(EnumType.STRING)
+    private RegionType region; // 지역
 
     //== Oauth2 ==//
     private String registrationId; // 인가서버 식별자
@@ -36,7 +37,7 @@ public class Member extends BaseEntity {
     //== 생성 메서드 ==//
     @Builder
     public Member(String username, String password, String nickname, String role,
-                               String email, String number, Address address,
+                               String email, String number, RegionType region,
                                String registrationId, String provider) {
         this.username = username;
         this.password = password;
@@ -44,8 +45,13 @@ public class Member extends BaseEntity {
         this.role = role;
         this.email = email;
         this.number = number;
-        this.address = address;
+        this.region = region;
         this.registrationId = registrationId;
         this.provider = provider;
+    }
+
+    // 위치 인증 시 변경 메서드
+    public void authenticateRegion(RegionType region) {
+        this.region = region;
     }
 }
