@@ -287,8 +287,13 @@ public class PostApiController {
                 .map(p -> new SearchResponse(
                         p.getId(),
                         p.getTitle(),
-                        p.getIndependentPostType().getDescription(),
+                        (p.getIndependentPostType() == null) ? null : p.getIndependentPostType().getDescription(),
+                        (p.getRegionType() == null) ? null : p.getRegionType().getDescription(),
+                        (p.getRegionPostType() == null) ? null : p.getRegionPostType().getDescription(),
                         p.getIndependentPostType(),
+                        p.getRegionType(),
+                        p.getRegionPostType(),
+                        p.getViews(),
                         recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
                         !filesService.findAllFilesByPostId(p.getId()).isEmpty()
