@@ -1,7 +1,7 @@
 package community.independe.service;
 
-import community.independe.domain.member.Address;
 import community.independe.domain.member.Member;
+import community.independe.domain.post.enums.RegionType;
 import community.independe.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,6 @@ public class MemberServiceImpl implements MemberService{
                 .role("ROLE_USER")
                 .email(email)
                 .number(number)
-                .address(new Address(city, street, zipcode))
                 .build();
         Member savedMember = memberRepository.save(member);
         return savedMember.getId();
@@ -58,6 +57,16 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public Member findByNickname(String nickname) {
         return memberRepository.findByNickname(nickname);
+    }
+
+    @Override
+    @Transactional
+    public void authenticateRegion(Long memberId, RegionType regionType) {
+        Member findMember = memberRepository.findById(memberId).orElseThrow(
+                () -> new IllegalArgumentException("member not exist")
+        );
+
+        findMember.authenticateRegion(regionType);
     }
 
     private boolean checkUsername(String username) {
