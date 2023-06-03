@@ -1,6 +1,10 @@
 package community.independe.api;
 
 import community.independe.api.dtos.member.CreateMemberRequest;
+import community.independe.api.dtos.member.DuplicateNicknameRequest;
+import community.independe.api.dtos.member.DuplicateResponse;
+import community.independe.api.dtos.member.DuplicateUsernameRequest;
+import community.independe.domain.member.Member;
 import community.independe.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -32,5 +36,31 @@ public class MemberApiController {
                 request.getZipcode());
 
         return ResponseEntity.ok(joinMember);
+    }
+
+    @Operation(summary = "아이디 중복 확인")
+    @PostMapping("/api/members/username")
+    public DuplicateResponse duplicateUsername(@RequestBody DuplicateUsernameRequest request) {
+
+        Member findMember = memberService.findByUsername(request.getUsername());
+
+        if (findMember == null) {
+            return new DuplicateResponse(true);
+        } else {
+            return new DuplicateResponse(false);
+        }
+    }
+
+    @Operation(summary = "닉네임 중복 확인")
+    @PostMapping("/api/members/nickname")
+    public DuplicateResponse duplicateNickname(@RequestBody DuplicateNicknameRequest request) {
+
+        Member findMember = memberService.findByNickname(request.getNickname());
+
+        if (findMember == null) {
+            return new DuplicateResponse(true);
+        } else {
+            return new DuplicateResponse(false);
+        }
     }
 }
