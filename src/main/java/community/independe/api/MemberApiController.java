@@ -66,7 +66,7 @@ public class MemberApiController {
 
     @Operation(summary = "위치 인증")
     @PostMapping("/api/members/region")
-    public ResponseEntity authenticateRegion(@RequestBody RegionRequest request,
+    public ResponseEntity authenticateRegion(@RequestBody AuthenticationRegionRequest request,
                                  @AuthenticationPrincipal MemberContext memberContext) {
 
         Member loginMember = memberContext.getMember();
