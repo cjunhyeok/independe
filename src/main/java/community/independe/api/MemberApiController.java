@@ -1,16 +1,16 @@
 package community.independe.api;
 
-import community.independe.api.dtos.member.CreateMemberRequest;
-import community.independe.api.dtos.member.DuplicateNicknameRequest;
-import community.independe.api.dtos.member.DuplicateResponse;
-import community.independe.api.dtos.member.DuplicateUsernameRequest;
+import community.independe.api.dtos.member.*;
 import community.independe.domain.member.Member;
+import community.independe.domain.post.enums.RegionType;
+import community.independe.security.service.MemberContext;
 import community.independe.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -61,6 +61,33 @@ public class MemberApiController {
             return new DuplicateResponse(true);
         } else {
             return new DuplicateResponse(false);
+        }
+    }
+
+    @Operation(summary = "위치 인증")
+    @PostMapping("/api/members/region")
+    public ResponseEntity authenticateRegion(@RequestBody RegionRequest request,
+                                 @AuthenticationPrincipal MemberContext memberContext) {
+
+        Member loginMember = memberContext.getMember();
+        RegionType regionType = regionProvider(request.getRegion());
+
+        memberService.authenticateRegion(loginMember.getId(), regionType);
+
+        return ResponseEntity.ok("Success Region Authentication");
+    }
+
+    private RegionType regionProvider(String region) {
+        if (region.equals("서울")) {
+            return RegionType.SEOUL;
+        } else if (region.equals("울산")) {
+            return RegionType.ULSAN;
+        } else if (region.equals("부산")) {
+            return RegionType.PUSAN;
+        } else if (region.equals("경남")) {
+            return RegionType.KYEONGNAM;
+        } else {
+            throw new IllegalArgumentException("region not exist");
         }
     }
 }
