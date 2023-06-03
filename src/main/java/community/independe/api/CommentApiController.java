@@ -24,9 +24,11 @@ public class CommentApiController {
     @PostMapping("/api/comments/parent/new")
     public ResponseEntity<Long> createParentComment(@RequestBody @Valid CreateParentCommentRequest request,
                                                     @AuthenticationPrincipal MemberContext memberContext) {
+
+        Member loginMember = memberContext.getMember();
+
         Long parentComment = commentService.createParentComment(
-//                member.getId(),
-                1L,
+                loginMember.getId(),
                 request.getPostId(),
                 request.getContent());
 
@@ -35,11 +37,12 @@ public class CommentApiController {
 
     @PostMapping("/api/comments/child/new")
     public ResponseEntity<Long> createChildComment(@RequestBody @Valid CreateChildCommentRequest request,
-                                                   @AuthenticationPrincipal Member member) {
+                                                   @AuthenticationPrincipal MemberContext memberContext) {
+
+        Member loginMember = memberContext.getMember();
 
         Long childComment = commentService.createChildComment(
-//                member.getId(),
-                1L,
+                loginMember.getId(),
                 request.getPostId(),
                 request.getParentId(),
                 request.getContent()
