@@ -3,6 +3,7 @@ package community.independe.service;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
+import community.independe.domain.post.enums.RegionType;
 import community.independe.repository.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
@@ -39,6 +40,8 @@ public class CommentServiceImpl implements CommentService{
         Post findPost = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("post not exist"));
 
+        checkRegion(findMember, findPost);
+
         Comment comment = Comment.builder()
                 .content(content)
                 .member(findMember)
@@ -62,6 +65,8 @@ public class CommentServiceImpl implements CommentService{
         Comment parentComment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("comment not exist"));
 
+        checkRegion(findMember, findPost);
+
         Comment comment = Comment.builder()
                 .content(content)
                 .member(findMember)
@@ -81,5 +86,22 @@ public class CommentServiceImpl implements CommentService{
     @Override
     public List<Comment> findAllByPostId(Long postId) {
         return commentRepository.findAllByPostId(postId);
+    }
+
+    private void checkRegion(Member findMember, Post findPost) {
+
+        Boolean isRegionPost = false;
+
+        if (findPost.getIndependentPostType() != null) {
+            isRegionPost = false;
+        } else if (findPost.getRegionType() == RegionType.ALL){
+            isRegionPost = false;
+        } else {
+            isRegionPost = true;
+        }
+
+        if (isRegionPost == true && (findMember.getRegion() == null || !findMember.getRegion().equals(findPost.getRegionType()))) {
+            throw new IllegalArgumentException("region not authenticate");
+        }
     }
 }
