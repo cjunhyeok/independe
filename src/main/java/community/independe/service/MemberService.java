@@ -7,4 +7,8 @@ public interface MemberService {
     Long join(String username, String password, String nickname, String email, String number, String city, String street, String zipcode);
 
     Member findById(Long id);
+
+    Member findByUsername(String username);
+
+    Member findByNickname(String nickname);
 }

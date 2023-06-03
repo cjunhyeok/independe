@@ -27,6 +27,10 @@ public class MemberServiceImpl implements MemberService{
             throw new IllegalArgumentException("중복된 Id");
         }
 
+        if (checkNickname(nickname) == false) {
+            throw new IllegalArgumentException("중복된 nickname");
+        }
+
         Member member = Member.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
@@ -46,10 +50,29 @@ public class MemberServiceImpl implements MemberService{
                 -> new IllegalArgumentException("Member not exist"));
     }
 
+    @Override
+    public Member findByUsername(String username) {
+        return memberRepository.findByUsername(username);
+    }
+
+    @Override
+    public Member findByNickname(String nickname) {
+        return memberRepository.findByNickname(nickname);
+    }
+
     private boolean checkUsername(String username) {
         Member findUsername = memberRepository.findByUsername(username);
 
         if (findUsername != null) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkNickname(String nickname) {
+        Member findNickname = memberRepository.findByNickname(nickname);
+
+        if (findNickname != null) {
             return false;
         }
         return true;
