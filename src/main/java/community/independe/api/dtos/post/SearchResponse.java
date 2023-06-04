@@ -14,6 +14,7 @@ public class SearchResponse {
 
     private Long postId;
     private String title;
+    private String nickname;
     private String independentPostType;
     private String regionType;
     private String regionPostType;
