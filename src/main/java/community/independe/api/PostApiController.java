@@ -65,7 +65,10 @@ public class PostApiController {
                                            sort = "createdDate",
                                            direction = Sort.Direction.DESC) Pageable pageable) {
 
-        keywordService.saveKeywordWithCondition(condition, keyword);
+        if(!keyword.isEmpty()) {
+            keywordService.saveKeywordWithCondition(condition, keyword);
+        }
+
 
         // 게시글 불러오기
 //        Page<Post> allIndependentPosts =
@@ -146,7 +149,10 @@ public class PostApiController {
                                       direction = Sort.Direction.DESC)Pageable pageable) {
 
         // 검색어 저장
-        keywordService.saveKeywordWithCondition(condition, keyword);
+        if(!keyword.isEmpty()) {
+            keywordService.saveKeywordWithCondition(condition, keyword);
+        }
+
 
         // 게시글 가져오기
 //        Page<Post> allRegionPosts = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
@@ -276,7 +282,9 @@ public class PostApiController {
                                      sort = "createdDate",
                                      direction = Sort.Direction.DESC)Pageable pageable) {
 
-        keywordService.saveKeywordWithCondition(condition, keyword);
+        if(!keyword.isEmpty()) {
+            keywordService.saveKeywordWithCondition(condition, keyword);
+        }
 
         Page<Post> findAllPostsBySearchWithMember = postService.findAllPostsBySearchWithMember(condition, keyword, pageable);
 
