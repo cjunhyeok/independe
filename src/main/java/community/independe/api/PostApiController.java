@@ -65,7 +65,9 @@ public class PostApiController {
                                            sort = "createdDate",
                                            direction = Sort.Direction.DESC) Pageable pageable) {
 
-        if(!keyword.isEmpty()) {
+        if (keyword == null || keyword.isEmpty()) {
+
+        } else {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
 
@@ -149,10 +151,11 @@ public class PostApiController {
                                       direction = Sort.Direction.DESC)Pageable pageable) {
 
         // 검색어 저장
-        if(!keyword.isEmpty()) {
+        if (keyword == null || keyword.isEmpty()) {
+
+        } else {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
-
 
         // 게시글 가져오기
 //        Page<Post> allRegionPosts = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
@@ -282,7 +285,9 @@ public class PostApiController {
                                      sort = "createdDate",
                                      direction = Sort.Direction.DESC)Pageable pageable) {
 
-        if(!keyword.isEmpty()) {
+        if (keyword == null || keyword.isEmpty()) {
+
+        } else {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
 
@@ -295,6 +300,7 @@ public class PostApiController {
                 .map(p -> new SearchResponse(
                         p.getId(),
                         p.getTitle(),
+                        p.getMember().getNickname(),
                         (p.getIndependentPostType() == null) ? null : p.getIndependentPostType().getDescription(),
                         (p.getRegionType() == null) ? null : p.getRegionType().getDescription(),
                         (p.getRegionPostType() == null) ? null : p.getRegionPostType().getDescription(),
