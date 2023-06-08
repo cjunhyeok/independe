@@ -2,6 +2,7 @@ package community.independe.api.manytomany;
 
 import community.independe.domain.manytomany.ReportPost;
 import community.independe.domain.member.Member;
+import community.independe.security.service.MemberContext;
 import community.independe.service.manytomany.ReportPostService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +23,14 @@ public class ReportPostApiController {
     @Operation(summary = "게시글 신고")
     @PostMapping("/api/reportPost/{postId}")
     public ResponseEntity addReportPost(@PathVariable(name = "postId") Long postId,
-                                        @AuthenticationPrincipal Member member) {
+                                        @AuthenticationPrincipal MemberContext memberContext) {
 
-//        ReportPost findReportPost = reportPostService.findByPostIdAndMemberId(postId, member.getId());
-        ReportPost findReportPost = reportPostService.findByPostIdAndMemberId(postId, 1L);
+        Member loginMember = memberContext.getMember();
+
+        ReportPost findReportPost = reportPostService.findByPostIdAndMemberId(postId, loginMember.getId());
 
         if (findReportPost == null) {
-//            reportPostService.save(postId, member.getId());
-            reportPostService.save(postId, 1L);
+            reportPostService.save(postId, loginMember.getId());
         } else if (findReportPost.getIsReport() == false) {
             reportPostService.updateIsReport(findReportPost, true);
         } else if (findReportPost.getIsReport() == true) {
