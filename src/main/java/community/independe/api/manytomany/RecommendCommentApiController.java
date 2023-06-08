@@ -2,6 +2,7 @@ package community.independe.api.manytomany;
 
 import community.independe.domain.manytomany.RecommendComment;
 import community.independe.domain.member.Member;
+import community.independe.security.service.MemberContext;
 import community.independe.service.manytomany.RecommendCommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -22,16 +23,15 @@ public class RecommendCommentApiController {
     @Operation(summary = "댓글 추천")
     @PostMapping("/api/recommendComment/{commentId}")
     public ResponseEntity addRecommendComment(@PathVariable(name = "commentId") Long commentId,
-                                              @AuthenticationPrincipal Member member) {
+                                              @AuthenticationPrincipal MemberContext memberContext) {
 
-//        RecommendComment findRecommendComment = recommendCommentService.findByCommentIdAndMemberId(
-//                commentId, member.getId());
+        Member loginMember = memberContext.getMember();
+
         RecommendComment findRecommendComment = recommendCommentService.findByCommentIdAndMemberId(
-                commentId, 1L);
+                commentId, loginMember.getId());
 
         if (findRecommendComment == null) {
-//            Long savedRecommendComment = recommendCommentService.save(commentId, member.getId());
-            Long savedRecommendComment = recommendCommentService.save(commentId, 1L);
+            Long savedRecommendComment = recommendCommentService.save(commentId, loginMember.getId());
         } else if (findRecommendComment.getIsRecommend() == false) {
             recommendCommentService.updateIsRecommend(findRecommendComment, true);
         } else if (findRecommendComment.getIsRecommend() == true) {
