@@ -2,6 +2,7 @@ package community.independe.api.manytomany;
 
 import community.independe.domain.manytomany.RecommendPost;
 import community.independe.domain.member.Member;
+import community.independe.security.service.MemberContext;
 import community.independe.service.PostService;
 import community.independe.service.manytomany.RecommendPostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,14 +25,14 @@ public class RecommendPostApiController {
     @Operation(summary = "게시글 추천")
     @PostMapping("/api/recommendPost/{postId}")
     public ResponseEntity addRecommendPost(@PathVariable(name = "postId") Long postId,
-                                                 @AuthenticationPrincipal Member member) {
+                                                 @AuthenticationPrincipal MemberContext memberContext) {
 
-//        RecommendPost findRecommendPostByPost = recommendPostService.findByPostIdAndMemberId(postId, member.getId());
-        RecommendPost findRecommendPostByPost = recommendPostService.findByPostIdAndMemberId(postId,1L);
+        Member loginMember = memberContext.getMember();
+
+        RecommendPost findRecommendPostByPost = recommendPostService.findByPostIdAndMemberId(postId, loginMember.getId());
 
         if (findRecommendPostByPost == null) {
-//            recommendPostService.save(postId, member.getId());
-            recommendPostService.save(postId, 1L);
+            recommendPostService.save(postId, loginMember.getId());
         } else if(findRecommendPostByPost.getIsRecommend() == false) {
             recommendPostService.updateIsRecommend(findRecommendPostByPost, true);
         } else if(findRecommendPostByPost.getIsRecommend() == true) {
