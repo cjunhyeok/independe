@@ -1,7 +1,8 @@
 package community.independe.security.service.oauth2;
 
+import community.independe.converters.ProviderUserConverter;
+import community.independe.converters.ProviderUserRequest;
 import community.independe.domain.member.Member;
-import community.independe.domain.member.oauth2.NaverUser;
 import community.independe.domain.member.oauth2.ProviderUser;
 import community.independe.repository.MemberRepository;
 import community.independe.security.service.MemberContext;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Getter
@@ -30,6 +32,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProviderUserConverter<ProviderUserRequest, ProviderUser> providerUserConverter;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -38,7 +41,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest); // 인가 서버와 통신하여 사용자 정보를 가져온다.
 
-        ProviderUser providerUser = providerUser(clientRegistration, oAuth2User);
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+
+        ProviderUserRequest providerUserRequest = new ProviderUserRequest(clientRegistration, oAuth2User);
+        ProviderUser providerUser = providerUser(providerUserRequest);
 
         // 회원가입
         Member savedMember = register(providerUser, userRequest);
@@ -74,14 +80,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         }
     }
 
-    public ProviderUser providerUser(ClientRegistration clientRegistration, OAuth2User oAuth2User) {
+    public ProviderUser providerUser(ProviderUserRequest providerUserRequest) {
 
-        String registrationId = clientRegistration.getRegistrationId();
-        if (registrationId.equals("naver")) {
-            return new NaverUser(oAuth2User, clientRegistration);
-        } else {
-            throw new IllegalArgumentException(registrationId + " not exist");
-        }
-
+        return providerUserConverter.converter(providerUserRequest);
     }
 }
