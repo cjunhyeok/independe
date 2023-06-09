@@ -54,4 +54,12 @@ public class Member extends BaseEntity {
     public void authenticateRegion(RegionType region) {
         this.region = region;
     }
+
+    // 소셜 로그인을 위한 수정
+    public void oauthMember(String nickname, String email, String number) {
+        this.nickname = nickname;
+        this.email = email;
+        this.number = number;
+        this.role = "ROLE_USER";
+    }
 }
