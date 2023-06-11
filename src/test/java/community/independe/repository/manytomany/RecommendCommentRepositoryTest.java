@@ -5,7 +5,7 @@ import community.independe.domain.manytomany.RecommendComment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
-import community.independe.repository.CommentRepository;
+import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
 import org.junit.jupiter.api.Test;

@@ -3,7 +3,7 @@ package community.independe.service.manytomany;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.manytomany.RecommendComment;
 import community.independe.domain.member.Member;
-import community.independe.repository.CommentRepository;
+import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.manytomany.RecommendCommentRepository;
 import lombok.RequiredArgsConstructor;
