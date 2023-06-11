@@ -12,11 +12,13 @@ public interface ChatRepository extends JpaRepository<Chat, Long>, ChatRepositor
     @Query(value = "select c from Chat c join fetch c.receiver" +
             " join fetch c.sender" +
             " where (c.sender.id = :loginMemberId and c.receiver.id = :receiverId)" +
-            " or (c.sender.id = :receiverId and c.receiver.id = :loginMemberId)",
+            " or (c.sender.id = :receiverId and c.receiver.id = :loginMemberId)" +
+            " order by c.createdDate desc",
             countQuery = "select c from Chat c join fetch c.receiver" +
                     " join fetch c.sender" +
                     " where (c.sender.id = :loginMemberId and c.receiver.id = :receiverId)" +
-                    " or (c.sender.id = :receiverId and c.receiver.id = :loginMemberId)")
+                    " or (c.sender.id = :receiverId and c.receiver.id = :loginMemberId)" +
+                    " order by c.createdDate desc")
     List<Chat> findChatHistory(@Param("loginMemberId") Long loginMemberId,
                                @Param("receiverId") Long receiverId);
 }
