@@ -4,7 +4,7 @@ import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.RegionType;
-import community.independe.repository.CommentRepository;
+import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,9 @@ public class CommentServiceImpl implements CommentService{
         Post findPost = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("post not exist"));
 
-        checkRegion(findMember, findPost);
+        if (!findPost.getMember().equals(findMember)) {
+            checkRegion(findMember, findPost);
+        }
 
         Comment comment = Comment.builder()
                 .content(content)
@@ -65,7 +67,9 @@ public class CommentServiceImpl implements CommentService{
         Comment parentComment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("comment not exist"));
 
-        checkRegion(findMember, findPost);
+        if (!findPost.getMember().equals(findMember)) {
+            checkRegion(findMember, findPost);
+        }
 
         Comment comment = Comment.builder()
                 .content(content)
