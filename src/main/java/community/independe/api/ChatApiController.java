@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class ChatApiController {
         Member loginMember = ((MemberContext) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getMember();
 
         message.setSenderNickname(loginMember.getNickname());
+        message.setCreatedDate(LocalDateTime.now());
 
         simpMessagingTemplate.convertAndSendToUser(message.getChatRoomId().toString(),"/private",message);
         Long savedChat = chatService.saveChat(loginMember.getId(), message.getReceiverId(), message.getMessage(), false);
