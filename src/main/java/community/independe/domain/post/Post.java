@@ -62,4 +62,19 @@ public class Post extends BaseEntity {
     public void increaseViews(int views) {
         this.views = views;
     }
+
+    // 게시글 수정
+    public void updatePost(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
+    // 연관 회원삭제
+    public void deleteMember() {
+        this.member = null;
+    }
+    // 게시글 추천 삭제
+    public void deleteRecommendPosts() {
+        this.recommendPosts = new ArrayList<>();
+    }
 }
