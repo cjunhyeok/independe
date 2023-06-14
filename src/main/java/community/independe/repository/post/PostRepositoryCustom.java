@@ -22,4 +22,6 @@ public interface PostRepositoryCustom {
 
     Page<Post> findAllPostsBySearchWithMemberDynamic(String condition, String keyword, Pageable pageable);
 
+    int deletePostByPostId(Long postId);
+
 }

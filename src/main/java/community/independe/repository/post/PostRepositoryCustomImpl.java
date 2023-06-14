@@ -20,8 +20,10 @@ import static community.independe.domain.post.QPost.post;
 public class PostRepositoryCustomImpl implements PostRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
+    private final EntityManager em;
 
     public PostRepositoryCustomImpl(EntityManager em) {
+        this.em = em;
         this.queryFactory = new JPAQueryFactory(em);
     }
 
@@ -36,6 +38,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
                 .where(post.regionPostType.eq(regionPostType)
                         .and(post.regionType.eq(regionType)
                                 .and(judgeCondition(condition, keyword))))
+                .orderBy(post.createdDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -57,6 +60,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
                 .from(post).join(post.member, member).fetchJoin()
                 .where(post.independentPostType.eq(independentPostType)
                         .and(judgeCondition(condition, keyword)))
+                .orderBy(post.createdDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -76,6 +80,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
         List<Post> posts = queryFactory.select(post)
                 .from(post).join(post.member, member).fetchJoin()
                 .where(judgeCondition(condition, keyword))
+                .orderBy(post.createdDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -86,6 +91,13 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
                 .fetchOne();
 
         return new PageImpl<>(posts, pageable, count);
+    }
+
+    @Override
+    public int deletePostByPostId(Long postId) {
+        return em.createQuery("delete from Post p where p.id = :postId")
+                .setParameter("postId", postId)
+                .executeUpdate();
     }
 
 
