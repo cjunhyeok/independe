@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface FilesRepository extends JpaRepository<Files, Long> {
+public interface FilesRepository extends JpaRepository<Files, Long>, FilesRepositoryCustom {
 
     @Query(value = "select f from Files f left join fetch f.post" +
             " where f.post.id = :postId",
