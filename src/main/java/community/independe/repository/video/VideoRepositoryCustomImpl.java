@@ -47,4 +47,15 @@ public class VideoRepositoryCustomImpl implements VideoRepositoryCustom{
 
         return result;
     }
+
+    @Override
+    public List<Video> findAllByIndependentPostType(IndependentPostType independentPostType) {
+        return queryFactory.selectFrom(video)
+                .where(video.independentPostType.eq(independentPostType))
+                .orderBy(video.views.desc())
+                .offset(0)
+                .limit(3)
+                .fetch();
+
+    }
 }
