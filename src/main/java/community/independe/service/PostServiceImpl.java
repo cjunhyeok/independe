@@ -1,11 +1,14 @@
 package community.independe.service;
 
+import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
+import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
+import community.independe.repository.file.FilesRepository;
 import community.independe.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -22,6 +27,8 @@ public class PostServiceImpl implements PostService{
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final FilesRepository filesRepository;
 
     @Override
     public Post findById(Long postId) {
@@ -66,6 +73,38 @@ public class PostServiceImpl implements PostService{
 
         postRepository.save(post);
         return post.getId();
+    }
+
+    @Override
+    @Transactional
+    public Long updatePost(Long postId, String title, String content) {
+
+        Post findPost = postRepository.findById(postId).orElseThrow(
+                () -> new IllegalArgumentException("post not exist")
+        );
+
+        findPost.updatePost(title, content);
+
+        return findPost.getId();
+    }
+
+    @Override
+    public void deletePost(Long postId) {
+        Post findPost = postRepository.findById(postId).orElseThrow(
+                () -> new IllegalArgumentException("post not exist")
+        );
+        findPost.deleteMember();
+        findPost.deleteRecommendPosts();
+
+        List<Comment> allByPostId = commentRepository.findAllByPostId(findPost.getId());
+
+        for (Comment comment : allByPostId) {
+            commentRepository.deleteParentComment(comment.getId());
+        }
+        filesRepository.deleteFilesByPostId(findPost.getId());
+
+        commentRepository.deleteCommentsByPostId(findPost.getId());
+        postRepository.deletePostByPostId(findPost.getId());
     }
 
     @Override

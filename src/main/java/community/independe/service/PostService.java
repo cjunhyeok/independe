@@ -19,6 +19,12 @@ public interface PostService {
     Long createRegionPost(Long memberId, String title, String content,
                           RegionType regionType, RegionPostType regionPostType);
 
+    // 게시글 수정
+    Long updatePost(Long postId, String title, String content);
+
+    // 게시글 삭제
+    void deletePost(Long postId);
+
     Page<Post> findAllIndependentPostsByTypeWithMember(IndependentPostType independentPostType,
                                                        String condition,
                                                        String keyword,
