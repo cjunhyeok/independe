@@ -79,6 +79,7 @@ public class ChatRoomApiController {
                         .senderNickname(c.getSender().getNickname())
                         .receiverNickname(c.getReceiver().getNickname())
                         .message(c.getContent())
+                        .createdDate(c.getCreatedDate())
                         .build()
         ).collect(Collectors.toList());
 
