@@ -11,9 +11,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController // json
 @RequiredArgsConstructor
@@ -77,7 +78,34 @@ public class MemberApiController {
         return ResponseEntity.ok("Success Region Authentication");
     }
 
+    @GetMapping("/api/members")
+    public List<MembersDto> members(@AuthenticationPrincipal MemberContext memberContext) {
+
+        List<Member> members = memberService.findAll();
+
+        return members.stream().map(
+                        m -> new MembersDto(
+                                m.getId(),
+                                m.getNickname()
+                        ))
+                .collect(Collectors.toList());
+    }
+
+    @PutMapping("/api/members")
+    public ResponseEntity modifyMembers(@RequestBody OAuthMemberRequest request,
+                                        @AuthenticationPrincipal MemberContext memberContext) {
+
+        Member loginMember = memberContext.getMember();
+
+        memberService.modifyOAuthMember(loginMember.getId(), request.getNickname(), request.getEmail(), request.getNumber());
+
+        return ResponseEntity.ok("OK");
+    }
+
     private RegionType regionProvider(String region) {
+
+        log.info("region : " + region);
+
         if (region.equals("서울")) {
             return RegionType.SEOUL;
         } else if (region.equals("울산")) {
