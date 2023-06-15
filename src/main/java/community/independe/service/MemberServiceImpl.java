@@ -9,6 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional(readOnly = true)
 @Slf4j
@@ -44,6 +46,16 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
+    @Transactional
+    public void modifyOAuthMember(Long memberId, String nickname, String email, String number) {
+        Member findMember = memberRepository.findById(memberId).orElseThrow(
+                () -> new IllegalArgumentException("Member not exist")
+        );
+
+        findMember.oauthMember(nickname, email, number);
+    }
+
+    @Override
     public Member findById(Long id) {
         return memberRepository.findById(id).orElseThrow(()
                 -> new IllegalArgumentException("Member not exist"));
@@ -67,6 +79,11 @@ public class MemberServiceImpl implements MemberService{
         );
 
         findMember.authenticateRegion(regionType);
+    }
+
+    @Override
+    public List<Member> findAll() {
+        return memberRepository.findAll();
     }
 
     private boolean checkUsername(String username) {
