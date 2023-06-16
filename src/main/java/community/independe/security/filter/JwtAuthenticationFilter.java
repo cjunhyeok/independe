@@ -3,7 +3,7 @@ package community.independe.security.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
-import community.independe.dto.LoginDto;
+import community.independe.security.filter.dto.LoginDto;
 import community.independe.security.signature.SecuritySigner;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

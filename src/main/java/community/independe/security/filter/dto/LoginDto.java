@@ -1,4 +1,4 @@
-package community.independe.dto;
+package community.independe.security.filter.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
