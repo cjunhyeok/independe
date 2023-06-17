@@ -16,21 +16,19 @@ public class ChatRoom extends BaseEntity {
     @Id @GeneratedValue
     @Column(name = "chat_room_id")
     private Long id;
-
     private String title;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id")
+    private Member sender; // 발신자
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "firstParticipation_id")
-    private Member firstParticipation;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "secondParticipation_id")
-    private Member secondParticipation;
+    @JoinColumn(name = "receiver_id")
+    private Member receiver; // 수신자
 
     @Builder
-    public ChatRoom(String title, Member firstParticipation, Member secondParticipation) {
+    public ChatRoom(String title, Member sender, Member receiver) {
         this.title = title;
-        this.firstParticipation = firstParticipation;
-        this.secondParticipation = secondParticipation;
+        this.sender = sender;
+        this.receiver = receiver;
     }
 }
