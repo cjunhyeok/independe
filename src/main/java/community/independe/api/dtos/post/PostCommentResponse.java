@@ -15,9 +15,10 @@ public class PostCommentResponse {
     private LocalDateTime createdDate;
     private Long recommendCount;
     private Long parentId;
+    private Long writerId;
     private Boolean isRecommend;
 
-    public PostCommentResponse(Long commentId, String nickname, String content, LocalDateTime createdDate, Long recommendCount, Long parentId, Boolean isRecommend) {
+    public PostCommentResponse(Long commentId, String nickname, String content, LocalDateTime createdDate, Long recommendCount, Long parentId, Long writerId, Boolean isRecommend) {
         this.commentId = commentId;
         this.nickname = nickname;
         this.content = content;
@@ -28,6 +29,7 @@ public class PostCommentResponse {
         } else {
             this.parentId = parentId;
         }
+        this.writerId = writerId;
         this.isRecommend = isRecommend;
     }
 }
