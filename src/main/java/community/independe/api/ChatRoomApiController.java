@@ -41,6 +41,7 @@ public class ChatRoomApiController {
                         .title(f.getTitle())
                         .receiverNickname(getOtherParticipationNickname(f, loginMember))
                         .receiverId(getOtherParticipationId(f, loginMember))
+                        .lastMessage((chatService.findTopByChatRoomOrderByDateDesc(f) != null) ? chatService.findTopByChatRoomOrderByDateDesc(f).getContent() : null)
                         .build()
         ).collect(Collectors.toList());
 
@@ -76,10 +77,11 @@ public class ChatRoomApiController {
 
         List<ChatHistoryDto> collect = chatHistory.stream().map(
                 c -> ChatHistoryDto.builder()
-                        .senderNickname(c.getSender().getNickname())
-                        .receiverNickname(c.getReceiver().getNickname())
+                        .senderNickname(c.getChatRoom().getSender().getNickname())
+                        .receiverNickname(c.getChatRoom().getReceiver().getNickname())
                         .message(c.getContent())
                         .createdDate(c.getCreatedDate())
+                        .isRead(c.getIsRead())
                         .build()
         ).collect(Collectors.toList());
 
@@ -87,20 +89,20 @@ public class ChatRoomApiController {
     }
 
     private String getOtherParticipationNickname(ChatRoom chatRoom, Member loginMember) {
-        if (chatRoom.getFirstParticipation().getId().equals(loginMember.getId())) {
-            return chatRoom.getSecondParticipation().getNickname();
-        } else if (chatRoom.getSecondParticipation().getId().equals(loginMember.getId())) {
-            return chatRoom.getFirstParticipation().getNickname();
+        if (chatRoom.getSender().getId().equals(loginMember.getId())) {
+            return chatRoom.getReceiver().getNickname();
+        } else if (chatRoom.getReceiver().getId().equals(loginMember.getId())) {
+            return chatRoom.getSender().getNickname();
         } else {
             throw new IllegalArgumentException("no participation");
         }
     }
 
     private Long getOtherParticipationId(ChatRoom chatRoom, Member loginMember) {
-        if (chatRoom.getFirstParticipation().getId().equals(loginMember.getId())) {
-            return chatRoom.getSecondParticipation().getId();
-        } else if (chatRoom.getSecondParticipation().getId().equals(loginMember.getId())) {
-            return chatRoom.getFirstParticipation().getId();
+        if (chatRoom.getSender().getId().equals(loginMember.getId())) {
+            return chatRoom.getReceiver().getId();
+        } else if (chatRoom.getReceiver().getId().equals(loginMember.getId())) {
+            return chatRoom.getSender().getId();
         } else {
             throw new IllegalArgumentException("no participation");
         }
