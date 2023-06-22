@@ -26,10 +26,11 @@ public abstract class SecuritySigner {
         // Claim정보 생성
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject("user")
-                .issuer("http://localhost:8080")
-                .claim("username", member.getUsername()) // 사용자 Id
+                .issuer("http://spring:8080")
+                .claim("username", member.getUsername())
                 .claim("authority", member.getRole()) // 사용자 권한
                 .claim("nickname", member.getNickname()) // 사용자 닉네임
+                .claim("region", member.getRegion()) // 사용자 지
                 .expirationTime(new Date(new Date().getTime() + 60 * 1000 * 10)) // 10분
                 .build();
         SignedJWT signedJWT = new SignedJWT(header, jwtClaimsSet);
