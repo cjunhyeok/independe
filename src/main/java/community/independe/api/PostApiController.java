@@ -211,6 +211,34 @@ public class PostApiController {
         return ResponseEntity.ok(regionPost);
     }
 
+    @Operation(summary = "게시글 수정")
+    @PutMapping(value = "/api/posts/{postId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<Long> updatePost(@Parameter(name = "postId") @PathVariable Long postId,
+                                           @Parameter(description = "제목") @RequestParam String title,
+                                           @Parameter(description = "내용") @RequestParam String content,
+                                           @Parameter(description = "이미지") @RequestParam(required = false) List<MultipartFile> files,
+                                           @AuthenticationPrincipal MemberContext memberContext) throws IOException {
+
+        Long updatedPost = postService.updatePost(postId, title, content);
+
+        // 파일 수정 기능 추가해야함
+//        if(files != null) {
+//            filesService.saveFiles(files, updatedPost);
+//        }
+
+        return ResponseEntity.ok(updatedPost);
+    }
+
+    @Operation(summary = "게시글 삭제")
+    @DeleteMapping("/api/posts/{postId}")
+    public ResponseEntity deletePost(@PathVariable Long postId,
+                                     @AuthenticationPrincipal MemberContext memberContext) {
+
+        postService.deletePost(postId);
+
+        return ResponseEntity.ok("ok");
+    }
+
     // 게시글 1개 구체정보 가져오기
     @Operation(summary = "게시글 상세 조회")
     @GetMapping("/api/posts/{postId}")
@@ -259,7 +287,8 @@ public class PostApiController {
                         c.getCreatedDate(),
                         recommendCommentService.countAllByCommentIdAndIsRecommend(c.getId()),
                         (c.getParent() == null) ? null : c.getParent().getId(),
-                        isRecommendComment(c.getId(), findPost.getId(), memberContext.getMember())
+                        c.getMember().getId(),
+                        isRecommendComment(c.getId(), findPost.getId(), (memberContext == null) ? null : memberContext.getMember())
                 )).collect(Collectors.toList());
 
         // 게시글 Dto 생성
@@ -394,7 +423,7 @@ public class PostApiController {
                 )).collect(Collectors.toList());
 
         MainPostDto mainPostDto = new MainPostDto(
-                "오늘은 힘드네요",
+                "다가오는 장마철 천연 정화석을 구비하여 습기를 제거해보세요",
                 popularPostDto,
                 regionAllPostDto,
                 regionNotAllPostDto,
