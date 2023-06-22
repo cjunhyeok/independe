@@ -4,6 +4,7 @@ import com.nimbusds.jose.jwk.OctetSequenceKey;
 import community.independe.repository.MemberRepository;
 import community.independe.security.exception.JwtAccessDeniedHandler;
 import community.independe.security.exception.JwtAuthenticationEntryPoint;
+import community.independe.security.filter.CorsFilter;
 import community.independe.security.filter.JwtAuthenticationFilter;
 import community.independe.security.filter.JwtAuthorizationMacFilter;
 import community.independe.security.handler.OAuth2AuthenticationFailureHandler;
@@ -68,14 +69,14 @@ public class SecurityConfig {
         http.httpBasic().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.headers().frameOptions().disable();
+//        http.headers().frameOptions().disable();
 
         // stomp 사용을 위한 cors 적용
         http.cors().configurationSource(corsConfigurationSource());
 
-        http.exceptionHandling()
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint())
-                        .accessDeniedHandler(jwtAccessDeniedHandler());
+//        http.exceptionHandling()
+//                .authenticationEntryPoint(jwtAuthenticationEntryPoint())
+//                        .accessDeniedHandler(jwtAccessDeniedHandler());
 
         http.authorizeHttpRequests()
                 .requestMatchers(blackList).authenticated()
@@ -86,14 +87,17 @@ public class SecurityConfig {
 //                        .anyRequest().permitAll();
 
         http.oauth2Login()
-                        .userInfoEndpoint()
+                .redirectionEndpoint()
+                    .baseUri("/oauth2/login/oauth2/code/*")
+                        .and()
+                            .userInfoEndpoint()
                                 .userService(customOAuth2UserService)
-                                        .and()
-                                                .authorizationEndpoint()
-                                                        .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
-                                                                .and()
-                                                                        .successHandler(oAuth2AuthenticationSuccessHandler())
-                                                                                .failureHandler(oAuth2AuthenticationFailureHandler());
+                                    .and()
+                                        .authorizationEndpoint()
+                                            .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
+                                                .and()
+                                                    .successHandler(oAuth2AuthenticationSuccessHandler());
+    //                                                                                .failureHandler(oAuth2AuthenticationFailureHandler())
 
         http.addFilterBefore(jwtAuthorizationMacFilter(octetSequenceKey), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(macSecuritySigner, octetSequenceKey), UsernamePasswordAuthenticationFilter.class);
@@ -139,12 +143,22 @@ public class SecurityConfig {
         config.addAllowedHeader("*");
         // frontend domain
         config.addAllowedOrigin("http://localhost:8081");
+        config.addAllowedOrigin("https://www.independe.co.kr");
+        config.addAllowedOrigin("https://independe.co.kr");
+        config.addAllowedOrigin("https://api.independe.co.kr");
+//        config.addAllowedOrigin("https://api.independe.co.kr");
+//        config.addAllowedOrigin("http://localhost:8081");
 //        config.addAllowedOrigin("*");
         // credential true 해야 채팅 가능
         config.setAllowCredentials(true);
 
         source.registerCorsConfiguration("/**", config);
         return source;
+    }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        return new CorsFilter();
     }
 
     @Bean
