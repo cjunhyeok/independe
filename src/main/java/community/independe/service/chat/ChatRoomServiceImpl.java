@@ -32,11 +32,9 @@ public class ChatRoomServiceImpl implements ChatRoomService{
 
         ChatRoom chatRoom = ChatRoom.builder()
                 .title(title)
-                .firstParticipation(findFirstMember)
-                .secondParticipation(findSecondMember)
+                .sender(findFirstMember)
+                .receiver(findSecondMember)
                 .build();
-
-
 
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
 
