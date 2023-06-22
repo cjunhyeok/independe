@@ -11,21 +11,21 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     ChatRoom findByTitle(String title);
 
-    @Query(value = "select distinct cr from ChatRoom cr join fetch cr.firstParticipation" +
-            " join fetch cr.secondParticipation" +
-            " where cr.firstParticipation.id = :loginMemberId" +
-            " or cr.secondParticipation.id = :loginMemberId",
+    @Query(value = "select distinct cr from ChatRoom cr join fetch cr.sender" +
+            " join fetch cr.receiver" +
+            " where cr.sender.id = :loginMemberId" +
+            " or cr.receiver.id = :loginMemberId",
             countQuery = "select cr from ChatRoom cr" +
-                    " where cr.firstParticipation.id = :loginMemberId" +
-                    " or cr.secondParticipation.id = :loginMemberId")
+                    " where cr.sender.id = :loginMemberId" +
+                    " or cr.receiver.id = :loginMemberId")
     List<ChatRoom> findAllByLoginMemberId(@Param("loginMemberId") Long loginMemberId);
 
     @Query(value = "select cr from ChatRoom cr" +
-            " where (cr.firstParticipation.id = :loginMemberId and cr.secondParticipation.id = :receiverId)" +
-            " or (cr.firstParticipation.id = :receiverId and cr.secondParticipation.id = :loginMemberId)",
+            " where (cr.sender.id = :loginMemberId and cr.receiver.id = :receiverId)" +
+            " or (cr.sender.id = :receiverId and cr.receiver.id = :loginMemberId)",
             countQuery = "select cr from ChatRoom cr" +
-                    " where (cr.firstParticipation.id = :loginMemberId and cr.secondParticipation.id = :receiverId)" +
-                    " or (cr.firstParticipation.id = :receiverId and cr.secondParticipation.id = :loginMemberId)")
+                    " where (cr.sender.id = :loginMemberId and cr.receiver.id = :receiverId)" +
+                    " or (cr.sender.id = :receiverId and cr.receiver.id = :loginMemberId)")
     ChatRoom findByLoginMemberIdWithReceiverId(@Param("loginMemberId") Long loginMemberId,
                                                @Param("receiverId") Long receiverId);
 }
