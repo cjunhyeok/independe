@@ -13,7 +13,7 @@ public class OAuth2KakaoProviderUserConverter implements ProviderUserConverter<P
             return null;
         }
 
-        return new KakaoUser(OAuth2Utils.getOtherAttributes(providerUserRequest.oAuth2User(), "kakao_account", "profile"),
+        return new KakaoUser(OAuth2Utils.getSubAttributes(providerUserRequest.oAuth2User(), "kakao_account"),
                 providerUserRequest.oAuth2User(),
                 providerUserRequest.clientRegistration());
     }
