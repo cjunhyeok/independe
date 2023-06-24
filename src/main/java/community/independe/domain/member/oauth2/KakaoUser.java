@@ -1,10 +1,12 @@
 package community.independe.domain.member.oauth2;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Map;
 
+@Slf4j
 public class KakaoUser extends OAuth2ProviderUser{
 
     private Map<String, Object> otherAttributes;
@@ -21,7 +23,7 @@ public class KakaoUser extends OAuth2ProviderUser{
 
     @Override
     public String getUsername() {
-        return (String) getAttributes().get("id");
+        return (String) ((Map<String, Object>) getAttributes().get("profile")).get("nickname");
     }
 
     @Override
