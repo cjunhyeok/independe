@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Getter
@@ -41,7 +40,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest); // 인가 서버와 통신하여 사용자 정보를 가져온다.
 
-        Map<String, Object> attributes = oAuth2User.getAttributes();
+//        Map<String, Object> attributes = oAuth2User.getAttributes();
 
         ProviderUserRequest providerUserRequest = new ProviderUserRequest(clientRegistration, oAuth2User);
         ProviderUser providerUser = providerUser(providerUserRequest);
