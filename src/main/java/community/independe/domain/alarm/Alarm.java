@@ -20,6 +20,7 @@ public class Alarm extends BaseEntity {
     private String message; // 알림 메시지
     private Boolean isRead; // 읽음 여부
 
+    @Enumerated(EnumType.STRING)
     private AlarmType alarmType;
 
     //== 연관 관계 ==//
