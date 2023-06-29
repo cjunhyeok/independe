@@ -40,6 +40,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
 
     private String[] whiteList = {"/",
+            "/actuator/prometheus",
             "/ws",
             "/ws/**",
             "/swagger-ui/**",
