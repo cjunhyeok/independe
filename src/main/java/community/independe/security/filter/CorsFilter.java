@@ -15,7 +15,7 @@ public class CorsFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String origin = request.getHeader("Origin");
 
-        log.info("Request from domain: " + origin);
+//        log.info("Request from domain: " + origin);
 
         filterChain.doFilter(request, response);
     }
