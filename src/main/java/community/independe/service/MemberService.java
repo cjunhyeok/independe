@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface MemberService {
 
-    Long join(String username, String password, String nickname, String email, String number, String city, String street, String zipcode);
+    Long join(String username, String password, String nickname, String email, String number);
 
     void modifyOAuthMember(Long memberId, String nickname, String email, String number);
     Member findById(Long id);

@@ -23,7 +23,7 @@ public class MemberServiceImpl implements MemberService{
 
     @Override
     @Transactional
-    public Long join(String username, String password, String nickname, String email, String number, String city, String street, String zipcode) {
+    public Long join(String username, String password, String nickname, String email, String number) {
 
         if (checkUsername(username) == false) {
             throw new IllegalArgumentException("중복된 Id");
