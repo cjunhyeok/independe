@@ -27,9 +27,4 @@ public class CreateMemberRequest {
     private String email;
     @Pattern(regexp = "^\\d{3}-\\d{3,4}-\\d{4}$")
     private String number;
-
-    // Address
-    private String street;
-    private String city;
-    private String zipcode;
 }
