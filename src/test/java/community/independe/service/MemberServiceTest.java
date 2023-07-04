@@ -43,7 +43,7 @@ public class MemberServiceTest {
         });
 
         // when
-        Long joinMemberId = memberService.join(username, password, nickname, null, null, null, null, null);
+        Long joinMemberId = memberService.join(username, password, nickname, null, null);
 
         System.out.println(joinMemberId);
 
