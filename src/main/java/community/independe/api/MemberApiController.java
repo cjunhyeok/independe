@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController // json
 @RequiredArgsConstructor
-@Slf4j
 public class MemberApiController {
 
     private final MemberService memberService;
@@ -31,10 +31,7 @@ public class MemberApiController {
                 request.getPassword(),
                 request.getNickname(),
                 request.getEmail(),
-                request.getNumber(),
-                request.getCity(),
-                request.getStreet(),
-                request.getZipcode());
+                request.getNumber());
 
         return ResponseEntity.ok(joinMember);
     }
@@ -91,13 +88,30 @@ public class MemberApiController {
                 .collect(Collectors.toList());
     }
 
-    @PutMapping("/api/members")
-    public ResponseEntity modifyMembers(@RequestBody OAuthMemberRequest request,
+    @PutMapping("/api/oauth/members")
+    public ResponseEntity modifyOAuthMembers(@RequestBody OAuthMemberRequest request,
                                         @AuthenticationPrincipal MemberContext memberContext) {
 
         Member loginMember = memberContext.getMember();
 
         memberService.modifyOAuthMember(loginMember.getId(), request.getNickname(), request.getEmail(), request.getNumber());
+
+        return ResponseEntity.ok("OK");
+    }
+
+    @PutMapping("/api/members")
+    public ResponseEntity modifyMembers(@RequestBody ModifyMemberRequest request,
+                                        @AuthenticationPrincipal MemberContext memberContext) {
+
+        Member loginMember = memberContext.getMember();
+
+        memberService.modifyMember(
+                loginMember.getId(),
+                request.getUsername(),
+                request.getPassword(),
+                request.getNickname(),
+                request.getEmail(),
+                request.getNumber());
 
         return ResponseEntity.ok("OK");
     }
