@@ -56,6 +56,16 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
+    @Transactional
+    public void modifyMember(Long memberId, String username, String password, String nickname, String email, String number) {
+        Member findMember = memberRepository.findById(memberId).orElseThrow(
+                () -> new IllegalArgumentException("Member not exist")
+        );
+
+        findMember.modifyMember(username, password, nickname, email, number);
+    }
+
+    @Override
     public Member findById(Long id) {
         return memberRepository.findById(id).orElseThrow(()
                 -> new IllegalArgumentException("Member not exist"));
