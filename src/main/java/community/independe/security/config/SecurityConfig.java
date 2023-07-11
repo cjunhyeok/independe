@@ -55,6 +55,7 @@ public class SecurityConfig {
 
     private String[] blackList = {
             "/api/posts/new",
+            "/api/oauth/members",
             "/api/posts/region/new",
             "/api/posts/independent/new",
             "/api/members/region",
