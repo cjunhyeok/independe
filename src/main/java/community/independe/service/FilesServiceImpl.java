@@ -5,7 +5,6 @@ import community.independe.domain.post.Post;
 import community.independe.repository.post.PostRepository;
 import community.independe.repository.file.FilesRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,8 +24,14 @@ public class FilesServiceImpl implements FilesService {
     private final FilesRepository filesRepository;
     private final PostRepository postRepository;
 
-    public FilesServiceImpl(@Value("${file.dir}") String fileDir, FilesRepository filesRepository, PostRepository postRepository) {
-        this.fileDir = fileDir;
+//    public FilesServiceImpl(@Value("${file.dir}") String fileDir, FilesRepository filesRepository, PostRepository postRepository) {
+//        this.fileDir = fileDir;
+//        this.filesRepository = filesRepository;
+//        this.postRepository = postRepository;
+//    }
+
+    public FilesServiceImpl(FilesRepository filesRepository, PostRepository postRepository) {
+        this.fileDir = null;
         this.filesRepository = filesRepository;
         this.postRepository = postRepository;
     }
