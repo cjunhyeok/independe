@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(MemberApiController.class)
 @MockBean(JpaMetamodelMappingContext.class)
@@ -91,6 +91,28 @@ class MemberApiControllerUnitTest {
                 .with(csrf()));
 
         // then
-        perform.andExpect(status().isOk());
+        perform.andExpect(jsonPath("$.idDuplicatedNot").value(false));
     }
+
+    @Test
+    @WithMockUser(username = "testUsername")
+    void duplicateUsernameFailTest() throws Exception {
+
+        // given
+        DuplicateUsernameRequest duplicateUsernameRequest = new DuplicateUsernameRequest();
+        duplicateUsernameRequest.setUsername("testUsername");
+
+        // stub
+        when(memberService.findByUsername(duplicateUsernameRequest.getUsername())).thenReturn(null);
+
+        // when
+        ResultActions perform = mockMvc.perform(post("/api/members/username")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(duplicateUsernameRequest))
+                .with(csrf()));
+
+        // then
+        perform.andExpect(jsonPath("$.idDuplicatedNot").value(true));
+    }
+
 }
