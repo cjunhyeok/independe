@@ -3,6 +3,7 @@ package community.independe.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import community.independe.api.dtos.member.AuthenticationRegionRequest;
 import community.independe.api.dtos.member.CreateMemberRequest;
+import community.independe.api.dtos.member.DuplicateUsernameRequest;
 import community.independe.domain.member.Member;
 import community.independe.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,8 +22,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
 @ExtendWith(SpringExtension.class)
@@ -100,5 +100,23 @@ public class MemberApiControllerTest {
 
         // then
         perform.andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "testUsername")
+    void duplicateUsernameTest() throws Exception {
+
+        // given
+        DuplicateUsernameRequest duplicateUsernameRequest = new DuplicateUsernameRequest();
+        duplicateUsernameRequest.setUsername("testUsername");
+
+        // when
+        ResultActions perform = mockMvc.perform(post("/api/members/username")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(duplicateUsernameRequest))
+                .with(csrf()));
+
+        // then
+        perform.andExpect(jsonPath("$.idDuplicatedNot").value(false));
     }
 }
