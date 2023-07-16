@@ -81,4 +81,24 @@ public class MemberApiControllerTest {
         // then
         perform.andExpect(status().isOk());
     }
+
+    @Test
+    @WithMockUser(username = "testUsername")
+    void createMemberFailTest() throws Exception {
+
+        // given
+        CreateMemberRequest createMemberRequest = new CreateMemberRequest();
+        createMemberRequest.setUsername("testUsername");
+        createMemberRequest.setPassword("abc");
+        createMemberRequest.setNickname("nick12");
+
+        // when
+        ResultActions perform = mockMvc.perform(post("/api/members/new")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(createMemberRequest))
+                .with(csrf()));
+
+        // then
+        perform.andExpect(status().isBadRequest());
+    }
 }
