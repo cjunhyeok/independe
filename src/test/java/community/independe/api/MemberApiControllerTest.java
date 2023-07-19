@@ -6,7 +6,7 @@ import community.independe.api.dtos.member.CreateMemberRequest;
 import community.independe.api.dtos.member.DuplicateUsernameRequest;
 import community.independe.domain.member.Member;
 import community.independe.repository.MemberRepository;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,12 +30,10 @@ public class MemberApiControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
-    private MemberRepository memberRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @BeforeEach
-    public void setup() {
+    @BeforeAll
+    public static void setup(@Autowired MemberRepository memberRepository) {
         Member member = Member.builder()
                 .username("testUsername")
                 .password("testPasswrod1!")
@@ -63,7 +60,6 @@ public class MemberApiControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "testUsername")
     void createMemberTest() throws Exception {
 
         // given
@@ -83,7 +79,6 @@ public class MemberApiControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "testUsername")
     void createMemberFailTest() throws Exception {
 
         // given
@@ -103,7 +98,6 @@ public class MemberApiControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "testUsername")
     void duplicateUsernameTest() throws Exception {
 
         // given
@@ -118,5 +112,22 @@ public class MemberApiControllerTest {
 
         // then
         perform.andExpect(jsonPath("$.idDuplicatedNot").value(false));
+    }
+
+    @Test
+    void duplicateUsernameFailTest() throws Exception {
+
+        // given
+        DuplicateUsernameRequest duplicateUsernameRequest = new DuplicateUsernameRequest();
+        duplicateUsernameRequest.setUsername("username");
+
+        // when
+        ResultActions perform = mockMvc.perform(post("/api/members/username")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(duplicateUsernameRequest))
+                .with(csrf()));
+
+        // then
+        perform.andExpect(jsonPath("$.idDuplicatedNot").value(true));
     }
 }
