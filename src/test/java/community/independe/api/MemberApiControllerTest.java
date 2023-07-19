@@ -3,6 +3,7 @@ package community.independe.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import community.independe.api.dtos.member.AuthenticationRegionRequest;
 import community.independe.api.dtos.member.CreateMemberRequest;
+import community.independe.api.dtos.member.DuplicateNicknameRequest;
 import community.independe.api.dtos.member.DuplicateUsernameRequest;
 import community.independe.domain.member.Member;
 import community.independe.repository.MemberRepository;
@@ -102,6 +103,23 @@ public class MemberApiControllerTest {
 
         // given
         DuplicateUsernameRequest duplicateUsernameRequest = new DuplicateUsernameRequest();
+        duplicateUsernameRequest.setUsername("username");
+
+        // when
+        ResultActions perform = mockMvc.perform(post("/api/members/username")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(duplicateUsernameRequest))
+                .with(csrf()));
+
+        // then
+        perform.andExpect(jsonPath("$.idDuplicatedNot").value(true));
+    }
+
+    @Test
+    void duplicateUsernameFailTest() throws Exception {
+
+        // given
+        DuplicateUsernameRequest duplicateUsernameRequest = new DuplicateUsernameRequest();
         duplicateUsernameRequest.setUsername("testUsername");
 
         // when
@@ -115,16 +133,16 @@ public class MemberApiControllerTest {
     }
 
     @Test
-    void duplicateUsernameFailTest() throws Exception {
+    void duplicateNicknameTest() throws Exception {
 
         // given
-        DuplicateUsernameRequest duplicateUsernameRequest = new DuplicateUsernameRequest();
-        duplicateUsernameRequest.setUsername("username");
+        DuplicateNicknameRequest duplicateNicknameRequest = new DuplicateNicknameRequest();
+        duplicateNicknameRequest.setNickname("nickname");
 
         // when
-        ResultActions perform = mockMvc.perform(post("/api/members/username")
+        ResultActions perform = mockMvc.perform(post("/api/members/nickname")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(duplicateUsernameRequest))
+                .content(objectMapper.writeValueAsString(duplicateNicknameRequest))
                 .with(csrf()));
 
         // then
