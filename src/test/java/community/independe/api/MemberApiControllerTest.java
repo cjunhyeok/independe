@@ -148,4 +148,21 @@ public class MemberApiControllerTest {
         // then
         perform.andExpect(jsonPath("$.idDuplicatedNot").value(true));
     }
+
+    @Test
+    void duplicateNicknameFailTest() throws Exception {
+
+        // given
+        DuplicateNicknameRequest duplicateNicknameRequest = new DuplicateNicknameRequest();
+        duplicateNicknameRequest.setNickname("testNickname");
+
+        // when
+        ResultActions perform = mockMvc.perform(post("/api/members/nickname")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(duplicateNicknameRequest))
+                .with(csrf()));
+
+        // then
+        perform.andExpect(jsonPath("$.idDuplicatedNot").value(false));
+    }
 }
