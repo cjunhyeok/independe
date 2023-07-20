@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -164,5 +165,25 @@ public class MemberApiControllerTest {
 
         // then
         perform.andExpect(jsonPath("$.idDuplicatedNot").value(false));
+    }
+
+    @Test
+    @WithUserDetails(value = "testUsername", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void membersTest() throws Exception {
+
+        // given
+
+        // when
+        ResultActions perform = mockMvc.perform(get("/api/members")
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf()));
+
+        // then
+        perform.andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$[0].nickname").value("nick1"))
+                .andExpect(jsonPath("$[1].nickname").value("nick2"))
+                .andExpect(jsonPath("$[2].nickname").value("testNickname"));
     }
 }
