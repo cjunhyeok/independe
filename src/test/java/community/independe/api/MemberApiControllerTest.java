@@ -1,10 +1,7 @@
 package community.independe.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import community.independe.api.dtos.member.AuthenticationRegionRequest;
-import community.independe.api.dtos.member.CreateMemberRequest;
-import community.independe.api.dtos.member.DuplicateNicknameRequest;
-import community.independe.api.dtos.member.DuplicateUsernameRequest;
+import community.independe.api.dtos.member.*;
 import community.independe.domain.member.Member;
 import community.independe.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,8 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
@@ -186,4 +182,25 @@ public class MemberApiControllerTest {
                 .andExpect(jsonPath("$[1].nickname").value("nick2"))
                 .andExpect(jsonPath("$[2].nickname").value("testNickname"));
     }
+
+    @Test
+    @WithUserDetails(value = "testUsername", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void modifyOAuthMembersTest() throws Exception {
+
+        // given
+        OAuthMemberRequest oAuthMemberRequest = new OAuthMemberRequest();
+        oAuthMemberRequest.setNickname("OAuthNick");
+        oAuthMemberRequest.setNumber("01016161334");
+        oAuthMemberRequest.setEmail("testEmail");
+
+        // when
+        ResultActions perform = mockMvc.perform(put("/api/oauth/members")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(oAuthMemberRequest))
+                .with(csrf()));
+
+        // then
+        perform.andExpect(status().isOk());
+    }
+
 }
