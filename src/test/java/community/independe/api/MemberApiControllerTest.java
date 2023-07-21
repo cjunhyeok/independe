@@ -203,4 +203,24 @@ public class MemberApiControllerTest {
         perform.andExpect(status().isOk());
     }
 
+
+    @Test
+    @WithUserDetails(value = "testUsername", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void modifyMembersTest() throws Exception {
+
+        // given
+        ModifyMemberRequest modifyMemberRequest = new ModifyMemberRequest();
+        modifyMemberRequest.setUsername("modifyUsername");
+        modifyMemberRequest.setPassword("modifyPW12!");
+        modifyMemberRequest.setNickname("modifyNickname");
+
+        // when
+        ResultActions perform = mockMvc.perform(put("/api/members")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(modifyMemberRequest))
+                .with(csrf()));
+
+        // then
+        perform.andExpect(status().isOk());
+    }
 }
