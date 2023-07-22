@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Profile("dev")
+@Profile("local")
 @RequiredArgsConstructor
 public class InitDB {
 
