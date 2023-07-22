@@ -4,34 +4,42 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import community.independe.api.dtos.member.*;
 import community.independe.domain.member.Member;
 import community.independe.repository.MemberRepository;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class MemberApiControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    private TransactionStatus transactionStatus;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @BeforeAll
-    public static void setup(@Autowired MemberRepository memberRepository) {
+    @BeforeEach
+    public void setup() {
+        transactionStatus = transactionManager.getTransaction(new DefaultTransactionDefinition());
         Member member = Member.builder()
                 .username("testUsername")
                 .password("testPasswrod1!")
@@ -40,6 +48,20 @@ public class MemberApiControllerTest {
                 .build();
 
         memberRepository.save(member);
+
+        Member modifyMember = Member.builder()
+                .username("modifyMember")
+                .password("testPasswrod1!")
+                .nickname("modifyNickname")
+                .role("ROLE_USER")
+                .build();
+
+        memberRepository.save(modifyMember);
+    }
+
+    @AfterEach
+    void afterTest() {
+        transactionManager.rollback(transactionStatus);
     }
 
     @Test
@@ -177,14 +199,13 @@ public class MemberApiControllerTest {
         // then
         perform.andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.length()").value(3))
-                .andExpect(jsonPath("$[0].nickname").value("nick1"))
-                .andExpect(jsonPath("$[1].nickname").value("nick2"))
-                .andExpect(jsonPath("$[2].nickname").value("testNickname"));
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].nickname").value("testNickname"))
+                .andExpect(jsonPath("$[1].nickname").value("modifyNickname"));
     }
 
     @Test
-    @WithUserDetails(value = "testUsername", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "modifyMember", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void modifyOAuthMembersTest() throws Exception {
 
         // given
@@ -205,7 +226,7 @@ public class MemberApiControllerTest {
 
 
     @Test
-    @WithUserDetails(value = "testUsername", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "modifyMember", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void modifyMembersTest() throws Exception {
 
         // given
