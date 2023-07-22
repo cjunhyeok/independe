@@ -3,8 +3,10 @@ package community.independe.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.IndependentPostType;
-import community.independe.repository.MemberRepository;
-import org.junit.jupiter.api.BeforeAll;
+import community.independe.service.MemberService;
+import community.independe.service.PostService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +18,13 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -28,22 +35,50 @@ public class PostApiControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private PostService postService;
+    @Autowired
+    private MemberService memberService;
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+    private TransactionStatus transactionStatus;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @BeforeAll
-    public static void setup(@Autowired MemberRepository memberRepository) {
-        Member member = Member.builder()
-                .username("testUsername")
-                .password("testPasswrod1!")
-                .nickname("testNickname")
-                .role("ROLE_USER")
-                .build();
+    @BeforeEach
+    public void setup() {
+        transactionStatus = transactionManager.getTransaction(new DefaultTransactionDefinition());
+        memberService.join("username", "testPass1!", "testNick", null, null);
+    }
 
-        memberRepository.save(member);
+    @AfterEach
+    void afterTest() {
+        transactionManager.rollback(transactionStatus);
     }
 
     @Test
-    @WithUserDetails(value = "testUsername", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "username", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void independentPostsTest() throws Exception {
+        // given
+        Member testUser = memberService.findByUsername("username");
+        postService.createIndependentPost(testUser.getId(),
+                "testTitle",
+                "testContent",
+                IndependentPostType.CLEAN);
+
+        // when
+        ResultActions perform = mockMvc.perform(get("/api/posts/independent/CLEAN"));
+
+        // then
+        perform
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].title").value("testTitle"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].nickName").value("testNick"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.count").value(1));
+    }
+
+    @Test
+    @WithUserDetails(value = "username", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void createIndependentPostTest() throws Exception {
         // given
         String title = "testTitle";
@@ -61,6 +96,4 @@ public class PostApiControllerTest {
         // then
         perform.andExpect(status().isOk());
     }
-
-
 }
