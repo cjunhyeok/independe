@@ -2,8 +2,7 @@ package community.independe.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import community.independe.api.dtos.member.*;
-import community.independe.domain.member.Member;
-import community.independe.repository.MemberRepository;
+import community.independe.service.MemberService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import java.util.Map;
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -30,7 +31,7 @@ public class MemberApiControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private MemberRepository memberRepository;
+    private MemberService memberService;
     @Autowired
     private PlatformTransactionManager transactionManager;
 
@@ -40,23 +41,9 @@ public class MemberApiControllerTest {
     @BeforeEach
     public void setup() {
         transactionStatus = transactionManager.getTransaction(new DefaultTransactionDefinition());
-        Member member = Member.builder()
-                .username("testUsername")
-                .password("testPasswrod1!")
-                .nickname("testNickname")
-                .role("ROLE_USER")
-                .build();
 
-        memberRepository.save(member);
-
-        Member modifyMember = Member.builder()
-                .username("modifyMember")
-                .password("testPasswrod1!")
-                .nickname("modifyNickname")
-                .role("ROLE_USER")
-                .build();
-
-        memberRepository.save(modifyMember);
+        memberService.join("testUsername", "testPasswrod1!", "testNickname", null, null);
+        memberService.join("modifyMember", "testPasswrod1!", "modifyNickname", null, null);
     }
 
     @AfterEach
@@ -243,5 +230,24 @@ public class MemberApiControllerTest {
 
         // then
         perform.andExpect(status().isOk());
+    }
+
+    @Test
+    void loginTest() throws Exception {
+        // given
+        String username = "testUsername";
+        String password = "testPasswrod1!";
+
+        // when
+        ResultActions perform = mockMvc.perform(post("/api/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of(
+                        "username", username,
+                        "password", password
+                )))
+                .with(csrf()));
+
+        // then
+         perform.andExpect(status().isOk());
     }
 }
