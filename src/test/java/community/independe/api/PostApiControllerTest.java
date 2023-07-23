@@ -3,6 +3,8 @@ package community.independe.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.IndependentPostType;
+import community.independe.domain.post.enums.RegionPostType;
+import community.independe.domain.post.enums.RegionType;
 import community.independe.service.MemberService;
 import community.independe.service.PostService;
 import org.junit.jupiter.api.AfterEach;
@@ -96,5 +98,34 @@ public class PostApiControllerTest {
 
         // then
         perform.andExpect(status().isOk());
+    }
+
+    @Test
+    void regionPostsTest() throws Exception {
+
+        // given
+        Member testUser = memberService.findByUsername("username");
+        Long savedRegionPostId = postService.createRegionPost(
+                testUser.getId(),
+                "regionTitle",
+                "regionContent",
+                RegionType.ALL,
+                RegionPostType.FREE);
+
+        // when
+        ResultActions perform = mockMvc.perform(get("/api/posts/region/ALL/FREE"));
+
+        // then
+        perform
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].postId").value(savedRegionPostId))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].nickName").value("testNick"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].title").value("regionTitle"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].views").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].recommendCount").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].commentCount").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].picture").value(false))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.count").value(1));
     }
 }
