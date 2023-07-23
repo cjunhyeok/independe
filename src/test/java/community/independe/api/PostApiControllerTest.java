@@ -128,4 +128,25 @@ public class PostApiControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].picture").value(false))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.count").value(1));
     }
+
+    @Test
+    @WithUserDetails(value = "username", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void createRegionPostTest() throws Exception {
+        // given
+        String title = "regionTitle";
+        String content = "regionContent";
+        RegionType regionType = RegionType.ALL;
+        RegionPostType regionPostType = RegionPostType.FREE;
+
+        // when
+        ResultActions perform = mockMvc.perform(post("/api/posts/region/new")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .param("title", title)
+                .param("content", content)
+                .param("regionType", regionType.name())
+                .param("regionPostType", regionPostType.name()));
+
+        // then
+        perform.andExpect(status().isOk());
+    }
 }
