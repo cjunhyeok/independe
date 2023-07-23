@@ -8,14 +8,12 @@ import community.independe.service.PostService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -29,7 +27,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PostApiControllerTest {
 
@@ -56,11 +53,10 @@ public class PostApiControllerTest {
     }
 
     @Test
-    @WithUserDetails(value = "username", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void independentPostsTest() throws Exception {
         // given
         Member testUser = memberService.findByUsername("username");
-        postService.createIndependentPost(testUser.getId(),
+        Long savedIndependentPost = postService.createIndependentPost(testUser.getId(),
                 "testTitle",
                 "testContent",
                 IndependentPostType.CLEAN);
@@ -72,8 +68,13 @@ public class PostApiControllerTest {
         perform
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].title").value("testTitle"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].postId").value(savedIndependentPost))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].nickName").value("testNick"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].title").value("testTitle"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].views").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].recommendCount").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].commentCount").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].picture").value(false))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.count").value(1));
     }
 
