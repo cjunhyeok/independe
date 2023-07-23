@@ -2,11 +2,13 @@ package community.independe.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import community.independe.domain.member.Member;
+import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.service.MemberService;
 import community.independe.service.PostService;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +26,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -148,5 +149,32 @@ public class PostApiControllerTest {
 
         // then
         perform.andExpect(status().isOk());
+    }
+
+    @Test
+    @WithUserDetails(value = "username", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void updatePostTest() throws Exception {
+        // given
+        Member testUser = memberService.findByUsername("username");
+        Long savedIndependentPostId = postService.createIndependentPost(
+                testUser.getId(),
+                "title",
+                "content",
+                IndependentPostType.COOK);
+
+        String updateTitle = "updateTitle";
+        String updateContent = "updateContent";
+
+        // when
+        ResultActions perform = mockMvc.perform(put("/api/posts/" + savedIndependentPostId)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .param("title", updateTitle)
+                .param("content", updateContent));
+        Post updatePost = postService.findById(savedIndependentPostId);
+
+        // then
+        perform.andExpect(status().isOk());
+        Assertions.assertThat(updatePost.getTitle()).isEqualTo(updateTitle);
+        Assertions.assertThat(updatePost.getContent()).isEqualTo(updateContent);
     }
 }
