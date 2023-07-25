@@ -6,6 +6,7 @@ import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
+import community.independe.service.CommentService;
 import community.independe.service.MemberService;
 import community.independe.service.PostService;
 import org.assertj.core.api.Assertions;
@@ -39,6 +40,8 @@ public class PostApiControllerTest {
     private PostService postService;
     @Autowired
     private MemberService memberService;
+    @Autowired
+    private CommentService commentService;
     @Autowired
     private PlatformTransactionManager transactionManager;
     private TransactionStatus transactionStatus;
@@ -177,4 +180,68 @@ public class PostApiControllerTest {
         Assertions.assertThat(updatePost.getTitle()).isEqualTo(updateTitle);
         Assertions.assertThat(updatePost.getContent()).isEqualTo(updateContent);
     }
+
+    @Test
+    @WithUserDetails(value = "username", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void deletePostTest() throws Exception {
+        // given
+        Member testUser = memberService.findByUsername("username");
+        Long savedIndependentPostId = postService.createIndependentPost(
+                testUser.getId(),
+                "title",
+                "content",
+                IndependentPostType.COOK);
+
+        // when
+        ResultActions perform = mockMvc.perform(delete("/api/posts/" + savedIndependentPostId));
+
+        // then
+        perform.andExpect(status().isOk());
+        Post post = postService.findById(savedIndependentPostId);
+//        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+//                () -> postService.findById(savedIndependentPostId));
+    }
+
+    @Test
+    void postTest() throws Exception {
+        // given
+        Member testUser = memberService.findByUsername("username");
+        Long savedIndependentPostId = postService.createIndependentPost(
+                testUser.getId(),
+                "title",
+                "content",
+                IndependentPostType.COOK);
+        Long savedCommentId = commentService.createParentComment(testUser.getId(), savedIndependentPostId, "comment");
+
+        // when
+        ResultActions perform = mockMvc.perform(get("/api/posts/" + savedIndependentPostId));
+
+        // then
+        perform.andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value("title"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value("content"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickname").value("testNick"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.independentPostType").value(IndependentPostType.COOK.getDescription()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.regionType").isEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.regionPostType").isEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.independentPostTypeEn").value(IndependentPostType.COOK.name()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.regionTypeEn").isEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.regionPostTypeEn").isEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.views").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.recommendCount").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.commentCount").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.isRecommend").value(false))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.isFavorite").value(false))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.isReport").value(false))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.bestComment").isEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.comments[0].commentId").value(savedCommentId))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.comments[0].nickname").value("testNick"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.comments[0].content").value("comment"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.comments[0].recommendCount").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.comments[0].parentId").isEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.comments[0].writerId").value(testUser.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.comments[0].isRecommend").value(false));
+    }
+    // todo
 }
