@@ -243,5 +243,40 @@ public class PostApiControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.comments[0].writerId").value(testUser.getId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.comments[0].isRecommend").value(false));
     }
+
+    @Test
+    void searchPostTest() throws Exception {
+        // given
+        Member testUser = memberService.findByUsername("username");
+        Long savedIndependentPostId = postService.createIndependentPost(
+                testUser.getId(),
+                "title",
+                "content",
+                IndependentPostType.COOK);
+        String condition = "title";
+        String keyword = "title";
+
+        // when
+        ResultActions perform = mockMvc.perform(get("/api/posts/search")
+                .param("condition", condition)
+                .param("keyword", keyword));
+
+        // then
+        perform.andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].postId").value(savedIndependentPostId))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].title").value("title"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].nickname").value("testNick"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].independentPostType").value(IndependentPostType.COOK.getDescription()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].regionType").isEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].regionPostType").isEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].independentPostTypeEn").value(IndependentPostType.COOK.name()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].regionTypeEn").isEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].regionPostTypeEn").isEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].views").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].recommendCount").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].commentCount").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].picture").value(false));
+    }
     // todo
 }
