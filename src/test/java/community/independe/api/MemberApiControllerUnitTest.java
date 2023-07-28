@@ -5,12 +5,17 @@ import community.independe.api.dtos.member.CreateMemberRequest;
 import community.independe.api.dtos.member.DuplicateUsernameRequest;
 import community.independe.domain.member.Member;
 import community.independe.service.MemberService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -28,9 +33,18 @@ class MemberApiControllerUnitTest {
     private MockMvc mockMvc;
     @MockBean
     private MemberService memberService;
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @BeforeEach
+    void setUp() {
+        UserDetails userDetails = User.withUsername("username")
+                .password("password12")
+                .roles("USER")
+                .build();
 
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+    }
 
     @Test
     @WithMockUser(username = "testUsername")
