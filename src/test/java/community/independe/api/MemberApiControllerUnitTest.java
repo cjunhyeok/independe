@@ -1,6 +1,7 @@
 package community.independe.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import community.independe.api.dtos.member.AuthenticationRegionRequest;
 import community.independe.api.dtos.member.CreateMemberRequest;
 import community.independe.api.dtos.member.DuplicateUsernameRequest;
 import community.independe.domain.member.Member;
@@ -16,7 +17,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -129,4 +132,19 @@ class MemberApiControllerUnitTest {
         perform.andExpect(jsonPath("$.idDuplicatedNot").value(true));
     }
 
+
+    @Test
+    @WithUserDetails(value = "username", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void authenticateRegionTest() throws Exception {
+
+        AuthenticationRegionRequest request = new AuthenticationRegionRequest();
+        request.setRegion("경남");
+
+        // 실행 및 검증
+        mockMvc.perform(post("/api/members/region")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Success Region Authentication"));
+    }
 }
