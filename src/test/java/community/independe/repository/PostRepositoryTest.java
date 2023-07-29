@@ -217,4 +217,17 @@ class PostRepositoryTest {
         assertThat(content.get(4).getTitle()).isEqualTo("independentTitle");
         assertThat(content.get(4).getContent()).isEqualTo("independentContent");
     }
+
+    @Test
+    void deletePostByPostIdTest() {
+        // given
+        Post findPost = postRepository.findAll().get(0);
+        Long findPostId = findPost.getId();
+
+        // when
+        postRepository.deletePostByPostId(findPostId);
+
+        // then
+        assertThat(postRepository.findAll().size()).isEqualTo(4);
+    }
 }
