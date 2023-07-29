@@ -12,7 +12,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -111,5 +115,26 @@ class PostRepositoryTest {
         //then
         assertThat(savedIndependentPost.getTitle()).isEqualTo("saveIndependentTitle");
         assertThat(savedRegionPost.getTitle()).isEqualTo("saveRegionTitle");
+    }
+
+    @Test
+    void findAllRegionPostsByTypesWithMemberDynamicTest() {
+        // given
+        RegionType regionType = RegionType.ALL;
+        RegionPostType regionPostType = RegionPostType.FREE;
+        String condition = "";
+        String keyword = "";
+        PageRequest page = PageRequest.of(0, 5);
+
+        // when
+        Page<Post> allRegionPostsByTypesWithMemberDynamic = postRepository.findAllRegionPostsByTypesWithMemberDynamic(regionType, regionPostType, condition, keyword, page);
+        List<Post> content = allRegionPostsByTypesWithMemberDynamic.getContent();
+
+        // then
+        assertThat(content.size()).isEqualTo(2);
+        assertThat(content.get(1).getTitle()).isEqualTo("regionTitle");
+        assertThat(content.get(1).getContent()).isEqualTo("regionContent");
+        assertThat(content.get(0).getTitle()).isEqualTo("regionTitle2");
+        assertThat(content.get(0).getContent()).isEqualTo("regionContent2");
     }
 }
