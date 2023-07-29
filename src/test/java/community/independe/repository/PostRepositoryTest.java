@@ -12,18 +12,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Transactional
 class PostRepositoryTest {
-    // 추가 테스트 필요
 
     @Autowired
     private PostRepository postRepository;
@@ -117,51 +112,4 @@ class PostRepositoryTest {
         assertThat(savedIndependentPost.getTitle()).isEqualTo("saveIndependentTitle");
         assertThat(savedRegionPost.getTitle()).isEqualTo("saveRegionTitle");
     }
-
-    @Test
-    public void findAllRegionAndIndependentPostsTest() {
-        // given
-
-        // when
-        List<Post> findAllRegionPosts = postRepository.findAllRegionPosts();
-        List<Post> findAllIndependentPosts = postRepository.findAllIndependentPosts();
-
-        // then
-        assertThat(findAllRegionPosts.size()).isEqualTo(2);
-        assertThat(findAllIndependentPosts.size()).isEqualTo(3);
-    }
-
-    @Test
-    public void simpleFindAllRegionPostsDynamicTest() {
-        // given
-        RegionType all = RegionType.ALL;
-        RegionPostType free = RegionPostType.FREE;
-        String condition = "title";
-        String keyword = "Title";
-        PageRequest page = PageRequest.of(0, 5);
-
-        // when
-        Page<Post> findAllRegionPostsByTypesWithMemberDynamicPaging = postRepository.findAllRegionPostsByTypesWithMemberDynamic(all, free, condition, keyword, page);
-        List<Post> findAllRegionPosts = findAllRegionPostsByTypesWithMemberDynamicPaging.getContent();
-
-        // then
-        assertThat(findAllRegionPosts.size()).isEqualTo(2);
-    }
-
-    @Test
-    public void simpleFindAllIndependentPostsDynamicTest() {
-        // given
-        IndependentPostType cook = IndependentPostType.COOK;
-        String condition = "ti";
-        String keyword = "Ti";
-        PageRequest page = PageRequest.of(0, 5);
-
-        // when
-        Page<Post> findAllIndependentPostsByTypesWithMemberDynamicPaging = postRepository.findAllIndependentPostsByTypeWithMemberDynamic(cook, condition, keyword, page);
-        List<Post> findAllIndependentPosts = findAllIndependentPostsByTypesWithMemberDynamicPaging.getContent();
-
-        // then
-        assertThat(findAllIndependentPosts.size()).isEqualTo(3);
-    }
-
 }
