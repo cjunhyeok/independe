@@ -167,4 +167,27 @@ class PostRepositoryTest {
         assertThat(content.get(0).getTitle()).isEqualTo("SearchTitle");
         assertThat(content.get(0).getContent()).isEqualTo("SearchContent");
     }
+
+    @Test
+    void findAllIndependentPostsByTypeWithMemberDynamicTest() {
+        // given
+        IndependentPostType independentPostType = IndependentPostType.COOK;
+        String condition = "";
+        String keyword = "";
+        PageRequest page = PageRequest.of(0, 5);
+
+        // when
+        Page<Post> allIndependentPostsByTypeWithMemberDynamic =
+                postRepository.findAllIndependentPostsByTypeWithMemberDynamic(independentPostType, condition, keyword, page);
+        List<Post> content = allIndependentPostsByTypeWithMemberDynamic.getContent();
+
+        // then
+        assertThat(content.size()).isEqualTo(3);
+        assertThat(content.get(0).getTitle()).isEqualTo("independentTitle3");
+        assertThat(content.get(0).getContent()).isEqualTo("independentContent3");
+        assertThat(content.get(1).getTitle()).isEqualTo("independentTitle2");
+        assertThat(content.get(1).getContent()).isEqualTo("independentContent2");
+        assertThat(content.get(2).getTitle()).isEqualTo("independentTitle");
+        assertThat(content.get(2).getContent()).isEqualTo("independentContent");
+    }
 }
