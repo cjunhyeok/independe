@@ -190,4 +190,31 @@ class PostRepositoryTest {
         assertThat(content.get(2).getTitle()).isEqualTo("independentTitle");
         assertThat(content.get(2).getContent()).isEqualTo("independentContent");
     }
+
+    @Test
+    void findAllPostsBySearchWithMemberDynamic() {
+        // given
+        String condition = "title";
+        String keyword = "Title";
+        PageRequest page = PageRequest.of(0, 10);
+
+        // when
+        Page<Post> allPostsBySearchWithMemberDynamic =
+                postRepository.findAllPostsBySearchWithMemberDynamic(condition, keyword, page);
+
+        List<Post> content = allPostsBySearchWithMemberDynamic.getContent();
+
+        // then
+        assertThat(content.size()).isEqualTo(5);
+        assertThat(content.get(0).getTitle()).isEqualTo("regionTitle2");
+        assertThat(content.get(0).getContent()).isEqualTo("regionContent2");
+        assertThat(content.get(1).getTitle()).isEqualTo("regionTitle");
+        assertThat(content.get(1).getContent()).isEqualTo("regionContent");
+        assertThat(content.get(2).getTitle()).isEqualTo("independentTitle3");
+        assertThat(content.get(2).getContent()).isEqualTo("independentContent3");
+        assertThat(content.get(3).getTitle()).isEqualTo("independentTitle2");
+        assertThat(content.get(3).getContent()).isEqualTo("independentContent2");
+        assertThat(content.get(4).getTitle()).isEqualTo("independentTitle");
+        assertThat(content.get(4).getContent()).isEqualTo("independentContent");
+    }
 }
