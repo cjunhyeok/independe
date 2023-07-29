@@ -137,4 +137,34 @@ class PostRepositoryTest {
         assertThat(content.get(0).getTitle()).isEqualTo("regionTitle2");
         assertThat(content.get(0).getContent()).isEqualTo("regionContent2");
     }
+
+    @Test
+    void findAllRegionPostsByTypesWithMemberDynamicSearchTest() {
+        // given
+        Member findMember = memberRepository.findByUsername("id");
+        Post regionPost = Post.builder()
+                .title("SearchTitle")
+                .content("SearchContent")
+                .regionType(RegionType.ALL)
+                .regionPostType(RegionPostType.FREE)
+                .member(findMember)
+                .build();
+
+        postRepository.save(regionPost);
+
+        RegionType regionType = RegionType.ALL;
+        RegionPostType regionPostType = RegionPostType.FREE;
+        String condition = "title";
+        String keyword = "Search";
+        PageRequest page = PageRequest.of(0, 5);
+
+        // when
+        Page<Post> allRegionPostsByTypesWithMemberDynamic = postRepository.findAllRegionPostsByTypesWithMemberDynamic(regionType, regionPostType, condition, keyword, page);
+        List<Post> content = allRegionPostsByTypesWithMemberDynamic.getContent();
+
+        // then
+        assertThat(content.size()).isEqualTo(1);
+        assertThat(content.get(0).getTitle()).isEqualTo("SearchTitle");
+        assertThat(content.get(0).getContent()).isEqualTo("SearchContent");
+    }
 }
