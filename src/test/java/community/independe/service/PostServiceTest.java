@@ -126,7 +126,26 @@ public class PostServiceTest {
     }
 
     @Test
-    public void increaseViewTest() {
+    void updatePostTest() {
+        // given
+        Long postId = 1L;
+        String title = "updateTitle";
+        String content = "updateContent";
+        Post mockPost = Post.builder().build();
+        when(postRepository.findById(postId)).thenReturn(Optional.of(mockPost));
+
+        // when
+        Long updatedPostId = postService.updatePost(postId, title, content);
+
+        assertThat(mockPost.getTitle()).isEqualTo(title);
+        assertThat(mockPost.getContent()).isEqualTo(content);
+
+        // then
+        verify(postRepository, times(1)).findById(postId);
+    }
+
+    @Test
+    public void increaseViewsTest() {
         // given
         Long postId = 1L;
         Post mockPost = Post.builder()
