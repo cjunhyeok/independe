@@ -10,6 +10,7 @@ import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.post.PostRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -195,5 +196,41 @@ public class CommentRepositoryTest {
         assertThat(findAllByPostId.get(3).getChild().size()).isEqualTo(3);
         assertThat(findAllByPostId.get(4).getParent()).isNull();
         assertThat(findAllByPostId.get(5).getParent()).isNotNull();
+    }
+
+    @Test
+    void deleteCommentsByPostIdTest() {
+        // given
+        Member member = Member.builder()
+                .username("id")
+                .password("1234")
+                .nickname("nick")
+                .role("ROLE_USER")
+                .build();
+        memberRepository.save(member);
+
+        Post post = Post.builder()
+                .title("title")
+                .content("content")
+                .member(member)
+                .independentPostType(IndependentPostType.COOK)
+                .build();
+        postRepository.save(post);
+
+        Comment parentComment = Comment.builder()
+                .content("parent")
+                .member(member)
+                .post(post)
+                .build();
+        Comment savedParent = commentRepository.save(parentComment);
+
+        // when
+        Long deleteId = Long.valueOf(commentRepository.deleteParentComment(savedParent.getId()));
+
+        // then
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> commentRepository.findById(deleteId).orElseThrow(
+                        () -> new IllegalArgumentException()
+                ));
     }
 }
