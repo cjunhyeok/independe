@@ -12,6 +12,7 @@ import community.independe.security.handler.OAuth2AuthenticationSuccessHandler;
 import community.independe.security.repository.HttpCookieOAuth2AuthorizationRequestRepository;
 import community.independe.security.service.oauth2.CustomOAuth2UserService;
 import community.independe.security.signature.MacSecuritySigner;
+import community.independe.util.JwtTokenVerifier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,6 +39,7 @@ public class SecurityConfig {
     private final MemberRepository memberRepository;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final JwtTokenVerifier jwtTokenVerifier;
 
     private String[] whiteList = {"/",
             "/actuator/**",
@@ -88,20 +90,20 @@ public class SecurityConfig {
 //        http.authorizeHttpRequests()
 //                        .anyRequest().permitAll();
 
-        http.oauth2Login()
-                .redirectionEndpoint()
-                    .baseUri("/oauth2/login/oauth2/code/*")
-                        .and()
-                            .userInfoEndpoint()
-                                .userService(customOAuth2UserService)
-                                    .and()
-                                        .authorizationEndpoint()
-                                            .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
-                                                .and()
-                                                    .successHandler(oAuth2AuthenticationSuccessHandler());
+//        http.oauth2Login()
+//                .redirectionEndpoint()
+//                    .baseUri("/oauth2/login/oauth2/code/*")
+//                        .and()
+//                            .userInfoEndpoint()
+//                                .userService(customOAuth2UserService)
+//                                    .and()
+//                                        .authorizationEndpoint()
+//                                            .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
+//                                                .and()
+//                                                    .successHandler(oAuth2AuthenticationSuccessHandler());
     //                                                                                .failureHandler(oAuth2AuthenticationFailureHandler())
 
-        http.addFilterBefore(jwtAuthorizationMacFilter(octetSequenceKey), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthorizationMacFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(macSecuritySigner, octetSequenceKey), UsernamePasswordAuthenticationFilter.class);
 
         http.userDetailsService(userDetailsService);
@@ -120,8 +122,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthorizationMacFilter jwtAuthorizationMacFilter(OctetSequenceKey octetSequenceKey) {
-        return new JwtAuthorizationMacFilter(octetSequenceKey, memberRepository);
+    public JwtAuthorizationMacFilter jwtAuthorizationMacFilter() {
+        return new JwtAuthorizationMacFilter(jwtTokenVerifier);
     }
 
     @Bean
