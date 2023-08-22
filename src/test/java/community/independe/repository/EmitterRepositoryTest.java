@@ -30,4 +30,19 @@ public class EmitterRepositoryTest {
         SseEmitter findSseEmitter = emitterRepository.findById(id);
         assertThat(findSseEmitter).isEqualTo(sseEmitter);
     }
+
+    @Test
+    void deleteByIdTest() {
+        // given
+        Long id = 1L;
+        SseEmitter sseEmitter = new SseEmitter();
+
+        // when
+        emitterRepository.save(id, sseEmitter);
+        emitterRepository.deleteById(id);
+
+        // then
+        SseEmitter findSseEmitter = emitterRepository.findById(id);
+        assertThat(findSseEmitter).isNull();
+    }
 }
