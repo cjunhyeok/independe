@@ -8,6 +8,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.*;
 
 @SpringJUnitConfig
@@ -58,5 +60,22 @@ public class EmitterRepositoryTest {
 
         // then
         assertThat(findSseEmitter).isEqualTo(sseEmitter);
+    }
+
+    @Test
+    void findAllTest() {
+        // given
+        Long id1 = 1L;
+        Long id2 = 2L;
+        SseEmitter sseEmitter1 = new SseEmitter();
+        SseEmitter sseEmitter2 = new SseEmitter();
+        emitterRepository.save(id1, sseEmitter1);
+        emitterRepository.save(id2, sseEmitter2);
+
+        // when
+        List<SseEmitter> findSseEmitters = emitterRepository.findAll();
+
+        // then
+        assertThat(findSseEmitters.size()).isEqualTo(2);
     }
 }
