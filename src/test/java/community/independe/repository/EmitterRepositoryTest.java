@@ -36,13 +36,27 @@ public class EmitterRepositoryTest {
         // given
         Long id = 1L;
         SseEmitter sseEmitter = new SseEmitter();
+        emitterRepository.save(id, sseEmitter);
 
         // when
-        emitterRepository.save(id, sseEmitter);
         emitterRepository.deleteById(id);
 
         // then
         SseEmitter findSseEmitter = emitterRepository.findById(id);
         assertThat(findSseEmitter).isNull();
+    }
+
+    @Test
+    void findByIdTest() {
+        // given
+        Long id = 1L;
+        SseEmitter sseEmitter = new SseEmitter();
+        emitterRepository.save(id, sseEmitter);
+
+        // when
+        SseEmitter findSseEmitter = emitterRepository.findById(id);
+
+        // then
+        assertThat(findSseEmitter).isEqualTo(sseEmitter);
     }
 }
