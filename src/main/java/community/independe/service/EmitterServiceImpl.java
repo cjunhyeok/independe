@@ -22,6 +22,11 @@ public class EmitterServiceImpl implements EmitterService{
         return sseEmitter;
     }
 
+    @Override
+    public void notify(Long memberId, Object event) {
+        sendToClient(memberId, event);
+    }
+
     private SseEmitter createEmitter(Long memberId) {
 
         SseEmitter sseEmitter = new SseEmitter(DEFAULT_TIMEOUT);
