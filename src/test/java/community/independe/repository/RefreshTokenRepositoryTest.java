@@ -2,6 +2,7 @@ package community.independe.repository;
 
 import community.independe.domain.token.RefreshToken;
 import community.independe.repository.token.RefreshTokenRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +14,11 @@ public class RefreshTokenRepositoryTest {
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
+
+    @AfterEach
+    public void deleteData() {
+        refreshTokenRepository.deleteAll();
+    }
 
     @Test
     void saveTest() {
@@ -32,5 +38,19 @@ public class RefreshTokenRepositoryTest {
         assertThat(findRefreshToken.getId()).isEqualTo(savedRefreshToken.getId());
     }
 
+    @Test
+    void findByRefreshTokenTest() {
+        // given
+        RefreshToken refreshToken = RefreshToken.builder()
+                .ip("mockIp")
+                .refreshToken("mockRefreshToken")
+                .build();
+        RefreshToken savedRefreshToken = refreshTokenRepository.save(refreshToken);
 
+        // when
+        RefreshToken findRefreshToken = refreshTokenRepository.findByRefreshToken("mockRefreshToken");
+
+        // then
+        assertThat(findRefreshToken.getId()).isEqualTo(savedRefreshToken.getId());
+    }
 }
