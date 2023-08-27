@@ -1,5 +1,9 @@
 package community.independe.service;
 
-public interface RefreshTokenService {
+import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Collection;
+
+public interface RefreshTokenService {
+    String save(String ip, Collection<GrantedAuthority> authorities, String refreshToken);
 }
