@@ -52,5 +52,6 @@ public class RefreshTokenRepositoryTest {
 
         // then
         assertThat(findRefreshToken.getId()).isEqualTo(savedRefreshToken.getId());
+        assertThat(findRefreshToken.getRefreshToken()).isEqualTo(savedRefreshToken.getRefreshToken());
     }
 }
