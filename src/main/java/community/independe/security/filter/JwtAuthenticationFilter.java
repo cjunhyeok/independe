@@ -5,8 +5,10 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import community.independe.security.filter.dto.LoginDto;
 import community.independe.security.signature.SecuritySigner;
+import community.independe.service.RefreshTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -22,11 +24,13 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
+    private final RefreshTokenService refreshTokenService;
     private final SecuritySigner securitySigner;
     private final JWK jwk;
 
-    public JwtAuthenticationFilter(SecuritySigner securitySigner, JWK jwk) {
+    public JwtAuthenticationFilter(SecuritySigner securitySigner, JWK jwk, RefreshTokenService refreshTokenService) {
         super(new AntPathRequestMatcher("/api/login"));
+        this.refreshTokenService = refreshTokenService;
         this.securitySigner = securitySigner;
         this.jwk = jwk;
     }
@@ -54,10 +58,20 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
         User user = (User) authResult.getPrincipal();
         String jwtToken;
+        String refreshToken;
+        String ip = request.getRemoteAddr();
 
         try {
             jwtToken = securitySigner.getJwtToken(user, jwk);
+            refreshToken = securitySigner.getRefreshToken(user, jwk);
+            refreshTokenService.save(ip, user.getAuthorities(), refreshToken);
             response.addHeader("Authorization", "Bearer " + jwtToken);
+            Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+
+            refreshTokenCookie.setSecure(true);
+            refreshTokenCookie.setHttpOnly(true);
+
+            response.addCookie(refreshTokenCookie);
         } catch (JOSEException e) {
             throw new RuntimeException(e);
         }
