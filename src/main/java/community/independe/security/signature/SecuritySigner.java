@@ -5,6 +5,7 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import community.independe.domain.member.Member;
@@ -55,6 +56,30 @@ public abstract class SecuritySigner {
                 .claim("authority", member.getRole()) // 사용자 권한
                 .claim("nickname", member.getNickname()) // 사용자 nickname
                 .expirationTime(new Date(new Date().getTime() + 60 * 1000 * 10)) // 10분
+                .build();
+        SignedJWT signedJWT = new SignedJWT(header, jwtClaimsSet);
+        signedJWT.sign(jwsSigner); // mac signer를 이용해 서명
+        String jwtToken = signedJWT.serialize();
+
+        return jwtToken;
+    }
+
+    public String getRefreshToken(UserDetails userDetails, JWK jwk) throws JOSEException {
+        MACSigner jwsSigner = new MACSigner(((OctetSequenceKey)jwk).toSecretKey()); // 시크릿 키를 이용해 Signer 생성
+
+        Member member = ((MemberContext) userDetails).getMember();
+
+        // jwk에서 알고리즘 정보와 keyId를 가져와 Header를 생성
+        JWSHeader header = new JWSHeader.Builder((JWSAlgorithm)jwk.getAlgorithm()).keyID(jwk.getKeyID()).build();
+        // Claim정보 생성
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject("user")
+                .issuer("http://localhost:8080")
+                .claim("username", member.getUsername())
+                .claim("authority", member.getRole()) // 사용자 권한
+                .claim("nickname", member.getNickname()) // 사용자 닉네임
+                .claim("region", member.getRegion()) // 사용자 지역
+                .expirationTime(new Date(new Date().getTime() + (7 * 24 * 60 * 60 * 1000))) // 1주일
                 .build();
         SignedJWT signedJWT = new SignedJWT(header, jwtClaimsSet);
         signedJWT.sign(jwsSigner); // mac signer를 이용해 서명
