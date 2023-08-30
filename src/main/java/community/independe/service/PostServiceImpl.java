@@ -6,6 +6,8 @@ import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
+import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.notfound.PostNotFountException;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.file.FilesRepository;
@@ -19,10 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
-@Transactional(readOnly = true)
 @Slf4j
+@Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PostServiceImpl implements PostService{
 
     private final MemberRepository memberRepository;
@@ -33,7 +35,7 @@ public class PostServiceImpl implements PostService{
     @Override
     public Post findById(Long postId) {
         return postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Id not exist"));
+                .orElseThrow(() -> new PostNotFountException("Post Not Exist"));
     }
 
     // 자취 게시글 생성
@@ -42,7 +44,7 @@ public class PostServiceImpl implements PostService{
     public Long createIndependentPost(Long memberId, String title, String content, IndependentPostType independentPostType) {
 
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Id not exist"));
+                .orElseThrow(() -> new MemberNotFountException("Member Not Exist"));
 
         Post post = Post.builder()
                 .title(title)
@@ -60,8 +62,9 @@ public class PostServiceImpl implements PostService{
     @Transactional
     public Long createRegionPost(Long memberId, String title, String content, RegionType regionType, RegionPostType regionPostType) {
 
-        Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Id not exist"));
+        Member findMember = memberRepository.findById(memberId).orElseThrow(
+                () -> new MemberNotFountException("Member Not Exist")
+        );
 
         Post post = Post.builder()
                 .title(title)
@@ -80,7 +83,7 @@ public class PostServiceImpl implements PostService{
     public Long updatePost(Long postId, String title, String content) {
 
         Post findPost = postRepository.findById(postId).orElseThrow(
-                () -> new IllegalArgumentException("post not exist")
+                () -> new PostNotFountException("Post Not Exist")
         );
 
         findPost.updatePost(title, content);
@@ -91,7 +94,7 @@ public class PostServiceImpl implements PostService{
     @Override
     public void deletePost(Long postId) {
         Post findPost = postRepository.findById(postId).orElseThrow(
-                () -> new IllegalArgumentException("post not exist")
+                () -> new PostNotFountException("Post Not Exist")
         );
         findPost.deleteMember();
         findPost.deleteRecommendPosts();
@@ -109,13 +112,11 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public Page<Post> findAllIndependentPostsByTypeWithMember(IndependentPostType independentPostType, String condition, String keyword, Pageable pageable) {
-//        return postRepository.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
         return postRepository.findAllIndependentPostsByTypeWithMemberDynamic(independentPostType, condition, keyword, pageable);
     }
 
     @Override
     public Page<Post> findAllRegionPostsByTypesWithMember(RegionType regionType, RegionPostType regionPostType, String condition, String keyword, Pageable pageable) {
-//        return postRepository.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
         return postRepository.findAllRegionPostsByTypesWithMemberDynamic(regionType, regionPostType, condition, keyword, pageable);
     }
 
@@ -127,8 +128,9 @@ public class PostServiceImpl implements PostService{
     @Override
     @Transactional
     public void increaseViews(Long postId) {
-        Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Id not exist"));
+        Post findPost = postRepository.findById(postId).orElseThrow(
+                () -> new PostNotFountException("Post Not Exist")
+        );
 
         findPost.increaseViews(findPost.getViews() + 1);
     }
