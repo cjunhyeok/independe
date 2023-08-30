@@ -4,6 +4,9 @@ import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.RegionType;
+import community.independe.exception.notfound.CommentNotFountException;
+import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.notfound.PostNotFountException;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
@@ -35,10 +38,10 @@ public class CommentServiceImpl implements CommentService{
     public Long createParentComment(Long memberId, Long postId, String content) {
 
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("member not exist"));
+                .orElseThrow(() -> new MemberNotFountException("Member Not Exist"));
 
         Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("post not exist"));
+                .orElseThrow(() -> new PostNotFountException("Post Not Exist"));
 
         if (!findPost.getMember().equals(findMember)) {
             checkRegion(findMember, findPost);
@@ -59,13 +62,13 @@ public class CommentServiceImpl implements CommentService{
     public Long createChildComment(Long memberId, Long postId, Long commentId, String content) {
 
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("member not exist"));
+                .orElseThrow(() -> new MemberNotFountException("Member Not Exist"));
 
         Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("post not exist"));
+                .orElseThrow(() -> new PostNotFountException("Post Not Exist"));
 
         Comment parentComment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("comment not exist"));
+                .orElseThrow(() -> new CommentNotFountException("Comment Not Exist"));
 
         if (!findPost.getMember().equals(findMember)) {
             checkRegion(findMember, findPost);
@@ -105,7 +108,7 @@ public class CommentServiceImpl implements CommentService{
         }
 
         if (isRegionPost == true && (findMember.getRegion() == null || !findMember.getRegion().equals(findPost.getRegionType()))) {
-            throw new IllegalArgumentException("region not authenticate");
+            throw new IllegalArgumentException("Region Not Authenticate");
         }
     }
 }
