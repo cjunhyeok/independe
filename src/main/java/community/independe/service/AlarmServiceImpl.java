@@ -3,6 +3,7 @@ package community.independe.service;
 import community.independe.domain.alarm.Alarm;
 import community.independe.domain.alarm.AlarmType;
 import community.independe.domain.member.Member;
+import community.independe.exception.notfound.MemberNotFountException;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.alarm.AlarmRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class AlarmServiceImpl implements AlarmService{
     @Override
     public Long saveAlarm(String message, Boolean isRead, AlarmType alarmType, Long memberId) {
         Member findMember = memberRepository.findById(memberId).orElseThrow(
-                () -> new IllegalArgumentException("member not exist")
+                () -> new MemberNotFountException("Member Not Exist")
         );
 
         Alarm alarm = Alarm.builder()
