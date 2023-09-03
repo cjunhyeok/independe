@@ -7,6 +7,8 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import community.independe.domain.member.Member;
 import community.independe.repository.MemberRepository;
+import community.independe.security.exception.JwtNotFoundException;
+import community.independe.security.exception.JwtVerifyException;
 import community.independe.security.service.MemberContext;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +59,7 @@ public class JwtTokenVerifier {
 
         if (header == null || !header.startsWith("Bearer ")) {
             // 토큰이 없거나 Bearer로 시작하지 않으면 다음 필터로 넘긴다.
-            return null;
+            throw new JwtNotFoundException();
         }
 
         // 순수 token 뽑아내기
@@ -90,7 +92,7 @@ public class JwtTokenVerifier {
                 }
             }
             else {
-                return false;
+                throw new JwtVerifyException("Token Verification Failed");
             }
         } catch (ParseException e) {
             throw new RuntimeException(e);
