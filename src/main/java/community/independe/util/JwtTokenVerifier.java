@@ -32,26 +32,26 @@ public class JwtTokenVerifier {
     private final OctetSequenceKey jwk;
     private final MemberRepository memberRepository;
 
-    public boolean verifyToken(String header) {
+    public void verifyToken(String header) {
 
         if (header == null || !header.startsWith("Bearer ")) {
             // 토큰이 없거나 Bearer로 시작하지 않으면 다음 필터로 넘긴다.
-            return false;
+            throw new JwtNotFoundException();
         }
         // 순수 token 뽑아내기
         String token = header.replace("Bearer ", "");
 
-        return verify(token);
+        verify(token);
     }
 
-    public boolean verifyToken(HttpServletRequest request) {
+    public void verifyToken(HttpServletRequest request) {
 
         String token = getHeaderAndToken(request);
         if (token == null) {
-            return false;
+            throw new JwtNotFoundException();
         }
 
-        return verify(token);
+        verify(token);
     }
 
     private String getHeaderAndToken(HttpServletRequest request) {
@@ -67,7 +67,7 @@ public class JwtTokenVerifier {
         return token;
     }
 
-    private boolean verify(String token) {
+    private void verify(String token) {
         SignedJWT signedJWT;
 
         try {
@@ -88,7 +88,6 @@ public class JwtTokenVerifier {
 
                 if (username != null) {
                     authentication(username);
-                    return true;
                 }
             }
             else {
@@ -99,7 +98,6 @@ public class JwtTokenVerifier {
         } catch (JOSEException e) {
             throw new RuntimeException(e);
         }
-        return true;
     }
 
     private void authentication(String username) {
