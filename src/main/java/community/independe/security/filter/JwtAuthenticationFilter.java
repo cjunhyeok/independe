@@ -12,14 +12,19 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
@@ -75,5 +80,30 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         } catch (JOSEException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+        if (failed instanceof BadCredentialsException) {
+            makeExceptionMessage(response, "잘못된 비밀번호입니다.", failed);
+        } else if (failed instanceof UsernameNotFoundException) {
+            makeExceptionMessage(response, "잘못된 아이디입니다.", failed);
+        } else {
+            super.unsuccessfulAuthentication(request, response, failed);
+        }
+    }
+
+    private void makeExceptionMessage(HttpServletResponse response, String message, Exception e) throws IOException {
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        final Map<String, Object> body = new HashMap<>();
+        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+        body.put("message", message);
+        body.put("exceptionMessage", e.getMessage());
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(response.getOutputStream(), body);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 }
