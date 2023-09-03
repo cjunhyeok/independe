@@ -4,7 +4,6 @@ import community.independe.domain.member.Member;
 import community.independe.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,16 +24,15 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        try {
-            Member findMember = memberRepository.findByUsername(username);
+        Member findMember = memberRepository.findByUsername(username);
 
-            List<GrantedAuthority> roles = new ArrayList<>();
-            roles.add(new SimpleGrantedAuthority(findMember.getRole()));
-
-            return new MemberContext(findMember, roles);
-        } catch (EmptyResultDataAccessException e) {
+        if (findMember == null) {
             throw new UsernameNotFoundException("Invalid Username");
         }
 
+        List<GrantedAuthority> roles = new ArrayList<>();
+        roles.add(new SimpleGrantedAuthority(findMember.getRole()));
+
+        return new MemberContext(findMember, roles);
     }
 }
