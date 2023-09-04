@@ -1,4 +1,4 @@
-package community.independe.exception.notfound;
+package community.independe.exception;
 
 public class RefreshTokenException extends RuntimeException {
 
