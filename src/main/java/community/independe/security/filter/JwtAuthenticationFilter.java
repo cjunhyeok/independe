@@ -5,7 +5,6 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import community.independe.domain.member.Member;
 import community.independe.security.filter.dto.LoginDto;
-import community.independe.security.service.MemberContext;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.service.RefreshTokenService;
 import jakarta.servlet.FilterChain;
@@ -19,12 +18,15 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,17 +65,20 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
 
-        User user = (User) authResult.getPrincipal();
-        Member member = ((MemberContext) user).getMember();
+        Member member = (Member) authResult.getPrincipal();
         String username = member.getUsername();
         String jwtToken;
         String refreshToken;
         String ip = request.getRemoteAddr();
 
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getRole());
+        authorities.add(grantedAuthority);
+
         try {
             jwtToken = securitySigner.getJwtToken(username, jwk);
             refreshToken = securitySigner.getRefreshJwtToken(username, jwk);
-            refreshTokenService.save(ip, user.getAuthorities(), refreshToken);
+            refreshTokenService.save(ip, authorities, refreshToken);
             response.addHeader("Authorization", "Bearer " + jwtToken);
             Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
 
