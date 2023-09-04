@@ -3,7 +3,9 @@ package community.independe.security.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
+import community.independe.domain.member.Member;
 import community.independe.security.filter.dto.LoginDto;
+import community.independe.security.service.MemberContext;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.service.RefreshTokenService;
 import jakarta.servlet.FilterChain;
@@ -62,13 +64,15 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
 
         User user = (User) authResult.getPrincipal();
+        Member member = ((MemberContext) user).getMember();
+        String username = member.getUsername();
         String jwtToken;
         String refreshToken;
         String ip = request.getRemoteAddr();
 
         try {
-            jwtToken = securitySigner.getJwtToken(user, jwk);
-            refreshToken = securitySigner.getRefreshToken(user, jwk);
+            jwtToken = securitySigner.getJwtToken(username, jwk);
+            refreshToken = securitySigner.getRefreshJwtToken(username, jwk);
             refreshTokenService.save(ip, user.getAuthorities(), refreshToken);
             response.addHeader("Authorization", "Bearer " + jwtToken);
             Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
