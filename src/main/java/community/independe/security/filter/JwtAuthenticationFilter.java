@@ -18,17 +18,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
@@ -71,9 +66,8 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         String refreshToken;
         String ip = request.getRemoteAddr();
 
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getRole());
-        authorities.add(grantedAuthority);
+        Set<String> authorities = new HashSet<>();
+        authorities.add(member.getRole());
 
         try {
             jwtToken = securitySigner.getJwtToken(username, jwk);
