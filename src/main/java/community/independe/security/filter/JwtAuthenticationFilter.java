@@ -72,7 +72,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         try {
             jwtToken = securitySigner.getJwtToken(username, jwk);
             refreshToken = securitySigner.getRefreshJwtToken(username, jwk);
-            refreshTokenService.save(ip, authorities, refreshToken);
+            refreshTokenService.save(ip, authorities, refreshToken, username);
             response.addHeader("Authorization", "Bearer " + jwtToken);
             Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
 
