@@ -11,7 +11,6 @@ import community.independe.util.JwtTokenVerifier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.util.Set;
@@ -19,7 +18,6 @@ import java.util.Set;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class RefreshTokenServiceImpl implements RefreshTokenService{
 
     private final RefreshTokenRepository refreshTokenRepository;
@@ -27,15 +25,15 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
     private final SecuritySigner securitySigner;
     private final JWK jwk;
 
-    public String save(String ip, Set<String> authorities, String refreshToken) {
+    public String save(String ip, Set<String> authorities, String refreshToken, String username) {
 
-        RefreshToken findRefreshToken = refreshTokenRepository.findByRefreshToken(refreshToken);
+        RefreshToken findRefreshToken = refreshTokenRepository.findByUsername(username);
 
         if (findRefreshToken != null) {
             refreshTokenRepository.deleteById(findRefreshToken.getId());
         }
 
-        RefreshToken savedRefreshToken = saveRefreshToken(ip, authorities, refreshToken);
+        RefreshToken savedRefreshToken = saveRefreshToken(ip, authorities, refreshToken, username);
 
         return savedRefreshToken.getId();
     }
@@ -75,7 +73,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
 
             newRefreshToken = securitySigner.getRefreshJwtToken(username, jwk);
 
-            saveRefreshToken(currentIp, findRefreshToken.getAuthorities(), newRefreshToken);
+            saveRefreshToken(currentIp, findRefreshToken.getAuthorities(), newRefreshToken, username);
 
         } catch (ParseException e) {
             throw new RefreshTokenException("Invalid RefreshToken");
@@ -84,12 +82,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
         return newRefreshToken;
     }
 
-    private RefreshToken saveRefreshToken(String currentIp, Set<String> authorities, String refreshToken) {
+    private RefreshToken saveRefreshToken(String currentIp, Set<String> authorities, String refreshToken, String username) {
 
         RefreshToken token = RefreshToken.builder()
                 .ip(currentIp)
                 .authorities(authorities)
                 .refreshToken(refreshToken)
+                .username(username)
                 .build();
         return refreshTokenRepository.save(token);
     }
