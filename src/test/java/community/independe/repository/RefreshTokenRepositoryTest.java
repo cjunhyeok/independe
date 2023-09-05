@@ -54,4 +54,54 @@ public class RefreshTokenRepositoryTest {
         assertThat(findRefreshToken.getId()).isEqualTo(savedRefreshToken.getId());
         assertThat(findRefreshToken.getRefreshToken()).isEqualTo(savedRefreshToken.getRefreshToken());
     }
+
+    @Test
+    void deleteByIdTest() {
+        // given
+        RefreshToken refreshToken = RefreshToken.builder()
+                .ip("mockIp")
+                .refreshToken("mockRefreshToken")
+                .build();
+        RefreshToken savedRefreshToken = refreshTokenRepository.save(refreshToken);
+
+        // when
+        refreshTokenRepository.deleteById(refreshToken.getId());
+
+        // then
+        assertThat(refreshTokenRepository.findById(refreshToken.getId())).isEmpty();
+    }
+
+    @Test
+    void findByUsernameTest() {
+        // given
+        RefreshToken refreshToken = RefreshToken.builder()
+                .username("username")
+                .ip("mockIp")
+                .refreshToken("mockRefreshToken")
+                .build();
+        RefreshToken savedRefreshToken = refreshTokenRepository.save(refreshToken);
+
+        // when
+        RefreshToken findRefreshToken = refreshTokenRepository.findByUsername("username");
+
+        // then
+        assertThat(findRefreshToken.getIp()).isEqualTo(savedRefreshToken.getIp());
+    }
+
+    @Test
+    void findByUsernameFailTest() {
+        // given
+        RefreshToken refreshToken = RefreshToken.builder()
+                .username("username")
+                .ip("mockIp")
+                .refreshToken("mockRefreshToken")
+                .build();
+        RefreshToken savedRefreshToken = refreshTokenRepository.save(refreshToken);
+
+        // when
+        RefreshToken findRefreshToken = refreshTokenRepository.findByUsername("fail");
+
+        // then
+        assertThat(findRefreshToken).isNull();
+    }
 }
