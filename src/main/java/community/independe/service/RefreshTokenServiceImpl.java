@@ -4,18 +4,17 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jwt.JWTParser;
 import community.independe.domain.token.RefreshToken;
-import community.independe.exception.notfound.RefreshTokenException;
+import community.independe.exception.RefreshTokenException;
 import community.independe.repository.token.RefreshTokenRepository;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.util.JwtTokenVerifier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
-import java.util.Collection;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -28,7 +27,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
     private final SecuritySigner securitySigner;
     private final JWK jwk;
 
-    public String save(String ip, Collection<? extends GrantedAuthority> authorities, String refreshToken) {
+    public String save(String ip, Set<String> authorities, String refreshToken) {
 
         RefreshToken findRefreshToken = refreshTokenRepository.findByRefreshToken(refreshToken);
 
@@ -48,9 +47,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
     }
 
     private RefreshToken RefreshTokenExceptionCheck(String refreshToken, String currentIp) {
-        jwtTokenVerifier.verifyToken(refreshToken);
 
-        RefreshToken findRefreshToken = refreshTokenRepository.findByRefreshToken(refreshToken);
+        String bearerToken = refreshToken.replace("; Secure; HttpOnly", "");
+        jwtTokenVerifier.verifyToken(bearerToken);
+
+        String sampleToken = bearerToken.replace("Bearer ", "");
+
+        RefreshToken findRefreshToken = refreshTokenRepository.findByRefreshToken(sampleToken);
         if (findRefreshToken == null) {
             throw new RefreshTokenException("Invalid RefreshToken");
         }
@@ -81,7 +84,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
         return newRefreshToken;
     }
 
-    private RefreshToken saveRefreshToken(String currentIp, Collection<? extends GrantedAuthority> authorities, String refreshToken) {
+    private RefreshToken saveRefreshToken(String currentIp, Set<String> authorities, String refreshToken) {
 
         RefreshToken token = RefreshToken.builder()
                 .ip(currentIp)

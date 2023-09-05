@@ -1,9 +1,11 @@
 package community.independe.service;
 
-import org.springframework.security.core.GrantedAuthority;
+import com.nimbusds.jose.JOSEException;
 
-import java.util.Collection;
+import java.util.Set;
 
 public interface RefreshTokenService {
-    String save(String ip, Collection<? extends GrantedAuthority> authorities, String refreshToken);
+    String save(String ip, Set<String> authorities, String refreshToken);
+
+    String reProvideRefreshToken(String currentIp, String refreshToken) throws JOSEException;
 }
