@@ -1,6 +1,7 @@
 package community.independe.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import community.independe.util.UrlList;
 import community.independe.security.exception.JwtNotFoundException;
 import community.independe.security.exception.JwtVerifyException;
 import community.independe.util.JwtTokenVerifier;
@@ -29,7 +30,15 @@ public class JwtAuthorizationMacFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            jwtTokenVerifier.verifyToken(request);
+            String requestURI = request.getRequestURI();
+            boolean isBlackListed = checkBlackList(requestURI);
+
+            if (isBlackListed) {
+                jwtTokenVerifier.verifyToken(request);
+            } else {
+                filterChain.doFilter(request, response);
+            }
+
         } catch (RuntimeException e) {
             if (e instanceof JwtNotFoundException) {
                 makeExceptionMessage(response, "토큰을 찾을 수 없습니다.", e);
@@ -39,6 +48,25 @@ public class JwtAuthorizationMacFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
             }
         }
+    }
+
+    private boolean checkBlackList(String requestURI) {
+        boolean isBlackListed = false;
+
+        for (String blackList : UrlList.getBlackList()) {
+            if (isPatternMatch(requestURI, blackList)) {
+                isBlackListed = true;
+                break;
+            }
+        }
+
+        return isBlackListed;
+    }
+
+    private boolean isPatternMatch(String url, String pattern) {
+        // 패턴이 일치하면 true 반환, **를 정규 표현식으로 처리
+        return url.equals(pattern) || url.matches(pattern.replace("**", ".*"))
+                || (pattern.endsWith("/**") && url.startsWith(pattern.substring(0, pattern.length() - 3)));
     }
 
     private void makeExceptionMessage(HttpServletResponse response, String message, Exception e) throws IOException {
