@@ -15,6 +15,7 @@ import community.independe.security.service.oauth2.CustomOAuth2UserService;
 import community.independe.security.signature.MacSecuritySigner;
 import community.independe.service.RefreshTokenService;
 import community.independe.util.JwtTokenVerifier;
+import community.independe.util.UrlList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,30 +46,6 @@ public class SecurityConfig {
     private final RefreshTokenService refreshTokenService;
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
 
-    private String[] whiteList = {"/",
-            "/actuator/**",
-            "/ws",
-            "/ws/**",
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/oauth2/**",
-            "/api/login",
-            "/api/members/new",
-            "/api/members/username",
-            "/api/members/nickname",
-            "/api/posts/main",
-            "/api/posts/**"};
-
-    private String[] blackList = {
-            "/api/posts/new",
-            "/api/oauth/members",
-            "/api/posts/region/new",
-            "/api/posts/independent/new",
-            "/api/members/region",
-            "/api/posts/update",
-            "/api/chat/**"
-    };
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -87,8 +64,8 @@ public class SecurityConfig {
 //                        .accessDeniedHandler(jwtAccessDeniedHandler());
 
         http.authorizeHttpRequests()
-                .requestMatchers(blackList).authenticated()
-                .requestMatchers(whiteList).permitAll()
+                .requestMatchers(UrlList.getBlackList()).authenticated()
+                .requestMatchers(UrlList.getWhiteList()).permitAll()
                 .anyRequest().authenticated();
 
 //        http.authorizeHttpRequests()
