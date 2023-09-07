@@ -11,16 +11,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AlarmServiceImpl implements AlarmService{
 
-    private AlarmRepository alarmRepository;
-    private MemberRepository memberRepository;
+    private final AlarmRepository alarmRepository;
+    private final MemberRepository memberRepository;
 
     @Override
+    @Transactional
     public Long saveAlarm(String message, Boolean isRead, AlarmType alarmType, Long memberId) {
         Member findMember = memberRepository.findById(memberId).orElseThrow(
                 () -> new MemberNotFountException("Member Not Exist")
@@ -36,5 +39,10 @@ public class AlarmServiceImpl implements AlarmService{
         Alarm savedAlarm = alarmRepository.save(alarm);
 
         return savedAlarm.getId();
+    }
+
+    @Override
+    public List<Alarm> findAllByMemberId(Long memberId) {
+        return alarmRepository.findAllByMemberId(memberId);
     }
 }
