@@ -3,6 +3,7 @@ package community.independe.repository.alarm;
 import community.independe.domain.alarm.Alarm;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -14,5 +15,5 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     countQuery = "select a from Alarm a" +
             " where a.member.id = :memberId" +
             " order by a.createdDate asc")
-    List<Alarm> findAllByMemberId(Long memberId);
+    List<Alarm> findAllByMemberId(@Param("memberId") Long memberId);
 }
