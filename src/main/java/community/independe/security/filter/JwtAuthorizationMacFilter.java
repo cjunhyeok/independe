@@ -35,6 +35,7 @@ public class JwtAuthorizationMacFilter extends OncePerRequestFilter {
 
             if (isBlackListed) {
                 jwtTokenVerifier.verifyToken(request);
+                filterChain.doFilter(request, response);
             } else {
                 filterChain.doFilter(request, response);
             }
