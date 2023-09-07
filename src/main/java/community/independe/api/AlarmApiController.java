@@ -1,14 +1,20 @@
 package community.independe.api;
 
-import community.independe.api.dtos.alarm.AlarmMessage;
+import community.independe.api.dtos.Result;
+import community.independe.api.dtos.alarm.AlarmsResponse;
+import community.independe.domain.alarm.Alarm;
+import community.independe.domain.member.Member;
 import community.independe.repository.MemberRepository;
+import community.independe.security.service.MemberContext;
 import community.independe.service.AlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -17,13 +23,23 @@ public class AlarmApiController {
 
     private final AlarmService alarmService;
     private final MemberRepository memberRepository;
-    private final SimpMessagingTemplate simpMessagingTemplate; // 특정 상대에게 메시지를 보내기 위한 객체
 
-    @MessageMapping("/post-alarm")
-    public AlarmMessage receiveAlarm(@Payload AlarmMessage message) {
-        simpMessagingTemplate.convertAndSendToUser(message.getMemberId().toString(), "/alarm", message.getMessage());
+    @GetMapping("/api/alarms")
+    public Result alarmList(@AuthenticationPrincipal MemberContext memberContext) {
 
-        alarmService.saveAlarm(message.getMessage(), false, message.getAlarmType(), message.getMemberId());
-        return message;
+        Member loginMember = memberContext.getMember();
+
+        List<Alarm> alarms = alarmService.findAllByMemberId(loginMember.getId());
+
+        List<AlarmsResponse> collect = alarms.stream()
+                .map(a -> AlarmsResponse.builder()
+                        .alarmType(a.getAlarmType())
+                        .message(a.getMessage())
+                        .isRead(a.getIsRead())
+                        .memberId(a.getMember().getId())
+                        .build())
+                .collect(Collectors.toList());
+
+        return new Result(collect);
     }
 }
