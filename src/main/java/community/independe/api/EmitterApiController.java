@@ -19,7 +19,7 @@ public class EmitterApiController {
 
     private final EmitterService emitterService;
 
-    @GetMapping(value = "/api/emitter/subscibe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/api/emitter/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@RequestHeader(value = "Last-Event-Id", required = false, defaultValue = " ") String lastEventId,
                                 @AuthenticationPrincipal MemberContext memberContext) {
 
