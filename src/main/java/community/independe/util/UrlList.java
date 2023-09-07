@@ -24,7 +24,9 @@ public abstract class UrlList {
             "/api/posts/independent/new",
             "/api/members/region",
             "/api/posts/update",
-            "/api/chat/**"
+            "/api/chat/**",
+            "/api/emitter/**",
+            "/api/comments/**"
     };
 
     public static String[] getWhiteList() {
