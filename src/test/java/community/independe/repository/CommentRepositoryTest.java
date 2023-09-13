@@ -10,7 +10,6 @@ import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.post.PostRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +17,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
 @Transactional
@@ -224,13 +225,14 @@ public class CommentRepositoryTest {
                 .build();
         Comment savedParent = commentRepository.save(parentComment);
 
+        em.flush();
+        em.clear();
+
         // when
-        Long deleteId = Long.valueOf(commentRepository.deleteParentComment(savedParent.getId()));
+        commentRepository.deleteCommentsByPostId(savedParent.getPost().getId());
 
         // then
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> commentRepository.findById(deleteId).orElseThrow(
-                        () -> new IllegalArgumentException()
-                ));
+        assertThatThrownBy(() -> commentRepository.findById(savedParent.getId()).get())
+                .isInstanceOf(NoSuchElementException.class);
     }
 }
