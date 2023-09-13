@@ -235,4 +235,49 @@ public class CommentRepositoryTest {
         assertThatThrownBy(() -> commentRepository.findById(savedParent.getId()).get())
                 .isInstanceOf(NoSuchElementException.class);
     }
+
+    @Test
+    void deleteParentComment() {
+        // given
+        Member member = Member.builder()
+                .username("id")
+                .password("1234")
+                .nickname("nick")
+                .role("ROLE_USER")
+                .build();
+        memberRepository.save(member);
+
+        Post post = Post.builder()
+                .title("title")
+                .content("content")
+                .member(member)
+                .independentPostType(IndependentPostType.COOK)
+                .build();
+        postRepository.save(post);
+
+        Comment parentComment = Comment.builder()
+                .content("parent")
+                .member(member)
+                .post(post)
+                .build();
+        Comment savedParent = commentRepository.save(parentComment);
+
+        Comment childComment = Comment.builder()
+                .content("child")
+                .member(member)
+                .post(post)
+                .parent(savedParent)
+                .build();
+        Comment savedChild = commentRepository.save(childComment);
+
+        em.flush();
+        em.clear();
+
+        // when
+        commentRepository.deleteParentComment(savedChild.getParent().getId());
+
+        // then
+        assertThatThrownBy(() -> commentRepository.findById(savedChild.getId()).get())
+                .isInstanceOf(NoSuchElementException.class);
+    }
 }
