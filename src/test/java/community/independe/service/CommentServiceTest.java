@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,12 +57,11 @@ public class CommentServiceTest {
         when(commentRepository.findById(id)).thenReturn(Optional.empty());
 
         // when
-        IllegalArgumentException exception = org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
-                () -> commentService.findById(id));
+        assertThatThrownBy(() -> commentService.findById(id))
+                .isInstanceOf(IllegalArgumentException.class);
 
         // then
         verify(commentRepository, times(1)).findById(id);
-        assertThat(exception).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -70,10 +70,11 @@ public class CommentServiceTest {
         Long memberId = 1L;
         Long postId = 1L;
         String content = "parentContent";
+        Member mockMember = Member.builder().build();
 
         // stub
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(Member.builder().build()));
-        when(postRepository.findById(postId)).thenReturn(Optional.of(Post.builder().build()));
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(Post.builder().member(mockMember).build()));
         when(commentRepository.save(any(Comment.class))).thenReturn(Comment.builder().build());
 
         // when
