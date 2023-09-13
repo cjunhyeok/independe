@@ -3,12 +3,12 @@ package community.independe.service;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
+import community.independe.exception.notfound.CommentNotFountException;
 import community.independe.exception.notfound.MemberNotFountException;
 import community.independe.exception.notfound.PostNotFountException;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -156,7 +156,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    public void createParentCommentFailTest() {
+    public void createChildCommentCommentFailTest() {
         // given
         Long memberId = 1L;
         Long postId = 1L;
@@ -169,14 +169,13 @@ public class CommentServiceTest {
         when(commentRepository.findById(commentId)).thenReturn(Optional.empty());
 
         // when
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> commentService.createChildComment(memberId, postId, commentId, content));
+        assertThatThrownBy(() -> commentService.createChildComment(memberId, postId, commentId, content))
+                .isInstanceOf(CommentNotFountException.class);
 
         // then
         verify(memberRepository).findById(memberId);
         verify(postRepository).findById(postId);
         verify(commentRepository).findById(postId);
         verifyNoMoreInteractions(commentRepository);
-        assertThat(exception).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 }
