@@ -4,6 +4,7 @@ import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.notfound.PostNotFountException;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
@@ -119,14 +120,13 @@ public class CommentServiceTest {
         when(postRepository.findById(postId)).thenReturn(Optional.empty());
 
         // when
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> commentService.createParentComment(memberId, postId, content));
+        assertThatThrownBy(() -> commentService.createParentComment(memberId, postId, content))
+                .isInstanceOf(PostNotFountException.class);
 
         // then
         verify(memberRepository).findById(memberId);
         verify(postRepository).findById(postId);
         verifyNoInteractions(commentRepository);
-        assertThat(exception).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
