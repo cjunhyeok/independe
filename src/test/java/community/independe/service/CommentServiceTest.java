@@ -137,9 +137,11 @@ public class CommentServiceTest {
         Long commentId = 1L;
         String content = "childComment";
 
+        Member mockMember = Member.builder().build();
+
         // stub
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(Member.builder().build()));
-        when(postRepository.findById(postId)).thenReturn(Optional.of(Post.builder().build()));
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(Post.builder().member(mockMember).build()));
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(Comment.builder().build()));
         when(commentRepository.save(any(Comment.class))).thenReturn(Comment.builder().build());
 
