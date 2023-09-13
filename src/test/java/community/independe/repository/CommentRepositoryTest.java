@@ -274,7 +274,7 @@ public class CommentRepositoryTest {
         em.clear();
 
         // when
-        commentRepository.deleteParentComment(savedChild.getParent().getId());
+        commentRepository.deleteCommentByParentId(savedChild.getParent().getId());
 
         // then
         assertThatThrownBy(() -> commentRepository.findById(savedChild.getId()).get())

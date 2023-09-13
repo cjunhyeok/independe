@@ -102,7 +102,7 @@ public class PostServiceImpl implements PostService{
         List<Comment> allByPostId = commentRepository.findAllByPostId(findPost.getId());
 
         for (Comment comment : allByPostId) {
-            commentRepository.deleteParentComment(comment.getId());
+            commentRepository.deleteCommentByParentId(comment.getId());
         }
         filesRepository.deleteFilesByPostId(findPost.getId());
 

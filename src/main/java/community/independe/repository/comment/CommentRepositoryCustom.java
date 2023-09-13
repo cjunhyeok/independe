@@ -4,5 +4,5 @@ public interface CommentRepositoryCustom {
 
     int deleteCommentsByPostId(Long postId);
 
-    int deleteParentComment(Long commentId);
+    int deleteCommentByParentId(Long commentId);
 }

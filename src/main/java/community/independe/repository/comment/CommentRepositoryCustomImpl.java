@@ -21,7 +21,7 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom{
     }
 
     @Override
-    public int deleteParentComment(Long commentId) {
+    public int deleteCommentByParentId(Long commentId) {
         return em.createQuery("delete from Comment c where c.parent.id = :parentId")
                 .setParameter("parentId", commentId)
                 .executeUpdate();
