@@ -5,7 +5,10 @@ import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
+import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.notfound.PostNotFountException;
 import community.independe.repository.MemberRepository;
+import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.post.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -28,6 +32,8 @@ public class PostServiceTest {
     private PostRepository postRepository;
     @Mock
     private MemberRepository memberRepository;
+    @Mock
+    private CommentRepository commentRepository;
 
     @Test
     public void findByIdTest() {
@@ -55,12 +61,11 @@ public class PostServiceTest {
         when(postRepository.findById(postId)).thenReturn(Optional.empty());
 
         // when
-        IllegalArgumentException exception = org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
-                () -> postService.findById(postId));
+        assertThatThrownBy(() -> postService.findById(postId))
+                .isInstanceOf(PostNotFountException.class);
 
         // then
         verify(postRepository, times(1)).findById(postId);
-        assertThat(exception).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -116,13 +121,12 @@ public class PostServiceTest {
         when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
         // when
-        IllegalArgumentException exception = org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
-                () -> postService.createRegionPost(memberId, title, content, regionType, regionPostType));
+        assertThatThrownBy(() -> postService.createRegionPost(memberId, title, content, regionType, regionPostType))
+                .isInstanceOf(MemberNotFountException.class);
 
         // then
         verify(memberRepository).findById(memberId);
         verifyNoInteractions(postRepository);
-        assertThat(exception).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
