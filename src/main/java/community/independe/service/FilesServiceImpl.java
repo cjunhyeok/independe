@@ -2,6 +2,7 @@ package community.independe.service;
 
 import community.independe.domain.file.Files;
 import community.independe.domain.post.Post;
+import community.independe.exception.notfound.PostNotFountException;
 import community.independe.repository.post.PostRepository;
 import community.independe.repository.file.FilesRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
-@Slf4j
 public class FilesServiceImpl implements FilesService {
 
     private final String fileDir;
@@ -45,7 +46,7 @@ public class FilesServiceImpl implements FilesService {
     public List<Files> saveFiles(List<MultipartFile> multipartFiles, Long postId) throws IOException {
 
         Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("post not exist"));
+                .orElseThrow(() -> new PostNotFountException("Post Not Exist"));
 
         List<Files> files = new ArrayList<>();
 
@@ -68,7 +69,7 @@ public class FilesServiceImpl implements FilesService {
     @Override
     public Files findById(Long filesId) {
         return filesRepository.findById(filesId)
-                .orElseThrow(() -> new IllegalArgumentException("post not exist"));
+                .orElseThrow(() -> new PostNotFountException("Post Not Exist"));
     }
 
     private Files saveFile(MultipartFile multipartFile, Post findPost) throws IOException {
