@@ -2,6 +2,7 @@ package community.independe.service;
 
 import community.independe.domain.file.Files;
 import community.independe.domain.post.Post;
+import community.independe.exception.notfound.PostNotFountException;
 import community.independe.repository.file.FilesRepository;
 import community.independe.repository.post.PostRepository;
 import org.junit.jupiter.api.Test;
@@ -72,12 +73,11 @@ public class FilesServiceTest {
         when(filesRepository.findById(id)).thenReturn(Optional.empty());
 
         // when
-        IllegalArgumentException exception = org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
-                () -> filesService.findById(id));
+        assertThatThrownBy(() -> filesService.findById(id))
+                .isInstanceOf(PostNotFountException.class);
 
         // then
         verify(filesRepository, times(1)).findById(id);
-        assertThat(exception).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
 }
