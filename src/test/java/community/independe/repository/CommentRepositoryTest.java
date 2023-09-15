@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -23,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
-@Transactional
 public class CommentRepositoryTest {
 
     @Autowired
@@ -278,6 +276,40 @@ public class CommentRepositoryTest {
 
         // then
         assertThatThrownBy(() -> commentRepository.findById(savedChild.getId()).get())
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void deleteByIdTest() {
+        // given
+        Member member = Member.builder()
+                .username("id")
+                .password("1234")
+                .nickname("nick")
+                .role("ROLE_USER")
+                .build();
+        memberRepository.save(member);
+
+        Post post = Post.builder()
+                .title("title")
+                .content("content")
+                .member(member)
+                .independentPostType(IndependentPostType.COOK)
+                .build();
+        postRepository.save(post);
+
+        Comment parentComment = Comment.builder()
+                .content("parent")
+                .member(member)
+                .post(post)
+                .build();
+        Comment savedComment = commentRepository.save(parentComment);
+
+        // when
+        commentRepository.deleteById(savedComment.getId());
+
+        // then
+        assertThatThrownBy(() -> commentRepository.findById(savedComment.getId()).get())
                 .isInstanceOf(NoSuchElementException.class);
     }
 }
