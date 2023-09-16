@@ -80,4 +80,28 @@ public class MemberServiceTest {
         verify(memberRepository).findById(memberId);
         assertThat(mockMember.getNickname()).isEqualTo(nickname);
     }
+
+    @Test
+    void modifyMember() {
+        // given
+        Long memberId = 1L;
+        String username = "updateUsername";
+        String password = "updatePassword";
+        String nickname = "updateNickname";
+        String email = "updateEmail";
+        String number = "01012345678";
+
+        Member mockMember = Member.builder().build();
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
+
+        // when
+        memberService.modifyMember(memberId, username, password, nickname, email, number);
+
+        // then
+        verify(memberRepository).findById(memberId);
+        assertThat(mockMember.getUsername()).isEqualTo(username);
+        assertThat(mockMember.getNickname()).isEqualTo(nickname);
+    }
 }
