@@ -3,12 +3,14 @@ package community.independe.service;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
+import community.independe.domain.post.enums.RegionType;
 import community.independe.exception.notfound.CommentNotFountException;
 import community.independe.exception.notfound.MemberNotFountException;
 import community.independe.exception.notfound.PostNotFountException;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
+import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -177,5 +179,25 @@ public class CommentServiceTest {
         verify(postRepository).findById(postId);
         verify(commentRepository).findById(postId);
         verifyNoMoreInteractions(commentRepository);
+    }
+
+    @Test
+    void checkRegionFailTest() {
+        // given
+        Member mockMember = Member.builder().region(RegionType.SEOUL).build();
+        Post mockPost = Post.builder().regionType(RegionType.PUSAN).member(Member.builder().build()).build();
+
+        // stub
+        when(memberRepository.findById(1L)).thenReturn(Optional.of(mockMember));
+        when(postRepository.findById(1L)).thenReturn(Optional.of(mockPost));
+
+        // when
+        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert
+                = assertThatThrownBy(() -> commentService.createParentComment(1L, 1L, "content"));
+
+        // then
+        abstractThrowableAssert
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Region Not Authenticate");
     }
 }
