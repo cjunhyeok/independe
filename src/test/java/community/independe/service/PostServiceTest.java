@@ -9,7 +9,9 @@ import community.independe.exception.notfound.MemberNotFountException;
 import community.independe.exception.notfound.PostNotFountException;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.comment.CommentRepository;
+import community.independe.repository.file.FilesRepository;
 import community.independe.repository.post.PostRepository;
+import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,6 +36,8 @@ public class PostServiceTest {
     private MemberRepository memberRepository;
     @Mock
     private CommentRepository commentRepository;
+    @Mock
+    FilesRepository filesRepository;
 
     @Test
     public void findByIdTest() {
@@ -136,6 +140,8 @@ public class PostServiceTest {
         String title = "updateTitle";
         String content = "updateContent";
         Post mockPost = Post.builder().build();
+
+        // stub
         when(postRepository.findById(postId)).thenReturn(Optional.of(mockPost));
 
         // when
@@ -167,5 +173,23 @@ public class PostServiceTest {
         // then
         verify(postRepository, times(1)).findById(postId);
         assertThat(1).isEqualTo(mockPost.getViews());
+    }
+
+    @Test
+    void increaseViewsFailTest() {
+        // given
+        Long postId = 1L;
+
+        // stub
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+        // when
+        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert
+                = assertThatThrownBy(() -> postService.increaseViews(postId));
+
+        // then
+        abstractThrowableAssert
+                .isInstanceOf(PostNotFountException.class)
+                .hasMessage("Post Not Exist");
     }
 }
