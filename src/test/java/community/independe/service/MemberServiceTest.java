@@ -3,6 +3,7 @@ package community.independe.service;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.repository.MemberRepository;
+import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,7 +31,6 @@ public class MemberServiceTest {
 
     @Test
     public void joinTest() {
-
         // given
         String username = "id";
         String password = "1234";
@@ -38,6 +38,7 @@ public class MemberServiceTest {
 
         // stub
         when(memberRepository.findByUsername(username)).thenReturn(null);
+        when(memberRepository.findByNickname(nickname)).thenReturn(null);
         when(passwordEncoder.encode(password)).thenReturn("hashedPassword");
         when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> {
             Member member = invocation.getArgument(0);
@@ -59,6 +60,26 @@ public class MemberServiceTest {
         Field field = object.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
         field.set(object, value);
+    }
+
+    @Test
+    void joinCheckUsernameFailTest() {
+        // given
+        String username = "mockUsername";
+        String password = "mockPassword";
+        String nickname = "mockNickname";
+
+        // stub
+        when(memberRepository.findByUsername(username)).thenReturn(Member.builder().build());
+
+        // when
+        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert =
+                assertThatThrownBy(() -> memberService.join(username, password, nickname, null, null));
+
+        // then
+        abstractThrowableAssert
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Duplicated Username");
     }
 
     @Test
