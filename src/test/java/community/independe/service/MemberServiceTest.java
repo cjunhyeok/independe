@@ -83,6 +83,27 @@ public class MemberServiceTest {
     }
 
     @Test
+    void joinCheckNicknameFailTest() {
+        // given
+        String username = "mockUsername";
+        String password = "mockPassword";
+        String nickname = "mockNickname";
+
+        // stub
+        when(memberRepository.findByUsername(username)).thenReturn(null);
+        when(memberRepository.findByNickname(nickname)).thenReturn(Member.builder().build());
+
+        // when
+        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert =
+                assertThatThrownBy(() -> memberService.join(username, password, nickname, null, null));
+
+        // then
+        abstractThrowableAssert
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Duplicated Nickname");
+    }
+
+    @Test
     void modifyOAuthMemberTest() {
         // given
         Long memberId = 1L;
