@@ -1,5 +1,7 @@
 package community.independe.service;
 
+import community.independe.domain.comment.Comment;
+import community.independe.domain.manytomany.RecommendPost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
@@ -18,6 +20,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -191,5 +195,35 @@ public class PostServiceTest {
         abstractThrowableAssert
                 .isInstanceOf(PostNotFountException.class)
                 .hasMessage("Post Not Exist");
+    }
+
+    @Test
+    void deletePostTest() {
+        // given
+        Long postId = 1L;
+        Member mockMember = Member.builder().build();
+        Post mockPost = Post.builder().member(mockMember).build();
+        mockPost.getRecommendPosts().add(RecommendPost.builder().post(mockPost).build());
+        List<Comment> mockComments = new ArrayList<>();
+
+        // stub
+        when(postRepository.findById(postId)).thenReturn(Optional.of(mockPost));
+
+        when(commentRepository.findAllByPostId(null)).thenReturn(mockComments);
+
+        // when
+        postService.deletePost(postId);
+
+        // then
+        verify(postRepository, times(1)).findById(postId);
+        verify(commentRepository, times(1)).findAllByPostId(null);
+        for (Comment mockComment : mockComments) {
+            verify(commentRepository, times(1)).deleteCommentByParentId(mockComment.getId());
+        }
+        verify(filesRepository, times(1)).deleteFilesByPostId(null);
+        verify(commentRepository, times(1)).deleteCommentsByPostId(null);
+        verify(postRepository, times(1)).deletePostByPostId(null);
+        assertThat(mockPost.getMember()).isNull();
+        assertThat(mockPost.getRecommendPosts()).isEmpty();
     }
 }
