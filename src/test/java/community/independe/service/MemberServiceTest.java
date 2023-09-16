@@ -1,6 +1,7 @@
 package community.independe.service;
 
 import community.independe.domain.member.Member;
+import community.independe.domain.post.enums.RegionType;
 import community.independe.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -103,5 +104,23 @@ public class MemberServiceTest {
         verify(memberRepository).findById(memberId);
         assertThat(mockMember.getUsername()).isEqualTo(username);
         assertThat(mockMember.getNickname()).isEqualTo(nickname);
+    }
+
+    @Test
+    void authenticateRegionTest() {
+        // given
+        Long memberId = 1L;
+        RegionType regionType = RegionType.ULSAN;
+        Member mockMember = Member.builder().region(RegionType.KYEONGNAM).build();
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
+
+        // when
+        memberService.authenticateRegion(memberId, regionType);
+
+        // then
+        verify(memberRepository).findById(memberId);
+        assertThat(mockMember.getRegion()).isEqualTo(regionType);
     }
 }
