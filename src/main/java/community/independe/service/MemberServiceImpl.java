@@ -12,11 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
-@Transactional(readOnly = true)
 @Slf4j
+@Service
 @RequiredArgsConstructor
-public class MemberServiceImpl implements MemberService{
+@Transactional(readOnly = true)
+public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
@@ -46,6 +46,24 @@ public class MemberServiceImpl implements MemberService{
         return savedMember.getId();
     }
 
+    private boolean checkUsername(String username) {
+        Member findUsername = memberRepository.findByUsername(username);
+
+        if (findUsername != null) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkNickname(String nickname) {
+        Member findNickname = memberRepository.findByNickname(nickname);
+
+        if (findNickname != null) {
+            return false;
+        }
+        return true;
+    }
+
     @Override
     @Transactional
     public void modifyOAuthMember(Long memberId, String nickname, String email, String number) {
@@ -67,6 +85,16 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
+    @Transactional
+    public void authenticateRegion(Long memberId, RegionType regionType) {
+        Member findMember = memberRepository.findById(memberId).orElseThrow(
+                () -> new MemberNotFountException("Member Not Exist")
+        );
+
+        findMember.authenticateRegion(regionType);
+    }
+
+    @Override
     public Member findById(Long id) {
         return memberRepository.findById(id).orElseThrow(()
                 -> new MemberNotFountException("Member Not Exist"));
@@ -83,35 +111,7 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    @Transactional
-    public void authenticateRegion(Long memberId, RegionType regionType) {
-        Member findMember = memberRepository.findById(memberId).orElseThrow(
-                () -> new MemberNotFountException("Member Not Exist")
-        );
-
-        findMember.authenticateRegion(regionType);
-    }
-
-    @Override
     public List<Member> findAll() {
         return memberRepository.findAll();
-    }
-
-    private boolean checkUsername(String username) {
-        Member findUsername = memberRepository.findByUsername(username);
-
-        if (findUsername != null) {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean checkNickname(String nickname) {
-        Member findNickname = memberRepository.findByNickname(nickname);
-
-        if (findNickname != null) {
-            return false;
-        }
-        return true;
     }
 }
