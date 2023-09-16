@@ -10,7 +10,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.lang.reflect.Field;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,5 +58,26 @@ public class MemberServiceTest {
         Field field = object.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
         field.set(object, value);
+    }
+
+    @Test
+    void modifyOAuthMemberTest() {
+        // given
+        Long memberId = 1L;
+        String nickname = "modifyNickname";
+        String email = "modifyEmail";
+        String number = "01064613134";
+
+        Member mockMember = Member.builder().build();
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
+
+        // when
+        memberService.modifyOAuthMember(memberId, nickname, email, number);
+
+        // then
+        verify(memberRepository).findById(memberId);
+        assertThat(mockMember.getNickname()).isEqualTo(nickname);
     }
 }
