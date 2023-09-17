@@ -3,6 +3,7 @@ package community.independe.service;
 import community.independe.domain.chat.Chat;
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
+import community.independe.exception.notfound.MemberNotFountException;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.chat.ChatRepository;
 import community.independe.repository.chat.ChatRoomRepository;
@@ -62,6 +63,52 @@ public class ChatServiceTest {
     }
 
     @Test
+    void saveChatSenderFailTest() {
+        // given
+        Long senderId = 1L;
+        Long receiverId = 2L;
+        String content = "fail";
+        Boolean isRead = false;
+
+        // stub
+        when(memberRepository.findById(senderId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> chatService.saveChat(senderId, receiverId, content, isRead))
+                .isInstanceOf(MemberNotFountException.class)
+                .hasMessage("Member Not Exist");
+
+        // then
+        verify(memberRepository, times(1)).findById(senderId);
+        verifyNoInteractions(chatRoomRepository);
+        verifyNoInteractions(chatRepository);
+    }
+
+    @Test
+    void saveChatReceiverFailTest() {
+        // given
+        Long senderId = 1L;
+        Long receiverId = 2L;
+        String content = "fail";
+        Boolean isRead = false;
+
+        // stub
+        when(memberRepository.findById(senderId)).thenReturn(Optional.of(Member.builder().build()));
+        when(memberRepository.findById(receiverId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> chatService.saveChat(senderId, receiverId, content, isRead))
+                .isInstanceOf(MemberNotFountException.class)
+                .hasMessage("Member Not Exist");
+
+        // then
+        verify(memberRepository, times(1)).findById(senderId);
+        verify(memberRepository, times(1)).findById(receiverId);
+        verifyNoInteractions(chatRoomRepository);
+        verifyNoInteractions(chatRepository);
+    }
+
+    @Test
     void findChatRoomsTest() {
         // given
         Long memberId = 1L;
@@ -79,5 +126,22 @@ public class ChatServiceTest {
         verify(memberRepository, times(1)).findById(memberId);
         verify(chatRepository, times(1)).findChatRooms(null);
         assertThat(chatRooms).isEqualTo(chats);
+    }
+
+    @Test
+    void findChatRoomsFailTest() {
+        // given
+        Long memberId = 1L;
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> chatService.findChatRooms(memberId))
+                .isInstanceOf(MemberNotFountException.class)
+                .hasMessage("Member Not Exist");
+
+        // then
+        verify(memberRepository, times(1)).findById(memberId);
     }
 }
