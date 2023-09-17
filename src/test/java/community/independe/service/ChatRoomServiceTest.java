@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -47,5 +48,24 @@ public class ChatRoomServiceTest {
         verify(memberRepository, times(1)).findById(senderId);
         verify(memberRepository, times(1)).findById(receiverId);
         verify(chatRoomRepository, times(1)).save(any(ChatRoom.class));
+    }
+
+    @Test
+    void saveChatRoomSenderFailTest() {
+        // given
+        String title = "mockTitle";
+        Long senderId = 1L;
+        Long receiverId = 2L;
+
+        // stub
+        when(memberRepository.findById(senderId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> chatRoomService.saveChatRoom(title, senderId, receiverId))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        // then
+        verify(memberRepository, times(1)).findById(senderId);
+        verifyNoInteractions(chatRoomRepository);
     }
 }
