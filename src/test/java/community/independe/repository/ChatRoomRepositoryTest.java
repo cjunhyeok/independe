@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
@@ -72,5 +74,27 @@ class ChatRoomRepositoryTest {
         assertThat(findChatRoom.getTitle()).isEqualTo(title);
         assertThat(findChatRoom.getSender().getUsername()).isEqualTo("sender");
         assertThat(findChatRoom.getReceiver().getUsername()).isEqualTo("receiver");
+    }
+
+    @Test
+    void findAllByLoginMemberIdTest() {
+        // given
+        Member sender = memberRepository.findByUsername("sender");
+        Member receiver = memberRepository.findByUsername("receiver");
+
+        ChatRoom chatRoom = ChatRoom
+                .builder()
+                .sender(receiver)
+                .receiver(sender)
+                .title("receiverToSender")
+                .build();
+        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+
+        // when
+        List<ChatRoom> findChatRooms =
+                chatRoomRepository.findAllByLoginMemberId(sender.getId());
+
+        // then
+        assertThat(findChatRooms.size()).isEqualTo(2);
     }
 }
