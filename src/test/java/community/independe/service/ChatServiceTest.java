@@ -13,8 +13,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -56,5 +59,25 @@ public class ChatServiceTest {
         verify(memberRepository, times(1)).findById(receiverId);
         verify(chatRoomRepository, times(1)).findByLoginMemberIdWithReceiverId(null, null);
         verify(chatRepository, times(1)).save(any(Chat.class));
+    }
+
+    @Test
+    void findChatRoomsTest() {
+        // given
+        Long memberId = 1L;
+        Member mockMember = Member.builder().build();
+        List<Chat> chats = new ArrayList<>();
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
+        when(chatRepository.findChatRooms(null)).thenReturn(chats);
+
+        // when
+        List<Chat> chatRooms = chatService.findChatRooms(memberId);
+
+        // then
+        verify(memberRepository, times(1)).findById(memberId);
+        verify(chatRepository, times(1)).findChatRooms(null);
+        assertThat(chatRooms).isEqualTo(chats);
     }
 }
