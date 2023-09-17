@@ -2,6 +2,7 @@ package community.independe.service;
 
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
+import community.independe.exception.notfound.MemberNotFountException;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.chat.ChatRoomRepository;
 import community.independe.service.chat.ChatRoomServiceImpl;
@@ -62,7 +63,8 @@ public class ChatRoomServiceTest {
 
         // when
         assertThatThrownBy(() -> chatRoomService.saveChatRoom(title, senderId, receiverId))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(MemberNotFountException.class)
+                .hasMessage("Member Not Exist");
 
         // then
         verify(memberRepository, times(1)).findById(senderId);
@@ -82,7 +84,8 @@ public class ChatRoomServiceTest {
 
         // when
         assertThatThrownBy(() -> chatRoomService.saveChatRoom(title, senderId, receiverId))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(MemberNotFountException.class)
+                .hasMessage("Member Not Exist");
 
         // then
         verify(memberRepository, times(1)).findById(senderId);
