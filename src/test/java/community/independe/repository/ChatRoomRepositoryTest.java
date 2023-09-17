@@ -110,4 +110,19 @@ class ChatRoomRepositoryTest {
         // then
         assertThat(findChatRooms).isEmpty();
     }
+
+
+    @Test
+    void findByLoginMemberIdWithReceiverIdTest() {
+        // given
+        Member sender = memberRepository.findByUsername("sender");
+        Member receiver = memberRepository.findByUsername("receiver");
+
+        // when
+        ChatRoom findChatRoom = chatRoomRepository.findByLoginMemberIdWithReceiverId(sender.getId(), receiver.getId());
+
+        // then
+        assertThat(findChatRoom.getSender()).isEqualTo(sender);
+        assertThat(findChatRoom.getReceiver()).isEqualTo(receiver);
+    }
 }
