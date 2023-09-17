@@ -91,4 +91,38 @@ public class ChatRoomServiceTest {
         verify(memberRepository, times(1)).findById(senderId);
         verifyNoInteractions(chatRoomRepository);
     }
+
+    @Test
+    void findByIdTest() {
+        // given
+        Long id = 1L;
+        ChatRoom chatRoom = ChatRoom.builder().build();
+
+        // stub
+        when(chatRoomRepository.findById(id)).thenReturn(Optional.of(chatRoom));
+
+        // when
+        ChatRoom findChatRoom = chatRoomService.findById(id);
+
+        // then
+        verify(chatRoomRepository, times(1)).findById(id);
+        assertThat(findChatRoom).isEqualTo(chatRoom);
+    }
+
+    @Test
+    void findByIdFailTest() {
+        // given
+        Long id = 1L;
+
+        // stub
+        when(chatRoomRepository.findById(id)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> chatRoomService.findById(id))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("chatRoom not exist");
+
+        // then
+        verify(chatRoomRepository, times(1)).findById(id);
+    }
 }
