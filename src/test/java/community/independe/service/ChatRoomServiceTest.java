@@ -68,4 +68,24 @@ public class ChatRoomServiceTest {
         verify(memberRepository, times(1)).findById(senderId);
         verifyNoInteractions(chatRoomRepository);
     }
+
+    @Test
+    void saveChatRoomReceiverFailTest() {
+        String title = "mockTitle";
+        Long senderId = 1L;
+        Long receiverId = 2L;
+        Member mockSender = Member.builder().build();
+
+        // stub
+        when(memberRepository.findById(senderId)).thenReturn(Optional.of(mockSender));
+        when(memberRepository.findById(receiverId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> chatRoomService.saveChatRoom(title, senderId, receiverId))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        // then
+        verify(memberRepository, times(1)).findById(senderId);
+        verifyNoInteractions(chatRoomRepository);
+    }
 }
