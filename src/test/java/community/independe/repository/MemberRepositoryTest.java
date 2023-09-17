@@ -7,12 +7,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Transactional
 class MemberRepositoryTest {
 
     @Autowired
@@ -80,9 +78,19 @@ class MemberRepositoryTest {
         Member findMember = memberRepository.findById(id).orElseThrow(()
                 -> new IllegalArgumentException("Member not exist"));
 
-        System.out.println(findMember.getId());
-
         // then
         assertThat(findMember.getId()).isEqualTo(id);
+    }
+
+    @Test
+    void findByNicknameTest() {
+        // given
+        String nickname = "nick";
+
+        // when
+        Member findMember = memberRepository.findByNickname(nickname);
+
+        // then
+        assertThat(findMember.getNickname()).isEqualTo(nickname);
     }
 }
