@@ -74,4 +74,16 @@ public class ChatRepositoryTest {
         assertThat(chatHistory.size()).isEqualTo(1);
         assertThat(chatHistory.get(0).getContent()).isEqualTo("initContent");
     }
+
+    @Test
+    void findChatRoomsTest() {
+        // given
+        Member sender = memberRepository.findByUsername("sender");
+
+        // when
+        List<Chat> chatRooms = chatRepository.findChatRooms(sender.getId());
+
+        // then
+        assertThat(chatRooms.size()).isEqualTo(1);
+    }
 }
