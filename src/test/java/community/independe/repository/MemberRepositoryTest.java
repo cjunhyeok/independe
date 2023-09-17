@@ -93,4 +93,16 @@ class MemberRepositoryTest {
         // then
         assertThat(findMember.getNickname()).isEqualTo(nickname);
     }
+
+    @Test
+    void findByNicknameFailTest() {
+        // given
+        String nickname = "fail";
+
+        // when
+        Member findMember = memberRepository.findByNickname(nickname);
+
+        // then
+        assertThat(findMember).isNull();
+    }
 }
