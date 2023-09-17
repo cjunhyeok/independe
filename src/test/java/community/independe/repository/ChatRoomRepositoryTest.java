@@ -97,4 +97,17 @@ class ChatRoomRepositoryTest {
         // then
         assertThat(findChatRooms.size()).isEqualTo(2);
     }
+
+    @Test
+    void findAllByLoginMemberIdFailTest() {
+        // given
+        Long loginMemberId = -1L;
+
+        // when
+        List<ChatRoom> findChatRooms =
+                chatRoomRepository.findAllByLoginMemberId(loginMemberId);
+
+        // then
+        assertThat(findChatRooms).isEmpty();
+    }
 }
