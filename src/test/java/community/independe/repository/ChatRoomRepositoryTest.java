@@ -125,4 +125,17 @@ class ChatRoomRepositoryTest {
         assertThat(findChatRoom.getSender()).isEqualTo(sender);
         assertThat(findChatRoom.getReceiver()).isEqualTo(receiver);
     }
+
+    @Test
+    void findByLoginMemberIdWithReceiverIdFailTest() {
+        // given
+        Member sender = memberRepository.findByUsername("sender");
+        Long receiverId = -1L;
+
+        // when
+        ChatRoom findChatRoom = chatRoomRepository.findByLoginMemberIdWithReceiverId(sender.getId(), receiverId);
+
+        // then
+        assertThat(findChatRoom).isNull();
+    }
 }
