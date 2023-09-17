@@ -86,4 +86,22 @@ public class ChatRepositoryTest {
         // then
         assertThat(chatRooms.size()).isEqualTo(1);
     }
+
+    @Test
+    void findTopByChatRoomOrderByDateDescTest() {
+        // given
+        ChatRoom chatRoom = chatRoomRepository.findByTitle("initSenderToReceiver");
+        Chat lastChat = Chat.builder()
+                .content("lastContent")
+                .chatRoom(chatRoom)
+                .isRead(false)
+                .build();
+        Chat savedLastChat = chatRepository.save(lastChat);
+
+        // when
+        Chat findChat = chatRepository.findTopByChatRoomOrderByDateDesc(chatRoom);
+
+        // that
+        assertThat(findChat).isEqualTo(savedLastChat);
+    }
 }
