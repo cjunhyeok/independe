@@ -37,4 +37,24 @@ public class ReportPostRepositoryTest {
         // then
         assertThat(savedReportPost).isEqualTo(reportPost);
     }
+
+    @Test
+    void findByPostIdAndMemberIdTest() {
+        // given
+
+        Member member = Member.builder().build();
+        Member savedMember = memberRepository.save(member);
+        Post post = Post.builder().member(member).build();
+        Post savedPost = postRepository.save(post);
+        ReportPost reportPost =
+                ReportPost.builder().member(savedMember).post(savedPost).isReport(false).build();
+        ReportPost savedReportPost = reportPostRepository.save(reportPost);
+
+        // when
+        ReportPost findReportPost =
+                reportPostRepository.findByPostIdAndMemberId(savedMember.getId(), savedPost.getId());
+
+        // then
+        assertThat(findReportPost).isEqualTo(savedReportPost);
+    }
 }
