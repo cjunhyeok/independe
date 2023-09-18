@@ -70,4 +70,27 @@ public class RecommendPostRepositoryTest {
         // then
         assertThat(count).isEqualTo(2);
     }
+
+    @Test
+    void findByPostIdAndMemberIdTest() {
+        // given
+        Member member = Member.builder().build();
+        Member savedMember = memberRepository.save(member);
+        Post post = Post.builder().build();
+        Post savedPost = postRepository.save(post);
+
+        RecommendPost recommendPost = RecommendPost.builder()
+                .isRecommend(true)
+                .member(savedMember)
+                .post(savedPost)
+                .build();
+        recommendPostRepository.save(recommendPost);
+
+        // when
+        RecommendPost findRecommendPost =
+                recommendPostRepository.findByPostIdAndMemberId(savedPost.getId(), savedMember.getId());
+
+        // then
+        assertThat(findRecommendPost).isEqualTo(recommendPost);
+    }
 }
