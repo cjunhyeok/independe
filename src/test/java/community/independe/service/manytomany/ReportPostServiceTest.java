@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -51,5 +52,19 @@ public class ReportPostServiceTest {
         verify(postRepository, times(1)).findById(postId);
         verify(memberRepository, times(1)).findById(memberId);
         verify(reportPostRepository, times(1)).save(any(ReportPost.class));
+    }
+
+    @Test
+    void updateIsReportTest() {
+        // given
+        ReportPost mockReportPost =
+                ReportPost.builder().isReport(true).build();
+        Boolean isReport = false;
+
+        // when
+        reportPostService.updateIsReport(mockReportPost, isReport);
+
+        // then
+        assertThat(mockReportPost.getIsReport()).isEqualTo(isReport);
     }
 }
