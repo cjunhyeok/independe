@@ -6,17 +6,19 @@ import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.repository.file.FilesRepository;
 import community.independe.repository.post.PostRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
-@Transactional
 public class FilesRepositoryTest {
 
     @Autowired
@@ -25,6 +27,8 @@ public class FilesRepositoryTest {
     private PostRepository postRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @PersistenceContext
+    EntityManager em;
 
     @Test
     public void saveTest() {
@@ -107,5 +111,46 @@ public class FilesRepositoryTest {
         // then
         assertThat(findAllFilesByPostId.size()).isEqualTo(5);
         assertThat(findAllFilesByPostId.get(2).getFilePath()).isEqualTo("path2");
+    }
+
+    @Test
+    void deleteFilesByPostIdTest() {
+        // given
+        Member member = Member.builder()
+                .username("id")
+                .password("pass")
+                .nickname("nick")
+                .build();
+        Member savedMember = memberRepository.save(member);
+
+        Post post = Post.builder()
+                .title("title")
+                .content("content")
+                .independentPostType(IndependentPostType.COOK)
+                .member(savedMember)
+                .build();
+        Post savedPost = postRepository.save(post);
+
+        Files files = Files.builder()
+                .uploadFilename("upload")
+                .storeFilename("store")
+                .filePath("path")
+                .post(savedPost)
+                .build();
+        Files savedFiles = filesRepository.save(files);
+
+        em.flush();
+        em.clear();
+
+        // when
+        int deleteCount = filesRepository.deleteFilesByPostId(savedPost.getId());
+
+        // then
+        assertThat(deleteCount).isEqualTo(1);
+        assertThatThrownBy(() -> filesRepository.findById(savedFiles.getId()).orElseThrow(
+                () -> new NoSuchElementException("No Element")
+        ))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("No Element");
     }
 }
