@@ -41,7 +41,6 @@ public class ReportPostRepositoryTest {
     @Test
     void findByPostIdAndMemberIdTest() {
         // given
-
         Member member = Member.builder().build();
         Member savedMember = memberRepository.save(member);
         Post post = Post.builder().member(member).build();
@@ -53,6 +52,25 @@ public class ReportPostRepositoryTest {
         // when
         ReportPost findReportPost =
                 reportPostRepository.findByPostIdAndMemberId(savedMember.getId(), savedPost.getId());
+
+        // then
+        assertThat(findReportPost).isEqualTo(savedReportPost);
+    }
+
+    @Test
+    void findByPostIdAndMemberIdAndIsRecommendTest() {
+        // given
+        Member member = Member.builder().build();
+        Member savedMember = memberRepository.save(member);
+        Post post = Post.builder().member(member).build();
+        Post savedPost = postRepository.save(post);
+        ReportPost reportPost =
+                ReportPost.builder().member(savedMember).post(savedPost).isReport(true).build();
+        ReportPost savedReportPost = reportPostRepository.save(reportPost);
+
+        // when
+        ReportPost findReportPost =
+                reportPostRepository.findByPostIdAndMemberIdAndIsRecommend(savedMember.getId(), savedPost.getId());
 
         // then
         assertThat(findReportPost).isEqualTo(savedReportPost);
