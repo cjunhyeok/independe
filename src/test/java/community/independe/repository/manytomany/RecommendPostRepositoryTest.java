@@ -5,10 +5,11 @@ import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
+import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
 public class RecommendPostRepositoryTest {
@@ -38,6 +39,35 @@ public class RecommendPostRepositoryTest {
         RecommendPost savedRecommendPost = recommendPostRepository.save(recommendPost);
 
         // then
-        Assertions.assertThat(savedRecommendPost).isEqualTo(recommendPost);
+        assertThat(savedRecommendPost).isEqualTo(recommendPost);
+    }
+
+    @Test
+    void countAllByPostIdAndIsRecommendTest() {
+        // given
+        Member member = Member.builder().build();
+        Member savedMember = memberRepository.save(member);
+        Post post = Post.builder().build();
+        Post savedPost = postRepository.save(post);
+
+        RecommendPost recommendPost = RecommendPost.builder()
+                .isRecommend(true)
+                .member(savedMember)
+                .post(savedPost)
+                .build();
+        recommendPostRepository.save(recommendPost);
+
+        RecommendPost secondRecommendPost = RecommendPost.builder()
+                .isRecommend(true)
+                .member(savedMember)
+                .post(savedPost)
+                .build();
+        recommendPostRepository.save(secondRecommendPost);
+
+        // when
+        Long count = recommendPostRepository.countAllByPostIdAndIsRecommend(savedPost.getId());
+
+        // then
+        assertThat(count).isEqualTo(2);
     }
 }
