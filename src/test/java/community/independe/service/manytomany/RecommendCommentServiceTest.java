@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -47,5 +48,18 @@ public class RecommendCommentServiceTest {
         verify(commentRepository, times(1)).findById(memberId);
         verify(memberRepository, times(1)).findById(memberId);
         verify(recommendCommentRepository, times(1)).save(any(RecommendComment.class));
+    }
+
+    @Test
+    void updateIsRecommendTest() {
+        // given
+        RecommendComment recommendComment = RecommendComment.builder().isRecommend(false).build();
+        Boolean isRecommend = true;
+
+        // when
+        recommendCommentService.updateIsRecommend(recommendComment, isRecommend);
+
+        // then
+        assertThat(recommendComment.getIsRecommend()).isEqualTo(isRecommend);
     }
 }
