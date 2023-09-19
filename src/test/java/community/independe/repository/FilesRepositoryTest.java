@@ -60,6 +60,9 @@ public class FilesRepositoryTest {
 
         // then
         assertThat(savedFiles.getFilePath()).isEqualTo(files.getFilePath());
+        assertThat(savedFiles.getUploadFilename()).isEqualTo(files.getUploadFilename());
+        assertThat(savedFiles.getStoreFilename()).isEqualTo(files.getStoreFilename());
+        assertThat(savedFiles.getPost()).isEqualTo(files.getPost());
     }
 
     @Test
