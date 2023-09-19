@@ -2,6 +2,13 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.0.3'
 	id 'io.spring.dependency-management' version '1.1.0'
+	// jacoco 추가
+	id 'jacoco'
+}
+
+// jacoco 추가
+jacoco {
+	toolVersion = "0.8.7" // JaCoCo 버전을 필요에 맞게 업데이트하세요.
 }
 
 group = 'community'
@@ -59,4 +66,27 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// 테스트 태스크 설정
+test {
+	useJUnitPlatform()
+	finalizedBy jacocoTestReport // 테스트 후 JaCoCo 리포트 생성
+}
+
+// JaCoCo 리포트 설정
+jacocoTestReport {
+	reports {
+		xml.enabled true // XML 리포트 활성화
+		html.enabled true // HTML 리포트 활성화
+		csv.enabled false // CSV 리포트 비활성화 (선택적)
+	}
+
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+					"**/Q*.class"
+			])
+		}))
+	}
 }
