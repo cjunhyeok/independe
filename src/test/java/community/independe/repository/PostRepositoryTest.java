@@ -115,6 +115,9 @@ class PostRepositoryTest {
         //then
         assertThat(savedIndependentPost.getTitle()).isEqualTo("saveIndependentTitle");
         assertThat(savedRegionPost.getTitle()).isEqualTo("saveRegionTitle");
+        assertThat(savedRegionPost.getRegionType().getDescription()).isEqualTo(regionPost.getRegionType().getDescription());
+        assertThat(savedRegionPost.getRegionPostType().getDescription()).isEqualTo(regionPost.getRegionPostType().getDescription());
+        assertThat(savedIndependentPost.getIndependentPostType().getDescription()).isEqualTo(independentPost.getIndependentPostType().getDescription());
     }
 
     @Test
