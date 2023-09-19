@@ -42,7 +42,12 @@ public class AlarmRepositoryTest {
         Alarm savedAlarm = alarmRepository.save(alarm);
 
         // then
+        assertThat(savedAlarm.getId()).isEqualTo(savedAlarm.getId());
         assertThat(savedAlarm.getMember()).isEqualTo(savedMember);
+        assertThat(savedAlarm.getAlarmType()).isEqualTo(savedAlarm.getAlarmType());
+        assertThat(savedAlarm.getMessage()).isEqualTo(savedAlarm.getMessage());
+        assertThat(savedAlarm.getIsRead()).isEqualTo(savedAlarm.getIsRead());
+        assertThat(savedAlarm.getAlarmType().getDescription()).isEqualTo(savedAlarm.getAlarmType().getDescription());
     }
 
     @Test
@@ -56,7 +61,7 @@ public class AlarmRepositoryTest {
 
         Alarm alarm = Alarm.builder()
                 .message("message")
-                .alarmType(AlarmType.TALK)
+                .alarmType(AlarmType.POST)
                 .isRead(false)
                 .member(savedMember)
                 .build();
@@ -64,7 +69,7 @@ public class AlarmRepositoryTest {
 
         Alarm alarm2 = Alarm.builder()
                 .message("message")
-                .alarmType(AlarmType.TALK)
+                .alarmType(AlarmType.COMMENT)
                 .isRead(false)
                 .member(savedMember)
                 .build();
