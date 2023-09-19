@@ -27,7 +27,6 @@ class MemberRepositoryTest {
                 .role("ROLE_USER")
                 .build();
         Member savedMember = memberRepository.save(member);
-        System.out.println(savedMember.getId());
     }
 
     @Test
@@ -38,6 +37,10 @@ class MemberRepositoryTest {
                 .password("1234")
                 .nickname("nick1")
                 .role("ROLE_USER")
+                .number("01012345678")
+                .email("mockEmail")
+                .registrationId("mockRegistration")
+                .provider("mockProvider")
                 .build();
         Member savedMember = memberRepository.save(member);
 
@@ -47,6 +50,15 @@ class MemberRepositoryTest {
 
         // then
         assertThat(findMember.getId()).isEqualTo(savedMember.getId());
+        assertThat(findMember.getUsername()).isEqualTo(savedMember.getUsername());
+        assertThat(findMember.getNickname()).isEqualTo(savedMember.getNickname());
+        assertThat(findMember.getRole()).isEqualTo(savedMember.getRole());
+        assertThat(findMember.getNumber()).isEqualTo(savedMember.getNumber());
+        assertThat(findMember.getEmail()).isEqualTo(savedMember.getEmail());
+        assertThat(findMember.getRegistrationId()).isEqualTo(savedMember.getRegistrationId());
+        assertThat(findMember.getProvider()).isEqualTo(savedMember.getProvider());
+        assertThat(findMember.getCreatedDate()).isNotNull();
+        assertThat(findMember.getLastModifiedDate()).isNotNull();
     }
 
     @Test
