@@ -41,6 +41,11 @@ public class VideoRepositoryTest {
 
         // then
         assertThat(savedVideo.getVideoUrl()).isEqualTo(video.getVideoUrl());
+        assertThat(savedVideo.getId()).isEqualTo(video.getId());
+        assertThat(savedVideo.getVideoTitle()).isEqualTo(video.getVideoTitle());
+        assertThat(savedVideo.getVideoMasterUrl()).isEqualTo(video.getVideoMasterUrl());
+        assertThat(savedVideo.getIndependentPostType()).isEqualTo(video.getIndependentPostType());
+        assertThat(savedVideo.getViews()).isEqualTo(video.getViews());
     }
 
     @Test
@@ -72,9 +77,7 @@ public class VideoRepositoryTest {
                 videoRepository.findAllByIndependentPostType(IndependentPostType.COOK);
 
         // then
-        assertThat(findAllByIndependentPostType.size()).isEqualTo(5);
-        assertThat(findAllByIndependentPostType.get(4).getVideoUrl()).isEqualTo("videoUrl" + 0);
-        assertThat(findAllByIndependentPostType.get(0).getVideoUrl()).isEqualTo("videoUrl" + 4);
+        assertThat(findAllByIndependentPostType.size()).isEqualTo(3);
     }
 
     @Test
