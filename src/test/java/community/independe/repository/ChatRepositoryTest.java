@@ -52,13 +52,31 @@ public class ChatRepositoryTest {
     @Test
     void saveTest() {
         // given
-        Chat chat = Chat.builder().content("content").isRead(false).build();
+        Member sender = Member.builder().username("sender").build();
+        memberRepository.save(sender);
+        Member receiver = Member.builder().username("receiver").build();
+        memberRepository.save(receiver);
+        String title = "senderToReceiver";
+
+        ChatRoom chatRoom = ChatRoom
+                .builder()
+                .title(title)
+                .sender(sender)
+                .receiver(receiver)
+                .build();
+        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+
+        Chat chat = Chat.builder().content("content").isRead(false).chatRoom(chatRoom).build();
 
         // when
         Chat savedChat = chatRepository.save(chat);
 
         // then
         assertThat(savedChat).isEqualTo(chat);
+        assertThat(savedChat.getId()).isEqualTo(chat.getId());
+        assertThat(savedChat.getContent()).isEqualTo(chat.getContent());
+        assertThat(savedChat.getIsRead()).isEqualTo(chat.getIsRead());
+        assertThat(savedChat.getChatRoom()).isEqualTo(chat.getChatRoom());
     }
 
     @Test
