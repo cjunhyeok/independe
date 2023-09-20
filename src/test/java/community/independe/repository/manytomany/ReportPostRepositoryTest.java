@@ -55,6 +55,11 @@ public class ReportPostRepositoryTest {
 
         // then
         assertThat(findReportPost).isEqualTo(savedReportPost);
+        assertThat(findReportPost.getId()).isEqualTo(savedReportPost.getId());
+        assertThat(findReportPost.getIsReport()).isEqualTo(savedReportPost.getIsReport());
+        assertThat(findReportPost.getPost()).isEqualTo(savedReportPost.getPost());
+        assertThat(findReportPost.getMember()).isEqualTo(savedReportPost.getMember());
+        assertThat(findReportPost.getCreatedDate()).isNotNull();
     }
 
     @Test
