@@ -110,4 +110,47 @@ public class ReportPostServiceTest {
         // then
         assertThat(mockReportPost.getIsReport()).isEqualTo(isReport);
     }
+
+    @Test
+    void findByPostIdAndMemberIdTest() {
+        // given
+        Long postId = 1L;
+        Long memberId = 1L;
+        ReportPost mockReportPost = ReportPost
+                .builder()
+                .post(Post.builder().build())
+                .build();
+
+        // stub
+        when(reportPostRepository.findByPostIdAndMemberId(postId, memberId)).thenReturn(mockReportPost);
+
+        // when
+        ReportPost findReportPost = reportPostService.findByPostIdAndMemberId(postId, memberId);
+
+        // then
+        assertThat(findReportPost).isEqualTo(mockReportPost);
+        verify(reportPostRepository, times(1)).findByPostIdAndMemberId(postId, memberId);
+    }
+
+    @Test
+    void findByPostIdAndMemberIdAndIsRecommendTest() {
+        // given
+        Long postId = 1L;
+        Long memberId = 1L;
+        ReportPost mockReportPost = ReportPost
+                .builder()
+                .post(Post.builder().build())
+                .isReport(true)
+                .build();
+
+        // stub
+        when(reportPostRepository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId)).thenReturn(mockReportPost);
+
+        // when
+        ReportPost findReportPost = reportPostService.findByPostIdAndMemberIdAndIsRecommend(postId, memberId);
+
+        // then
+        assertThat(findReportPost).isEqualTo(mockReportPost);
+        verify(reportPostRepository, times(1)).findByPostIdAndMemberIdAndIsRecommend(postId, memberId);
+    }
 }
