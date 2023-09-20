@@ -53,7 +53,11 @@ public class FavoritePostRepositoryTest {
 
         // then
         assertThat(savedFavoritePost.getIsFavorite()).isTrue();
+        assertThat(savedFavoritePost.getId()).isEqualTo(favoritePost.getId());
         assertThat(savedFavoritePost).isEqualTo(favoritePost);
+        assertThat(savedFavoritePost.getPost()).isEqualTo(favoritePost.getPost());
+        assertThat(savedFavoritePost.getMember()).isEqualTo(favoritePost.getMember());
+        assertThat(savedFavoritePost.getCreatedDate()).isNotNull();
     }
 
     @Test
