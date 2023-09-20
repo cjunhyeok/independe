@@ -13,7 +13,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RecommendComment {
+public class RecommendComment extends BaseManyToManyEntity {
 
     @Id
     @GeneratedValue
