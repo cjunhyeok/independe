@@ -3,6 +3,8 @@ package community.independe.service.manytomany;
 import community.independe.domain.manytomany.FavoritePost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
+import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.notfound.PostNotFountException;
 import community.independe.repository.manytomany.FavoritePostRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
@@ -26,10 +28,10 @@ public class FavoritePostServiceImpl implements FavoritePostService {
     public Long save(Long postId, Long memberId) {
 
         Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("post not exist"));
+                .orElseThrow(() -> new PostNotFountException("Post Not Exist"));
 
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("member not exist"));
+                .orElseThrow(() -> new MemberNotFountException("Member Not Exist"));
 
         FavoritePost savedFavoritePost = favoritePostRepository.save(
                 FavoritePost.builder()
@@ -43,17 +45,17 @@ public class FavoritePostServiceImpl implements FavoritePostService {
     }
 
     @Override
-    public FavoritePost findByPostIdAndMemberId(Long postId, Long memberId) {
-        return favoritePostRepository.findByPostIdAndMemberId(postId, memberId);
-    }
-
-    @Override
     @Transactional
     public void updateIsFavorite(FavoritePost favoritePost, Boolean isFavorite) {
         FavoritePost findFavoritePost = favoritePostRepository.findById(favoritePost.getId()).orElseThrow(
                 () -> new IllegalArgumentException("FavoritePost not exist")
         );
         findFavoritePost.updateIsFavorite(isFavorite);
+    }
+
+    @Override
+    public FavoritePost findByPostIdAndMemberId(Long postId, Long memberId) {
+        return favoritePostRepository.findByPostIdAndMemberId(postId, memberId);
     }
 
     @Override
