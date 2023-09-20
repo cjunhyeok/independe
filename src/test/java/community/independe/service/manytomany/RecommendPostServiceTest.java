@@ -3,6 +3,8 @@ package community.independe.service.manytomany;
 import community.independe.domain.manytomany.RecommendPost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
+import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.notfound.PostNotFountException;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.manytomany.RecommendPostRepository;
 import community.independe.repository.post.PostRepository;
@@ -51,6 +53,47 @@ public class RecommendPostServiceTest {
         verify(postRepository, times(1)).findById(postId);
         verify(memberRepository, times(1)).findById(memberId);
         verify(recommendPostRepository, times(1)).save(any(RecommendPost.class));
+    }
+
+    @Test
+    void savePostFailTest() {
+        // given
+        Long postId = 1L;
+        Long memberId = 1L;
+
+        // stub
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> recommendPostService.save(postId, memberId))
+                .isInstanceOf(PostNotFountException.class)
+                .hasMessage("Post Not Exist");
+
+        // then
+        verify(postRepository, times(1)).findById(postId);
+        verifyNoInteractions(memberRepository);
+        verifyNoInteractions(recommendPostRepository);
+    }
+
+    @Test
+    void saveMemberFailTest() {
+        // given
+        Long postId = 1L;
+        Long memberId = 1L;
+
+        // stub
+        when(postRepository.findById(postId)).thenReturn(Optional.of(Post.builder().build()));
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> recommendPostService.save(postId, memberId))
+                .isInstanceOf(MemberNotFountException.class)
+                .hasMessage("Member Not Exist");
+
+        // then
+        verify(postRepository, times(1)).findById(postId);
+        verify(memberRepository, times(1)).findById(memberId);
+        verifyNoInteractions(recommendPostRepository);
     }
 
     @Test
