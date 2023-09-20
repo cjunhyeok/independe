@@ -247,11 +247,12 @@ public class PostServiceTest {
         Post mockPost = Post.builder().member(mockMember).build();
         mockPost.getRecommendPosts().add(RecommendPost.builder().post(mockPost).build());
         List<Comment> mockComments = new ArrayList<>();
+        mockComments.add(Comment.builder().build());
 
         // stub
         when(postRepository.findById(postId)).thenReturn(Optional.of(mockPost));
-
         when(commentRepository.findAllByPostId(null)).thenReturn(mockComments);
+        when(commentRepository.deleteCommentByParentId(null)).thenReturn(1);
 
         // when
         postService.deletePost(postId);
