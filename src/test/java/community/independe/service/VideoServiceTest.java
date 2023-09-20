@@ -1,5 +1,6 @@
 package community.independe.service;
 
+import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.video.Video;
 import community.independe.repository.video.VideoRepository;
 import org.junit.jupiter.api.Test;
@@ -37,5 +38,23 @@ public class VideoServiceTest {
         // then
         assertThat(findVideos).isEqualTo(videos);
         verify(videoRepository, times(1)).findAllForMain();
+    }
+
+    @Test
+    void findAllByIndependentPostTypeTest() {
+        // given
+        IndependentPostType independentPostType = IndependentPostType.COOK;
+        List<Video> videos = new ArrayList<>();
+        videos.add(Video.builder().independentPostType(independentPostType).build());
+
+        // stub
+        when(videoRepository.findAllByIndependentPostType(independentPostType)).thenReturn(videos);
+
+        // when
+        List<Video> findVideos = videoService.findAllByIndependentPostType(independentPostType);
+
+        // then
+        assertThat(findVideos).isEqualTo(videos);
+        verify(videoRepository, times(1)).findAllByIndependentPostType(independentPostType);
     }
 }
