@@ -3,6 +3,8 @@ package community.independe.service.manytomany;
 import community.independe.domain.manytomany.RecommendPost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
+import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.notfound.PostNotFountException;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
 import community.independe.repository.manytomany.RecommendPostRepository;
@@ -13,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class RecommendPostServiceImpl implements RecommendPostService {
 
     private final RecommendPostRepository recommendPostRepository;
@@ -26,10 +28,10 @@ public class RecommendPostServiceImpl implements RecommendPostService {
     public Long save(Long postId, Long memberId) {
 
         Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("post not exist"));
+                .orElseThrow(() -> new PostNotFountException("Post Not Exist"));
 
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("member not exist"));
+                .orElseThrow(() -> new MemberNotFountException("Member Not Exist"));
 
         RecommendPost savedRecommendPost = recommendPostRepository.save(
                 RecommendPost.builder()
@@ -43,6 +45,12 @@ public class RecommendPostServiceImpl implements RecommendPostService {
     }
 
     @Override
+    @Transactional
+    public void updateIsRecommend(RecommendPost recommendPost, Boolean isRecommend) {
+        recommendPost.updateIsRecommend(isRecommend);
+    }
+
+    @Override
     public RecommendPost findById(Long recommendPostId) {
         return recommendPostRepository.findById(recommendPostId)
                 .orElseThrow(() -> new IllegalArgumentException("recommendPost not exist"));
@@ -51,12 +59,6 @@ public class RecommendPostServiceImpl implements RecommendPostService {
     @Override
     public RecommendPost findByPostIdAndMemberId(Long postId, Long memberId) {
         return recommendPostRepository.findByPostIdAndMemberId(postId, memberId);
-    }
-
-    @Override
-    @Transactional
-    public void updateIsRecommend(RecommendPost recommendPost, Boolean isRecommend) {
-        recommendPost.updateIsRecommend(isRecommend);
     }
 
     @Override
