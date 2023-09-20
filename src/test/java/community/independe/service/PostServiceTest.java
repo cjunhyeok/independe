@@ -44,7 +44,7 @@ public class PostServiceTest {
     FilesRepository filesRepository;
 
     @Test
-    public void findByIdTest() {
+    void findByIdTest() {
         // given
         Long postId = 1L;
         Post mockPost = Post.builder().build();
@@ -61,7 +61,7 @@ public class PostServiceTest {
     }
 
     @Test
-    public void findByIdFailTest() {
+    void findByIdFailTest() {
         // given
         Long postId = 1L;
 
@@ -77,7 +77,7 @@ public class PostServiceTest {
     }
 
     @Test
-    public void createIndependentPostTest() {
+    void createIndependentPostTest() {
         // given
         Long memberId = 1L;
         String title = "independentTitle";
@@ -96,7 +96,28 @@ public class PostServiceTest {
     }
 
     @Test
-    public void createRegionPostTest() {
+    void createIndependentPostFailTest() {
+        // given
+        Long memberId = 1L;
+        String title = "independentTitle";
+        String content = "independentContent";
+        IndependentPostType independentPostType = IndependentPostType.COOK;
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> postService.createIndependentPost(memberId, title, content, independentPostType))
+                .isInstanceOf(MemberNotFountException.class)
+                .hasMessage("Member Not Exist");
+
+        // then
+        verify(memberRepository, times(1)).findById(memberId);
+        verifyNoInteractions(postRepository);
+    }
+
+    @Test
+    void createRegionPostTest() {
         // given
         Long memberId = 1L;
         String title = "regionTitle";
@@ -117,7 +138,7 @@ public class PostServiceTest {
     }
 
     @Test
-    public void createPostFailTest() {
+    void createRegionPostFailTest() {
         // given
         Long memberId = 1L;
         String title = "regionTitle";
@@ -130,10 +151,11 @@ public class PostServiceTest {
 
         // when
         assertThatThrownBy(() -> postService.createRegionPost(memberId, title, content, regionType, regionPostType))
-                .isInstanceOf(MemberNotFountException.class);
+                .isInstanceOf(MemberNotFountException.class)
+                .hasMessage("Member Not Exist");
 
         // then
-        verify(memberRepository).findById(memberId);
+        verify(memberRepository, times(1)).findById(memberId);
         verifyNoInteractions(postRepository);
     }
 
@@ -159,7 +181,27 @@ public class PostServiceTest {
     }
 
     @Test
-    public void increaseViewsTest() {
+    void updatePostFailTest() {
+        // given
+        Long postId = 1L;
+        String title = "updateTitle";
+        String content = "updateContent";
+        Post mockPost = Post.builder().build();
+
+        // stub
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> postService.updatePost(postId, title, content))
+                .isInstanceOf(PostNotFountException.class)
+                .hasMessage("Post Not Exist");
+
+        // then
+        verify(postRepository, times(1)).findById(postId);
+    }
+
+    @Test
+    void increaseViewsTest() {
         // given
         Long postId = 1L;
         Post mockPost = Post.builder()
@@ -225,5 +267,25 @@ public class PostServiceTest {
         verify(postRepository, times(1)).deletePostByPostId(null);
         assertThat(mockPost.getMember()).isNull();
         assertThat(mockPost.getRecommendPosts()).isEmpty();
+    }
+
+    @Test
+    void deletePostFailTest() {
+        // given
+        Long postId = 1L;
+
+        // stub
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> postService.deletePost(postId))
+                .isInstanceOf(PostNotFountException.class)
+                .hasMessage("Post Not Exist");
+
+        // then
+        verify(postRepository, times(1)).findById(postId);
+        verifyNoInteractions(commentRepository);
+        verifyNoInteractions(filesRepository);
+        verifyNoMoreInteractions(postRepository);
     }
 }
