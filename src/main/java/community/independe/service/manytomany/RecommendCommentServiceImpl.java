@@ -3,6 +3,8 @@ package community.independe.service.manytomany;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.manytomany.RecommendComment;
 import community.independe.domain.member.Member;
+import community.independe.exception.notfound.CommentNotFountException;
+import community.independe.exception.notfound.MemberNotFountException;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.manytomany.RecommendCommentRepository;
@@ -27,10 +29,10 @@ public class RecommendCommentServiceImpl implements RecommendCommentService{
     @Transactional
     public Long save(Long commentId, Long memberId) {
         Comment findComment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("comment not exist"));
+                .orElseThrow(() -> new CommentNotFountException("Comment Not Exist"));
 
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("member not exist"));
+                .orElseThrow(() -> new MemberNotFountException("Member Not Exist"));
 
         RecommendComment savedRecommendComment = recommendCommentRepository.save(
                 RecommendComment.builder()
