@@ -2,6 +2,7 @@ package community.independe.service;
 
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.RegionType;
+import community.independe.exception.notfound.MemberNotFountException;
 import community.independe.repository.MemberRepository;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.Test;
@@ -16,8 +17,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
@@ -125,6 +125,26 @@ public class MemberServiceTest {
     }
 
     @Test
+    void modifyOAuthMemberFailTest() {
+        // given
+        Long memberId = 1L;
+        String nickname = "modifyNickname";
+        String email = "modifyEmail";
+        String number = "01064613134";
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> memberService.modifyOAuthMember(memberId, nickname, email, number))
+                .isInstanceOf(MemberNotFountException.class)
+                .hasMessage("Member Not Exist");
+
+        // then
+        verify(memberRepository, times(1)).findById(memberId);
+    }
+
+    @Test
     void modifyMember() {
         // given
         Long memberId = 1L;
@@ -149,6 +169,28 @@ public class MemberServiceTest {
     }
 
     @Test
+    void modifyMemberFailTest() {
+        // given
+        Long memberId = 1L;
+        String username = "updateUsername";
+        String password = "updatePassword";
+        String nickname = "updateNickname";
+        String email = "updateEmail";
+        String number = "01012345678";
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> memberService.modifyMember(memberId, username, password, nickname, email, number))
+                .isInstanceOf(MemberNotFountException.class)
+                .hasMessage("Member Not Exist");
+
+        // then
+        verify(memberRepository, times(1)).findById(memberId);
+    }
+
+    @Test
     void authenticateRegionTest() {
         // given
         Long memberId = 1L;
@@ -164,5 +206,58 @@ public class MemberServiceTest {
         // then
         verify(memberRepository).findById(memberId);
         assertThat(mockMember.getRegion()).isEqualTo(regionType);
+    }
+
+    @Test
+    void authenticateRegionFailTest() {
+        // given
+        Long memberId = 1L;
+        RegionType regionType = RegionType.ULSAN;
+        Member mockMember = Member.builder().region(RegionType.KYEONGNAM).build();
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> memberService.authenticateRegion(memberId, regionType))
+                .isInstanceOf(MemberNotFountException.class)
+                .hasMessage("Member Not Exist");
+
+        // then
+        verify(memberRepository, times(1)).findById(memberId);
+    }
+
+    @Test
+    void findByIdTest() {
+        // given
+        Long memberId = 1L;
+        Member mockMember = Member.builder().build();
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
+
+        // when
+        Member findMember = memberService.findById(memberId);
+
+        // then
+        assertThat(findMember).isEqualTo(mockMember);
+        verify(memberRepository, times(1)).findById(memberId);
+    }
+
+    @Test
+    void findByIdFailTest() {
+        // given
+        Long memberId = 1L;
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> memberService.findById(memberId))
+                .isInstanceOf(MemberNotFountException.class)
+                .hasMessage("Member Not Exist");
+
+        // then
+        verify(memberRepository, times(1)).findById(memberId);
     }
 }
