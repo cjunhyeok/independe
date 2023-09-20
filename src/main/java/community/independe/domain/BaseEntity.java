@@ -19,20 +19,4 @@ public class BaseEntity {
 
     @LastModifiedDate
     private LocalDateTime lastModifiedDate; // 수정 일자
-
-    public void updateLastModifiedDate(LocalDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    //    @PrePersist // persist 전에 발생
-//    public void prePersist() {
-//        LocalDateTime now = LocalDateTime.now();
-//        createdDate = now;
-//        lastModifiedDate = now;
-//    }
-//
-//    @PreUpdate // update 전에 발생
-//    public void preUpdate() {
-//        lastModifiedDate = LocalDateTime.now();
-//    }
 }
