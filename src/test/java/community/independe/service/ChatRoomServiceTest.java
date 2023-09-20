@@ -12,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -124,5 +126,59 @@ public class ChatRoomServiceTest {
 
         // then
         verify(chatRoomRepository, times(1)).findById(id);
+    }
+
+    @Test
+    void findByTitleTest() {
+        // given
+        String title = "title";
+        ChatRoom mockChatRoom = ChatRoom.builder().build();
+
+        // stub
+        when(chatRoomRepository.findByTitle(title)).thenReturn(mockChatRoom);
+
+        // when
+        ChatRoom findChatRoom = chatRoomService.findByTitle(title);
+
+        // then
+        assertThat(findChatRoom).isEqualTo(mockChatRoom);
+        verify(chatRoomRepository, times(1)).findByTitle(title);
+    }
+
+    @Test
+    void findAllByLoginMember() {
+        // given
+        Long loginMemberId = 1L;
+        List<ChatRoom> mockChatRooms = new ArrayList<>();
+        mockChatRooms.add(ChatRoom.builder().build());
+
+        // stub
+        when(chatRoomRepository.findAllByLoginMemberId(loginMemberId)).thenReturn(mockChatRooms);
+
+        // when
+        List<ChatRoom> findChatRooms = chatRoomService.findAllByLoginMember(loginMemberId);
+
+        // then
+        assertThat(findChatRooms).isEqualTo(mockChatRooms);
+        verify(chatRoomRepository, times(1)).findAllByLoginMemberId(loginMemberId);
+    }
+
+    @Test
+    void findByLoginMemberIdWithReceiverId() {
+        // given
+        Long loginMemberId = 1L;
+        Long receiverId = 2L;
+        ChatRoom mockChatRoom = ChatRoom.builder().build();
+
+        // stub
+        when(chatRoomRepository.findByLoginMemberIdWithReceiverId(loginMemberId, receiverId))
+                .thenReturn(mockChatRoom);
+
+        // when
+        ChatRoom findChatRoom = chatRoomService.findByLoginMemberIdWithReceiverId(loginMemberId, receiverId);
+
+        // then
+        assertThat(findChatRoom).isEqualTo(mockChatRoom);
+        verify(chatRoomRepository, times(1)).findByLoginMemberIdWithReceiverId(loginMemberId, receiverId);
     }
 }
