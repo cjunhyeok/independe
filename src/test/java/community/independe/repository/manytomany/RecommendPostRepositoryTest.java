@@ -40,6 +40,11 @@ public class RecommendPostRepositoryTest {
 
         // then
         assertThat(savedRecommendPost).isEqualTo(recommendPost);
+        assertThat(savedRecommendPost.getId()).isEqualTo(recommendPost.getId());
+        assertThat(savedRecommendPost.getIsRecommend()).isEqualTo(recommendPost.getIsRecommend());
+        assertThat(savedRecommendPost.getPost()).isEqualTo(recommendPost.getPost());
+        assertThat(savedRecommendPost.getMember()).isEqualTo(recommendPost.getMember());
+        assertThat(savedRecommendPost.getCreatedDate()).isNotNull();
     }
 
     @Test
