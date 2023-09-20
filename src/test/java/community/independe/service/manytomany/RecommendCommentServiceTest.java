@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -101,5 +103,77 @@ public class RecommendCommentServiceTest {
 
         // then
         assertThat(recommendComment.getIsRecommend()).isEqualTo(isRecommend);
+    }
+
+    @Test
+    void findByCommentIdAndMemberIdTest() {
+        // given
+        Long commentId = 1L;
+        Long memberId = 1L;
+        RecommendComment mockRecommendComment = RecommendComment.builder().build();
+
+        // stub
+        when(recommendCommentRepository.findByCommentIdAndMemberId(commentId, memberId)).thenReturn(mockRecommendComment);
+
+        // when
+        RecommendComment findRecommendComment = recommendCommentService.findByCommentIdAndMemberId(commentId, memberId);
+
+        // then
+        assertThat(findRecommendComment).isEqualTo(mockRecommendComment);
+        verify(recommendCommentRepository, times(1)).findByCommentIdAndMemberId(commentId, memberId);
+    }
+
+    @Test
+    void countAllByCommentIdAndIsRecommendTest() {
+        // given
+        Long commentId = 1L;
+
+        // stub
+        when(recommendCommentRepository.countAllByCommentIdAndIsRecommend(commentId)).thenReturn(1L);
+
+        // when
+        Long count = recommendCommentService.countAllByCommentIdAndIsRecommend(commentId);
+
+        // then
+        assertThat(count).isEqualTo(1L);
+        verify(recommendCommentRepository, times(1)).countAllByCommentIdAndIsRecommend(commentId);
+    }
+
+    @Test
+    void findByCommentIdAndPostIdAndMemberIdAndIsRecommendTest() {
+        // given
+        Long commentId = 1L;
+        Long postId = 1L;
+        Long memberId = 1L;
+        RecommendComment mockRecommendComment = RecommendComment.builder().build();
+
+        // stub
+        when(recommendCommentRepository.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, memberId))
+                .thenReturn(mockRecommendComment);
+
+        // when
+        RecommendComment findRecommendComment =
+                recommendCommentService.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, memberId);
+
+        // then
+        assertThat(findRecommendComment).isEqualTo(mockRecommendComment);
+        verify(recommendCommentRepository, times(1))
+                .findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, memberId);
+    }
+
+    @Test
+    void findBestCommentTest() {
+        // given
+        List<Object[]> commentObjects = new ArrayList<>();
+
+        // stub
+        when(recommendCommentRepository.findBestComment()).thenReturn(commentObjects);
+
+        // when
+        List<Object[]> bestComment = recommendCommentService.findBestComment();
+
+        // then
+        assertThat(bestComment).isEqualTo(commentObjects);
+        verify(recommendCommentRepository, times(1)).findBestComment();
     }
 }
