@@ -3,6 +3,8 @@ package community.independe.service.manytomany;
 import community.independe.domain.manytomany.ReportPost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
+import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.notfound.PostNotFountException;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
 import community.independe.repository.manytomany.ReportPostRepository;
@@ -27,10 +29,10 @@ public class ReportPostServiceImpl implements ReportPostService {
     public Long save(Long postId, Long memberId) {
 
         Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("post not exist"));
+                .orElseThrow(() -> new PostNotFountException("Post Not Exist"));
 
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("member not exist"));
+                .orElseThrow(() -> new MemberNotFountException("Member Not Exist"));
 
         ReportPost savedReportPost = reportPostRepository.save(
                 ReportPost.builder().
@@ -44,6 +46,12 @@ public class ReportPostServiceImpl implements ReportPostService {
     }
 
     @Override
+    @Transactional
+    public void updateIsReport(ReportPost reportPost, Boolean isRecommend) {
+        reportPost.updateIsReport(isRecommend);
+    }
+
+    @Override
     public ReportPost findByPostIdAndMemberId(Long postId, Long memberId) {
         return reportPostRepository.findByPostIdAndMemberId(postId, memberId);
     }
@@ -51,11 +59,5 @@ public class ReportPostServiceImpl implements ReportPostService {
     @Override
     public ReportPost findByPostIdAndMemberIdAndIsRecommend(Long postId, Long memberId) {
         return reportPostRepository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId);
-    }
-
-    @Override
-    @Transactional
-    public void updateIsReport(ReportPost reportPost, Boolean isRecommend) {
-        reportPost.updateIsReport(isRecommend);
     }
 }
