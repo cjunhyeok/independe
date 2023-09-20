@@ -111,4 +111,98 @@ public class RecommendPostServiceTest {
         // then
         assertThat(mockRecommendPost.getIsRecommend()).isEqualTo(isRecommend);
     }
+
+    @Test
+    void findByIdTest() {
+        // given
+        Long recommendPostId = 1L;
+        RecommendPost mockRecommendPost = RecommendPost.builder()
+                .post(Post.builder().build())
+                .build();
+
+        // stub
+        when(recommendPostRepository.findById(recommendPostId)).thenReturn(Optional.of(mockRecommendPost));
+
+        // when
+        RecommendPost findRecommendPost = recommendPostService.findById(recommendPostId);
+
+        // then
+        assertThat(findRecommendPost).isEqualTo(mockRecommendPost);
+        verify(recommendPostRepository, times(1)).findById(recommendPostId);
+    }
+
+    @Test
+    void findByIdFailTest() {
+        // given
+        Long recommendPostId = 1L;
+
+        // stub
+        when(recommendPostRepository.findById(recommendPostId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> recommendPostService.findById(recommendPostId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("recommendPost not exist");
+
+        // then
+        verify(recommendPostRepository, times(1)).findById(recommendPostId);
+    }
+
+    @Test
+    void findByPostIdAndMemberIdTest() {
+        // given
+        Long postId = 1L;
+        Long memberId = 1L;
+        RecommendPost mockRecommendPost = RecommendPost.builder()
+                .post(Post.builder().build())
+                .build();
+
+        // stub
+        when(recommendPostRepository.findByPostIdAndMemberId(postId, memberId)).thenReturn(mockRecommendPost);
+
+        // when
+        RecommendPost findRecommendPost = recommendPostService.findByPostIdAndMemberId(postId, memberId);
+
+        // then
+        assertThat(findRecommendPost).isEqualTo(mockRecommendPost);
+        verify(recommendPostRepository, times(1)).findByPostIdAndMemberId(postId, memberId);
+    }
+
+    @Test
+    void countAllByPostIdAndIsRecommendTest() {
+        // given
+        Long postId = 1L;
+
+        // stub
+        when(recommendPostRepository.countAllByPostIdAndIsRecommend(postId)).thenReturn(1L);
+
+        // when
+        Long count = recommendPostService.countAllByPostIdAndIsRecommend(postId);
+
+        // then
+        assertThat(count).isEqualTo(1L);
+        verify(recommendPostRepository, times(1)).countAllByPostIdAndIsRecommend(postId);
+    }
+
+    @Test
+    void findByPostIdAndMemberIdAndIsRecommendTest() {
+        // given
+        Long postId = 1L;
+        Long memberId = 1L;
+        RecommendPost mockRecommendPost = RecommendPost.builder()
+                .post(Post.builder().build())
+                .isRecommend(true)
+                .build();
+
+        // stub
+        when(recommendPostRepository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId))
+                .thenReturn(mockRecommendPost);
+
+        // when
+        RecommendPost findRecommendPost = recommendPostService.findByPostIdAndMemberIdAndIsRecommend(postId, memberId);
+
+        // then
+        assertThat(findRecommendPost).isEqualTo(mockRecommendPost);
+        verify(recommendPostRepository, times(1)).findByPostIdAndMemberIdAndIsRecommend(postId, memberId);
+    }
 }
