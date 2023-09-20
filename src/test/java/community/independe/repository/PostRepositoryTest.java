@@ -270,4 +270,23 @@ class PostRepositoryTest {
             }
         }
     }
+
+    @Test
+    void judgeConditionNoKeywordTest() {
+        // given
+        String[] conditions = {"title", "nickname", "all", "content", "total", "other"};
+        String keyword = "";
+        PageRequest page = PageRequest.of(0, 10);
+
+        // when
+        for (String condition : conditions) {
+            // when
+            Page<Post> findPostsPage =
+                    postRepository.findAllPostsBySearchWithMemberDynamic(condition, keyword, page);
+            List<Post> findPosts = findPostsPage.getContent();
+
+            // then
+            assertThat(findPosts.size()).isEqualTo(5);
+        }
+    }
 }
