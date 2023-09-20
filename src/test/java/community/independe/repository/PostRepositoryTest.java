@@ -233,4 +233,41 @@ class PostRepositoryTest {
         // then
         assertThat(postRepository.findAll().size()).isEqualTo(4);
     }
+
+    @Test
+    void judgeConditionTest() {
+        // given
+        String[] conditions = {"title", "nickname", "all", "content", "total", "other"};
+        String keyword = "mock";
+        PageRequest page = PageRequest.of(0, 10);
+        Member mockUser = Member.builder()
+                .username("mockId")
+                .password("mockPassword")
+                .nickname("mockNickname")
+                .role("ROLE_USER")
+                .build();
+        Member savedMember = memberRepository.save(mockUser);
+
+        Post mockPost = Post.builder()
+                .title("mockTitle")
+                .content("mockContent")
+                .independentPostType(IndependentPostType.COOK)
+                .member(savedMember)
+                .build();
+        postRepository.save(mockPost);
+
+        for (String condition : conditions) {
+            // when
+            Page<Post> findPostsPage =
+                    postRepository.findAllPostsBySearchWithMemberDynamic(condition, keyword, page);
+            List<Post> findPosts = findPostsPage.getContent();
+
+            // then
+            if(condition.equals("other")) {
+                assertThat(findPosts.size()).isEqualTo(6);
+            } else {
+                assertThat(findPosts.size()).isEqualTo(1);
+            }
+        }
+    }
 }
