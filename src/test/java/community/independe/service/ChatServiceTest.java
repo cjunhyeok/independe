@@ -144,4 +144,23 @@ public class ChatServiceTest {
         // then
         verify(memberRepository, times(1)).findById(memberId);
     }
+
+    @Test
+    void findChatHistoryTest() {
+        // given
+        Long loginMemberId = 1L;
+        Long receiverId = 2L;
+        List<Chat> history = new ArrayList<>();
+        history.add(Chat.builder().build());
+
+        // stub
+        when(chatRepository.findChatHistory(loginMemberId, receiverId)).thenReturn(history);
+
+        // when
+        List<Chat> chatHistory = chatService.findChatHistory(loginMemberId, receiverId);
+
+        // then
+        assertThat(chatHistory).isNotEmpty();
+        verify(chatRepository, times(1)).findChatHistory(loginMemberId, receiverId);
+    }
 }
