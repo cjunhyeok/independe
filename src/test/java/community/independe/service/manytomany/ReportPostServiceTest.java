@@ -3,6 +3,8 @@ package community.independe.service.manytomany;
 import community.independe.domain.manytomany.ReportPost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
+import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.notfound.PostNotFountException;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.manytomany.ReportPostRepository;
 import community.independe.repository.post.PostRepository;
@@ -52,6 +54,47 @@ public class ReportPostServiceTest {
         verify(postRepository, times(1)).findById(postId);
         verify(memberRepository, times(1)).findById(memberId);
         verify(reportPostRepository, times(1)).save(any(ReportPost.class));
+    }
+
+    @Test
+    void savePostFailTest() {
+        // given
+        Long postId = 1L;
+        Long memberId = 1L;
+
+        // stub
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> reportPostService.save(postId, memberId))
+                .isInstanceOf(PostNotFountException.class)
+                .hasMessage("Post Not Exist");
+
+        // then
+        verify(postRepository, times(1)).findById(postId);
+        verifyNoInteractions(memberRepository);
+        verifyNoInteractions(reportPostRepository);
+    }
+
+    @Test
+    void saveMemberFailTest() {
+        // given
+        Long postId = 1L;
+        Long memberId = 1L;
+
+        // stub
+        when(postRepository.findById(postId)).thenReturn(Optional.of(Post.builder().build()));
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> reportPostService.save(postId, memberId))
+                .isInstanceOf(MemberNotFountException.class)
+                .hasMessage("Member Not Exist");
+
+        // then
+        verify(postRepository, times(1)).findById(postId);
+        verify(memberRepository, times(1)).findById(memberId);
+        verifyNoInteractions(reportPostRepository);
     }
 
     @Test
