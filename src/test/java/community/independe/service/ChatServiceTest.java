@@ -163,4 +163,21 @@ public class ChatServiceTest {
         assertThat(chatHistory).isNotEmpty();
         verify(chatRepository, times(1)).findChatHistory(loginMemberId, receiverId);
     }
+
+    @Test
+    void findTopByChatRoomOrderByDateDescTest() {
+        // given
+        ChatRoom chatRoom = ChatRoom.builder().build();
+        Chat mockChat = Chat.builder().build();
+
+        // stub
+        when(chatRepository.findTopByChatRoomOrderByDateDesc(chatRoom)).thenReturn(mockChat);
+
+        // when
+        Chat findChat = chatService.findTopByChatRoomOrderByDateDesc(chatRoom);
+
+        // then
+        assertThat(findChat).isEqualTo(mockChat);
+        verify(chatRepository, times(1)).findTopByChatRoomOrderByDateDesc(chatRoom);
+    }
 }
