@@ -73,12 +73,13 @@ public class CommentServiceTest {
         // given
         Long memberId = 1L;
         Long postId = 1L;
-        String content = "parentContent";
-        Member mockMember = Member.builder().build();
+        String content = "content";
+        Member mockMember = Member.builder().region(RegionType.SEOUL).build();
+        Post mockPost = Post.builder().regionType(RegionType.SEOUL).member(Member.builder().build()).build();
 
         // stub
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
-        when(postRepository.findById(postId)).thenReturn(Optional.of(Post.builder().member(mockMember).build()));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(mockPost));
         when(commentRepository.save(any(Comment.class))).thenReturn(Comment.builder().build());
 
         // when
@@ -139,11 +140,12 @@ public class CommentServiceTest {
         Long commentId = 1L;
         String content = "childComment";
 
-        Member mockMember = Member.builder().build();
+        Member mockMember = Member.builder().region(RegionType.SEOUL).build();
+        Post mockPost = Post.builder().regionType(RegionType.SEOUL).member(Member.builder().build()).build();
 
         // stub
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
-        when(postRepository.findById(postId)).thenReturn(Optional.of(Post.builder().member(mockMember).build()));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(mockPost));
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(Comment.builder().build()));
         when(commentRepository.save(any(Comment.class))).thenReturn(Comment.builder().build());
 
@@ -155,6 +157,49 @@ public class CommentServiceTest {
         verify(postRepository, times(1)).findById(postId);
         verify(commentRepository, times(1)).findById(commentId);
         verify(commentRepository, times(1)).save(any(Comment.class));
+    }
+
+    @Test
+    public void createChildCommentMemberFailTest() {
+        // given
+        Long memberId = 1L;
+        Long postId = 1L;
+        Long commentId = 1L;
+        String content = "childContent";
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> commentService.createChildComment(memberId, postId, commentId, content))
+                .isInstanceOf(MemberNotFountException.class);
+
+        //
+        verify(memberRepository).findById(memberId);
+        verifyNoInteractions(postRepository);
+        verifyNoInteractions(commentRepository);
+    }
+
+    @Test
+    public void createChildCommentPostFailTest() {
+        // given
+        Long memberId = 1L;
+        Long postId = 1L;
+        Long commentId = 1L;
+        String content = "childContent";
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(Member.builder().build()));
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> commentService.createChildComment(memberId, postId, commentId, content))
+                .isInstanceOf(PostNotFountException.class);
+
+        // then
+        verify(memberRepository).findById(memberId);
+        verify(postRepository).findById(postId);
+        verifyNoInteractions(commentRepository);
     }
 
     @Test
