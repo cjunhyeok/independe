@@ -48,4 +48,25 @@ public class RefreshTokenServiceTest {
         verify(refreshTokenRepository, times(1)).deleteById(refreshToken.getId());
         verify(refreshTokenRepository, times(1)).save(any(RefreshToken.class));
     }
+
+    @Test
+    void saveNoInteractionDeleteTest() {
+        // given
+        String ip = "mockIp";
+        String username = "username";
+        Set<String> authorities = new HashSet<>();
+        String token = "mockRefreshToken";
+
+        // stub
+        when(refreshTokenRepository.findByUsername(username)).thenReturn(null);
+        when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(RefreshToken.builder().build());
+
+        // when
+        refreshTokenService.save(ip, authorities, token, username);
+
+        // then
+        verify(refreshTokenRepository, times(1)).findByUsername(username);
+        verify(refreshTokenRepository, times(1)).save(any(RefreshToken.class));
+        verifyNoMoreInteractions(refreshTokenRepository);
+    }
 }
