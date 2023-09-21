@@ -35,11 +35,17 @@ public class RefreshTokenServiceTest {
                 .refreshToken(token)
                 .build();
 
-        // when
+        // stub
+        when(refreshTokenRepository.findByUsername(username)).thenReturn(refreshToken);
+        doNothing().when(refreshTokenRepository).deleteById(refreshToken.getId());
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(refreshToken);
+
+        // when
         refreshTokenService.save(ip, authorities, token, username);
 
         // then
+        verify(refreshTokenRepository, times(1)).findByUsername(username);
+        verify(refreshTokenRepository, times(1)).deleteById(refreshToken.getId());
         verify(refreshTokenRepository, times(1)).save(any(RefreshToken.class));
     }
 }
