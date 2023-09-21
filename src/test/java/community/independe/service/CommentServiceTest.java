@@ -3,6 +3,7 @@ package community.independe.service;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
+import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.exception.notfound.CommentNotFountException;
 import community.independe.exception.notfound.MemberNotFountException;
@@ -244,5 +245,34 @@ public class CommentServiceTest {
         abstractThrowableAssert
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Region Not Authenticate");
+    }
+
+    @Test
+    void checkRegionIsRegionFalseTest() {
+        // given
+        Long memberId = 1L;
+        Long postId = 1L;
+        String content = "content";
+        Member mockMember = Member.builder().region(RegionType.SEOUL).build();
+        Post mockIndependentPost = Post.builder().independentPostType(IndependentPostType.COOK).member(Member.builder().build()).build();
+        Post mockRegionAllPost = Post.builder().regionType(RegionType.ALL).member(Member.builder().build()).build();
+        Post posts[] = new Post[]{mockIndependentPost, mockRegionAllPost};
+
+        for (Post post : posts) {
+            // stub
+            when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
+            when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+            when(commentRepository.save(any(Comment.class))).thenReturn(Comment.builder().build());
+
+            // when
+            commentService.createParentComment(memberId, postId, content);
+
+            // then
+            verify(postRepository, times(1)).findById(postId);
+            postId++;
+        }
+
+        verify(memberRepository, times(2)).findById(memberId);
+        verify(commentRepository, times(2)).save(any(Comment.class));
     }
 }
