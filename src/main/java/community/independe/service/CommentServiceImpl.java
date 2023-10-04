@@ -4,9 +4,8 @@ import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.RegionType;
-import community.independe.exception.notfound.CommentNotFountException;
-import community.independe.exception.notfound.MemberNotFountException;
-import community.independe.exception.notfound.PostNotFountException;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
@@ -17,10 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
-@Transactional(readOnly = true)
 @Slf4j
+@Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CommentServiceImpl implements CommentService{
 
     private final MemberRepository memberRepository;
@@ -30,7 +29,7 @@ public class CommentServiceImpl implements CommentService{
     @Override
     public Comment findById(Long id) {
         return commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Comment not exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
     }
 
     @Transactional
@@ -38,10 +37,10 @@ public class CommentServiceImpl implements CommentService{
     public Long createParentComment(Long memberId, Long postId, String content) {
 
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotFountException("Member Not Exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFountException("Post Not Exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         if (!findPost.getMember().equals(findMember)) {
             checkRegion(findMember, findPost);
@@ -62,13 +61,13 @@ public class CommentServiceImpl implements CommentService{
     public Long createChildComment(Long memberId, Long postId, Long commentId, String content) {
 
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotFountException("Member Not Exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFountException("Post Not Exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         Comment parentComment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CommentNotFountException("Comment Not Exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
 
         if (!findPost.getMember().equals(findMember)) {
             checkRegion(findMember, findPost);
@@ -108,7 +107,7 @@ public class CommentServiceImpl implements CommentService{
         }
 
         if (isRegionPost == true && (findMember.getRegion() == null || !findMember.getRegion().equals(findPost.getRegionType()))) {
-            throw new IllegalArgumentException("Region Not Authenticate");
+            throw new CustomException(ErrorCode.REGION_NOT_AUTHENTICATE);
         }
     }
 }

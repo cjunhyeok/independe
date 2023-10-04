@@ -4,7 +4,8 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jwt.JWTParser;
 import community.independe.domain.token.RefreshToken;
-import community.independe.exception.RefreshTokenException;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.token.RefreshTokenRepository;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.util.JwtTokenVerifier;
@@ -18,13 +19,14 @@ import java.util.Set;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RefreshTokenServiceImpl implements RefreshTokenService{
+public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenVerifier jwtTokenVerifier;
     private final SecuritySigner securitySigner;
     private final JWK jwk;
 
+    @Override
     public String save(String ip, Set<String> authorities, String refreshToken, String username) {
 
         RefreshToken findRefreshToken = refreshTokenRepository.findByUsername(username);
@@ -38,6 +40,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
         return savedRefreshToken.getId();
     }
 
+    @Override
     public String reProvideRefreshToken(String currentIp, String refreshToken) throws JOSEException {
 
         RefreshToken findRefreshToken = RefreshTokenExceptionCheck(refreshToken, currentIp);
@@ -53,12 +56,12 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
 
         RefreshToken findRefreshToken = refreshTokenRepository.findByRefreshToken(sampleToken);
         if (findRefreshToken == null) {
-            throw new RefreshTokenException("Invalid RefreshToken");
+            throw new CustomException(ErrorCode.REFRESH_TOKEN_NOT_MATCH);
         }
 
         String savedIp = findRefreshToken.getIp();
         if (!currentIp.equals(savedIp)) {
-            throw new RefreshTokenException("Invalid RefreshToken Ip");
+            throw new CustomException(ErrorCode.REFRESH_IP_NOT_MATCH);
         }
 
         return findRefreshToken;
@@ -76,7 +79,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
             saveRefreshToken(currentIp, findRefreshToken.getAuthorities(), newRefreshToken, username);
 
         } catch (ParseException e) {
-            throw new RefreshTokenException("Invalid RefreshToken");
+            throw new CustomException(ErrorCode.REFRESH_TOKEN_NOT_MATCH);
         }
 
         return newRefreshToken;

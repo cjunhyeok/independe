@@ -6,8 +6,8 @@ import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
-import community.independe.exception.notfound.MemberNotFountException;
-import community.independe.exception.notfound.PostNotFountException;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.file.FilesRepository;
@@ -35,7 +35,7 @@ public class PostServiceImpl implements PostService{
     @Override
     public Post findById(Long postId) {
         return postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFountException("Post Not Exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
     }
 
     // 자취 게시글 생성
@@ -44,7 +44,7 @@ public class PostServiceImpl implements PostService{
     public Long createIndependentPost(Long memberId, String title, String content, IndependentPostType independentPostType) {
 
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotFountException("Member Not Exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Post post = Post.builder()
                 .title(title)
@@ -63,7 +63,7 @@ public class PostServiceImpl implements PostService{
     public Long createRegionPost(Long memberId, String title, String content, RegionType regionType, RegionPostType regionPostType) {
 
         Member findMember = memberRepository.findById(memberId).orElseThrow(
-                () -> new MemberNotFountException("Member Not Exist")
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
         Post post = Post.builder()
@@ -83,7 +83,7 @@ public class PostServiceImpl implements PostService{
     public Long updatePost(Long postId, String title, String content) {
 
         Post findPost = postRepository.findById(postId).orElseThrow(
-                () -> new PostNotFountException("Post Not Exist")
+                () -> new CustomException(ErrorCode.POST_NOT_FOUND)
         );
 
         findPost.updatePost(title, content);
@@ -94,7 +94,7 @@ public class PostServiceImpl implements PostService{
     @Override
     public void deletePost(Long postId) {
         Post findPost = postRepository.findById(postId).orElseThrow(
-                () -> new PostNotFountException("Post Not Exist")
+                () -> new CustomException(ErrorCode.POST_NOT_FOUND)
         );
         findPost.deleteMember();
         findPost.deleteRecommendPosts();
@@ -129,7 +129,7 @@ public class PostServiceImpl implements PostService{
     @Transactional
     public void increaseViews(Long postId) {
         Post findPost = postRepository.findById(postId).orElseThrow(
-                () -> new PostNotFountException("Post Not Exist")
+                () -> new CustomException(ErrorCode.POST_NOT_FOUND)
         );
 
         findPost.increaseViews(findPost.getViews() + 1);
