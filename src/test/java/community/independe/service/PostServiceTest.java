@@ -7,8 +7,7 @@ import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
-import community.independe.exception.notfound.MemberNotFountException;
-import community.independe.exception.notfound.PostNotFountException;
+import community.independe.exception.CustomException;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.file.FilesRepository;
@@ -70,7 +69,7 @@ public class PostServiceTest {
 
         // when
         assertThatThrownBy(() -> postService.findById(postId))
-                .isInstanceOf(PostNotFountException.class);
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(postRepository, times(1)).findById(postId);
@@ -108,8 +107,7 @@ public class PostServiceTest {
 
         // when
         assertThatThrownBy(() -> postService.createIndependentPost(memberId, title, content, independentPostType))
-                .isInstanceOf(MemberNotFountException.class)
-                .hasMessage("Member Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(memberRepository, times(1)).findById(memberId);
@@ -151,8 +149,7 @@ public class PostServiceTest {
 
         // when
         assertThatThrownBy(() -> postService.createRegionPost(memberId, title, content, regionType, regionPostType))
-                .isInstanceOf(MemberNotFountException.class)
-                .hasMessage("Member Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(memberRepository, times(1)).findById(memberId);
@@ -193,8 +190,7 @@ public class PostServiceTest {
 
         // when
         assertThatThrownBy(() -> postService.updatePost(postId, title, content))
-                .isInstanceOf(PostNotFountException.class)
-                .hasMessage("Post Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(postRepository, times(1)).findById(postId);
@@ -235,8 +231,7 @@ public class PostServiceTest {
 
         // then
         abstractThrowableAssert
-                .isInstanceOf(PostNotFountException.class)
-                .hasMessage("Post Not Exist");
+                .isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -280,8 +275,7 @@ public class PostServiceTest {
 
         // when
         assertThatThrownBy(() -> postService.deletePost(postId))
-                .isInstanceOf(PostNotFountException.class)
-                .hasMessage("Post Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(postRepository, times(1)).findById(postId);

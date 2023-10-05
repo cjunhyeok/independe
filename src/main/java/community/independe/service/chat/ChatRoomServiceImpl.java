@@ -2,7 +2,8 @@ package community.independe.service.chat;
 
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
-import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.chat.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +25,11 @@ public class ChatRoomServiceImpl implements ChatRoomService{
     public Long saveChatRoom(String title, Long senderId, Long receiverId) {
 
         Member findFirstMember = memberRepository.findById(senderId).orElseThrow(
-                () -> new MemberNotFountException("Member Not Exist")
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
         Member findSecondMember = memberRepository.findById(receiverId).orElseThrow(
-                () -> new MemberNotFountException("Member Not Exist")
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
         ChatRoom chatRoom = ChatRoom.builder()
@@ -50,7 +51,7 @@ public class ChatRoomServiceImpl implements ChatRoomService{
     @Override
     public ChatRoom findById(Long id) {
         return chatRoomRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("chatRoom not exist")
+                () -> new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND)
         );
     }
 

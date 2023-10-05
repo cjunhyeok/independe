@@ -3,8 +3,8 @@ package community.independe.service.manytomany;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.manytomany.RecommendComment;
 import community.independe.domain.member.Member;
-import community.independe.exception.notfound.CommentNotFountException;
-import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.manytomany.RecommendCommentRepository;
@@ -17,8 +17,8 @@ import java.util.List;
 
 @Slf4j
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class RecommendCommentServiceImpl implements RecommendCommentService{
 
     private final RecommendCommentRepository recommendCommentRepository;
@@ -29,10 +29,10 @@ public class RecommendCommentServiceImpl implements RecommendCommentService{
     @Transactional
     public Long save(Long commentId, Long memberId) {
         Comment findComment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CommentNotFountException("Comment Not Exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
 
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotFountException("Member Not Exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         RecommendComment savedRecommendComment = recommendCommentRepository.save(
                 RecommendComment.builder()

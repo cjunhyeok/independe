@@ -3,8 +3,8 @@ package community.independe.service.manytomany;
 import community.independe.domain.manytomany.ReportPost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
-import community.independe.exception.notfound.MemberNotFountException;
-import community.independe.exception.notfound.PostNotFountException;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
 import community.independe.repository.manytomany.ReportPostRepository;
@@ -15,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReportPostServiceImpl implements ReportPostService {
 
     private final ReportPostRepository reportPostRepository;
@@ -29,10 +29,10 @@ public class ReportPostServiceImpl implements ReportPostService {
     public Long save(Long postId, Long memberId) {
 
         Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFountException("Post Not Exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotFountException("Member Not Exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         ReportPost savedReportPost = reportPostRepository.save(
                 ReportPost.builder().

@@ -36,6 +36,10 @@ public class ReportPostRepositoryTest {
 
         // then
         assertThat(savedReportPost).isEqualTo(reportPost);
+        assertThat(savedReportPost.getId()).isEqualTo(reportPost.getId());
+        assertThat(savedReportPost.getIsReport()).isEqualTo(reportPost.getIsReport());
+        assertThat(savedReportPost.getMember()).isEqualTo(reportPost.getMember());
+        assertThat(savedReportPost.getPost()).isEqualTo(reportPost.getPost());
     }
 
     @Test

@@ -5,9 +5,7 @@ import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionType;
-import community.independe.exception.notfound.CommentNotFountException;
-import community.independe.exception.notfound.MemberNotFountException;
-import community.independe.exception.notfound.PostNotFountException;
+import community.independe.exception.CustomException;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
@@ -63,7 +61,7 @@ public class CommentServiceTest {
 
         // when
         assertThatThrownBy(() -> commentService.findById(id))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(commentRepository, times(1)).findById(id);
@@ -104,7 +102,7 @@ public class CommentServiceTest {
 
         // when
         assertThatThrownBy(() -> commentService.createParentComment(memberId, postId, content))
-                .isInstanceOf(MemberNotFountException.class);
+                .isInstanceOf(CustomException.class);
 
         //
         verify(memberRepository).findById(memberId);
@@ -125,7 +123,7 @@ public class CommentServiceTest {
 
         // when
         assertThatThrownBy(() -> commentService.createParentComment(memberId, postId, content))
-                .isInstanceOf(PostNotFountException.class);
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(memberRepository).findById(memberId);
@@ -173,7 +171,7 @@ public class CommentServiceTest {
 
         // when
         assertThatThrownBy(() -> commentService.createChildComment(memberId, postId, commentId, content))
-                .isInstanceOf(MemberNotFountException.class);
+                .isInstanceOf(CustomException.class);
 
         //
         verify(memberRepository).findById(memberId);
@@ -195,7 +193,7 @@ public class CommentServiceTest {
 
         // when
         assertThatThrownBy(() -> commentService.createChildComment(memberId, postId, commentId, content))
-                .isInstanceOf(PostNotFountException.class);
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(memberRepository).findById(memberId);
@@ -218,7 +216,7 @@ public class CommentServiceTest {
 
         // when
         assertThatThrownBy(() -> commentService.createChildComment(memberId, postId, commentId, content))
-                .isInstanceOf(CommentNotFountException.class);
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(memberRepository).findById(memberId);
@@ -243,8 +241,7 @@ public class CommentServiceTest {
 
         // then
         abstractThrowableAssert
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Region Not Authenticate");
+                .isInstanceOf(CustomException.class);
     }
 
     @Test

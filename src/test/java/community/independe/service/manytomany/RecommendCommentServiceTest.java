@@ -3,8 +3,7 @@ package community.independe.service.manytomany;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.manytomany.RecommendComment;
 import community.independe.domain.member.Member;
-import community.independe.exception.notfound.CommentNotFountException;
-import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.CustomException;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.manytomany.RecommendCommentRepository;
@@ -65,8 +64,7 @@ public class RecommendCommentServiceTest {
 
         // when
         assertThatThrownBy(() -> recommendCommentService.save(commentId, memberId))
-                .isInstanceOf(CommentNotFountException.class)
-                .hasMessage("Comment Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(commentRepository, times(1)).findById(commentId);
@@ -84,8 +82,7 @@ public class RecommendCommentServiceTest {
 
         // when
         assertThatThrownBy(() -> recommendCommentService.save(commentId, memberId))
-                .isInstanceOf(MemberNotFountException.class)
-                .hasMessage("Member Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(commentRepository, times(1)).findById(commentId);

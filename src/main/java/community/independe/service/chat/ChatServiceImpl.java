@@ -3,7 +3,8 @@ package community.independe.service.chat;
 import community.independe.domain.chat.Chat;
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
-import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.chat.ChatRepository;
 import community.independe.repository.chat.ChatRoomRepository;
@@ -26,11 +27,11 @@ public class ChatServiceImpl implements ChatService{
     @Transactional
     public Long saveChat(Long senderId, Long receiverId, String content, Boolean isRead) {
         Member findSender = memberRepository.findById(senderId).orElseThrow(
-                () -> new MemberNotFountException("Member Not Exist")
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
         Member findReceiver = memberRepository.findById(receiverId).orElseThrow(
-                () -> new MemberNotFountException("Member Not Exist")
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
         ChatRoom chatRoom = chatRoomRepository.findByLoginMemberIdWithReceiverId(findSender.getId(), findReceiver.getId());
@@ -50,7 +51,7 @@ public class ChatServiceImpl implements ChatService{
     public List<Chat> findChatRooms(Long memberId) {
 
         Member findSender = memberRepository.findById(memberId).orElseThrow(
-                () -> new MemberNotFountException("Member Not Exist")
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
         return chatRepository.findChatRooms(findSender.getId());

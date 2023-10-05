@@ -3,8 +3,7 @@ package community.independe.service.manytomany;
 import community.independe.domain.manytomany.FavoritePost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
-import community.independe.exception.notfound.MemberNotFountException;
-import community.independe.exception.notfound.PostNotFountException;
+import community.independe.exception.CustomException;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.manytomany.FavoritePostRepository;
 import community.independe.repository.post.PostRepository;
@@ -64,8 +63,7 @@ public class FavoritePostServiceTest {
 
         // when
         assertThatThrownBy(() -> favoritePostService.save(postId, memberId))
-                .isInstanceOf(PostNotFountException.class)
-                .hasMessage("Post Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(postRepository, times(1)).findById(postId);
@@ -85,8 +83,7 @@ public class FavoritePostServiceTest {
 
         // when
         assertThatThrownBy(() -> favoritePostService.save(postId, memberId))
-                .isInstanceOf(MemberNotFountException.class)
-                .hasMessage("Member Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(postRepository, times(1)).findById(postId);
@@ -124,12 +121,12 @@ public class FavoritePostServiceTest {
         when(favoritePostRepository.findById(mockFavoritePost.getId())).thenReturn(Optional.empty());
 
         // when
-        IllegalArgumentException exception = org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+        CustomException exception = org.junit.jupiter.api.Assertions.assertThrows(CustomException.class,
                 () -> favoritePostService.updateIsFavorite(mockFavoritePost, isFavorite));
 
         // then
         verify(favoritePostRepository, times(1)).findById(mockFavoritePost.getId());
-        assertThat(exception).isExactlyInstanceOf(IllegalArgumentException.class);
+        assertThat(exception).isExactlyInstanceOf(CustomException.class);
     }
 
     @Test

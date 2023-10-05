@@ -3,8 +3,8 @@ package community.independe.service.manytomany;
 import community.independe.domain.manytomany.FavoritePost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
-import community.independe.exception.notfound.MemberNotFountException;
-import community.independe.exception.notfound.PostNotFountException;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.manytomany.FavoritePostRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
@@ -28,10 +28,10 @@ public class FavoritePostServiceImpl implements FavoritePostService {
     public Long save(Long postId, Long memberId) {
 
         Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFountException("Post Not Exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotFountException("Member Not Exist"));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         FavoritePost savedFavoritePost = favoritePostRepository.save(
                 FavoritePost.builder()
@@ -48,7 +48,7 @@ public class FavoritePostServiceImpl implements FavoritePostService {
     @Transactional
     public void updateIsFavorite(FavoritePost favoritePost, Boolean isFavorite) {
         FavoritePost findFavoritePost = favoritePostRepository.findById(favoritePost.getId()).orElseThrow(
-                () -> new IllegalArgumentException("FavoritePost not exist")
+                () -> new CustomException(ErrorCode.FAVORITE_POST_NOT_FOUND)
         );
         findFavoritePost.updateIsFavorite(isFavorite);
     }

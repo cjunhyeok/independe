@@ -2,7 +2,7 @@ package community.independe.service;
 
 import community.independe.domain.file.Files;
 import community.independe.domain.post.Post;
-import community.independe.exception.notfound.PostNotFountException;
+import community.independe.exception.CustomException;
 import community.independe.repository.file.FilesRepository;
 import community.independe.repository.post.PostRepository;
 import org.junit.jupiter.api.Test;
@@ -47,6 +47,8 @@ public class FilesServiceTest {
         verify(filesRepository, times(multipartFiles.size())).save(any(Files.class));
     }
 
+    // todo save test
+
     @Test
     public void findByIdTest() {
         // given
@@ -74,7 +76,7 @@ public class FilesServiceTest {
 
         // when
         assertThatThrownBy(() -> filesService.findById(id))
-                .isInstanceOf(PostNotFountException.class);
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(filesRepository, times(1)).findById(id);

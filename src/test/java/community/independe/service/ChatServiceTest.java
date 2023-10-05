@@ -3,7 +3,7 @@ package community.independe.service;
 import community.independe.domain.chat.Chat;
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
-import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.CustomException;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.chat.ChatRepository;
 import community.independe.repository.chat.ChatRoomRepository;
@@ -75,8 +75,7 @@ public class ChatServiceTest {
 
         // when
         assertThatThrownBy(() -> chatService.saveChat(senderId, receiverId, content, isRead))
-                .isInstanceOf(MemberNotFountException.class)
-                .hasMessage("Member Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(memberRepository, times(1)).findById(senderId);
@@ -98,8 +97,7 @@ public class ChatServiceTest {
 
         // when
         assertThatThrownBy(() -> chatService.saveChat(senderId, receiverId, content, isRead))
-                .isInstanceOf(MemberNotFountException.class)
-                .hasMessage("Member Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(memberRepository, times(1)).findById(senderId);
@@ -138,8 +136,7 @@ public class ChatServiceTest {
 
         // when
         assertThatThrownBy(() -> chatService.findChatRooms(memberId))
-                .isInstanceOf(MemberNotFountException.class)
-                .hasMessage("Member Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(memberRepository, times(1)).findById(memberId);

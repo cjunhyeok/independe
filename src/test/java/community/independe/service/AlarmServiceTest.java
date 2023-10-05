@@ -3,7 +3,7 @@ package community.independe.service;
 import community.independe.domain.alarm.Alarm;
 import community.independe.domain.alarm.AlarmType;
 import community.independe.domain.member.Member;
-import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.CustomException;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.alarm.AlarmRepository;
 import org.junit.jupiter.api.Test;
@@ -62,8 +62,7 @@ public class AlarmServiceTest {
 
         // when
         assertThatThrownBy(() -> alarmService.saveAlarm(message, isRead, alarmType, memberId))
-                .isInstanceOf(MemberNotFountException.class)
-                .hasMessage("Member Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(memberRepository, times(1)).findById(memberId);

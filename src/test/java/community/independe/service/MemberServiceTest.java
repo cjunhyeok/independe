@@ -2,7 +2,7 @@ package community.independe.service;
 
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.RegionType;
-import community.independe.exception.notfound.MemberNotFountException;
+import community.independe.exception.CustomException;
 import community.independe.repository.MemberRepository;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.Test;
@@ -78,8 +78,7 @@ public class MemberServiceTest {
 
         // then
         abstractThrowableAssert
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Duplicated Username");
+                .isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -99,8 +98,7 @@ public class MemberServiceTest {
 
         // then
         abstractThrowableAssert
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Duplicated Nickname");
+                .isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -137,8 +135,7 @@ public class MemberServiceTest {
 
         // when
         assertThatThrownBy(() -> memberService.modifyOAuthMember(memberId, nickname, email, number))
-                .isInstanceOf(MemberNotFountException.class)
-                .hasMessage("Member Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(memberRepository, times(1)).findById(memberId);
@@ -183,8 +180,7 @@ public class MemberServiceTest {
 
         // when
         assertThatThrownBy(() -> memberService.modifyMember(memberId, username, password, nickname, email, number))
-                .isInstanceOf(MemberNotFountException.class)
-                .hasMessage("Member Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(memberRepository, times(1)).findById(memberId);
@@ -220,8 +216,7 @@ public class MemberServiceTest {
 
         // when
         assertThatThrownBy(() -> memberService.authenticateRegion(memberId, regionType))
-                .isInstanceOf(MemberNotFountException.class)
-                .hasMessage("Member Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(memberRepository, times(1)).findById(memberId);
@@ -254,8 +249,7 @@ public class MemberServiceTest {
 
         // when
         assertThatThrownBy(() -> memberService.findById(memberId))
-                .isInstanceOf(MemberNotFountException.class)
-                .hasMessage("Member Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(memberRepository, times(1)).findById(memberId);

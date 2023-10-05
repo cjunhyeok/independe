@@ -3,8 +3,7 @@ package community.independe.service.manytomany;
 import community.independe.domain.manytomany.RecommendPost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
-import community.independe.exception.notfound.MemberNotFountException;
-import community.independe.exception.notfound.PostNotFountException;
+import community.independe.exception.CustomException;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.manytomany.RecommendPostRepository;
 import community.independe.repository.post.PostRepository;
@@ -66,8 +65,7 @@ public class RecommendPostServiceTest {
 
         // when
         assertThatThrownBy(() -> recommendPostService.save(postId, memberId))
-                .isInstanceOf(PostNotFountException.class)
-                .hasMessage("Post Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(postRepository, times(1)).findById(postId);
@@ -87,8 +85,7 @@ public class RecommendPostServiceTest {
 
         // when
         assertThatThrownBy(() -> recommendPostService.save(postId, memberId))
-                .isInstanceOf(MemberNotFountException.class)
-                .hasMessage("Member Not Exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(postRepository, times(1)).findById(postId);
@@ -141,8 +138,7 @@ public class RecommendPostServiceTest {
 
         // when
         assertThatThrownBy(() -> recommendPostService.findById(recommendPostId))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("recommendPost not exist");
+                .isInstanceOf(CustomException.class);
 
         // then
         verify(recommendPostRepository, times(1)).findById(recommendPostId);
