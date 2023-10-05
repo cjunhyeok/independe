@@ -6,7 +6,8 @@ import com.nimbusds.jwt.JWTParser;
 import community.independe.api.dtos.member.*;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.RegionType;
-import community.independe.exception.RefreshTokenException;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.security.service.MemberContext;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.service.MemberService;
@@ -153,7 +154,7 @@ public class MemberApiController {
         String refreshToken = request.getHeader("RefreshToken");
 
         if (refreshToken == null) {
-            throw new RefreshTokenException("RefreshToken Not Exist");
+            throw new CustomException(ErrorCode.REFRESH_TOKEN_NOT_MATCH);
         }
 
         String newRefreshToken = refreshTokenService.reProvideRefreshToken(request.getRemoteAddr(), refreshToken);
