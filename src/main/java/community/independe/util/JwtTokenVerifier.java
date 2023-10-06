@@ -6,9 +6,9 @@ import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import community.independe.domain.member.Member;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
-import community.independe.security.exception.JwtNotFoundException;
-import community.independe.security.exception.JwtVerifyException;
 import community.independe.security.service.MemberContext;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class JwtTokenVerifier {
 
         if (header == null || !header.startsWith("Bearer ")) {
             // 토큰이 없거나 Bearer로 시작하지 않으면 다음 필터로 넘긴다.
-            throw new JwtNotFoundException();
+            throw new CustomException(ErrorCode.ACCESS_TOKEN_NOT_FOUND);
         }
         // 순수 token 뽑아내기
         String token = header.replace("Bearer ", "");
@@ -48,7 +48,7 @@ public class JwtTokenVerifier {
 
         String token = getHeaderAndToken(request);
         if (token == null) {
-            throw new JwtNotFoundException();
+            throw new CustomException(ErrorCode.ACCESS_TOKEN_NOT_FOUND);
         }
 
         verify(token);
@@ -59,7 +59,7 @@ public class JwtTokenVerifier {
 
         if (header == null || !header.startsWith("Bearer ")) {
             // 토큰이 없거나 Bearer로 시작하지 않으면 다음 필터로 넘긴다.
-            throw new JwtNotFoundException();
+            throw new CustomException(ErrorCode.ACCESS_TOKEN_NOT_FOUND);
         }
 
         // 순수 token 뽑아내기
@@ -91,7 +91,7 @@ public class JwtTokenVerifier {
                 }
             }
             else {
-                throw new JwtVerifyException("Token Verification Failed");
+                throw new CustomException(ErrorCode.TOKEN_NOT_VERIFY);
             }
         } catch (ParseException e) {
             throw new RuntimeException(e);

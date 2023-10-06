@@ -1,9 +1,8 @@
 package community.independe.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import community.independe.exception.CustomException;
 import community.independe.util.UrlList;
-import community.independe.security.exception.JwtNotFoundException;
-import community.independe.security.exception.JwtVerifyException;
 import community.independe.util.JwtTokenVerifier;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -40,14 +39,8 @@ public class JwtAuthorizationMacFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
             }
 
-        } catch (RuntimeException e) {
-            if (e instanceof JwtNotFoundException) {
-                makeExceptionMessage(response, "토큰을 찾을 수 없습니다.", e);
-            } else if (e instanceof JwtVerifyException) {
-                makeExceptionMessage(response, "토큰 검증에 실패하였습니다.", e);
-            } else {
-                filterChain.doFilter(request, response);
-            }
+        } catch (CustomException e) {
+            makeExceptionMessage(response, e.getErrorCode().getErrorMessage(), e);
         }
     }
 
