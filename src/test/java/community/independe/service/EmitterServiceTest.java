@@ -78,4 +78,21 @@ public class EmitterServiceTest {
         verify(emitterRepository, times(1)).findById(memberId);
         verify(emitterRepository, times(1)).deleteById(memberId);
     }
+
+    @Test
+    void notifyTest() {
+        // given
+        Long memberId = 1L;
+        String event = "event";
+
+        // stub
+        when(emitterRepository.findById(memberId)).thenReturn(any(SseEmitter.class));
+
+        // when
+        emitterService.notify(memberId, event);
+
+        // then
+        verify(emitterRepository, times(1)).findById(memberId);
+        verifyNoMoreInteractions(emitterRepository);
+    }
 }
