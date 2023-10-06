@@ -1,7 +1,16 @@
 package community.independe.service;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import community.independe.domain.token.RefreshToken;
 import community.independe.repository.token.RefreshTokenRepository;
+import community.independe.security.provider.JwtParser;
+import community.independe.security.signature.SecuritySigner;
+import community.independe.util.JwtTokenVerifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.Mockito.*;
 
+import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +30,14 @@ public class RefreshTokenServiceTest {
     private RefreshTokenServiceImpl refreshTokenService;
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
+    @Mock
+    private JwtTokenVerifier jwtTokenVerifier;
+    @Mock
+    private SecuritySigner securitySigner;
+    @Mock
+    private JWK jwk;
+    @Mock
+    private JwtParser jwtParser;
 
     @Test
     void saveTest() {
@@ -68,5 +86,37 @@ public class RefreshTokenServiceTest {
         verify(refreshTokenRepository, times(1)).findByUsername(username);
         verify(refreshTokenRepository, times(1)).save(any(RefreshToken.class));
         verifyNoMoreInteractions(refreshTokenRepository);
+    }
+
+    @Test
+    void reProvideRefreshTokenTest() throws JOSEException, ParseException {
+        // given
+        String currentIp = "127.0.0.1";
+        String refreshToken = "Bearer smockToken.body.claim; Secure; HttpOnly";
+        RefreshToken mockRefreshToken = RefreshToken.builder().ip(currentIp).refreshToken(refreshToken).build();
+        JWSHeader header = new JWSHeader.Builder(new JWSAlgorithm("SHA1")).build();
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder().build();
+        SignedJWT signedJWT = new SignedJWT(header, jwtClaimsSet);
+
+        // stub
+        doNothing().when(jwtTokenVerifier).verifyToken(anyString());
+        when(refreshTokenRepository.findByRefreshToken(anyString()))
+                .thenReturn(mockRefreshToken);
+        when(jwtParser.parse(mockRefreshToken.getRefreshToken())).thenReturn(signedJWT);
+        when(jwtParser.getClaim(signedJWT, "username")).thenReturn("username");
+        when(securitySigner.getRefreshJwtToken(anyString(), eq(jwk))).thenReturn("token");
+        when(refreshTokenRepository.save(any(RefreshToken.class)))
+                .thenReturn(RefreshToken.builder().build());
+
+        // when
+        refreshTokenService.reProvideRefreshToken(currentIp, refreshToken);
+
+        // then
+        verify(jwtTokenVerifier, times(1)).verifyToken(anyString());
+        verify(refreshTokenRepository, times(1)).findByRefreshToken(anyString());
+        verify(jwtParser, times(1)).parse(mockRefreshToken.getRefreshToken());
+        verify(jwtParser, times(1)).getClaim(signedJWT, "username");
+        verify(securitySigner, times(1)).getRefreshJwtToken(anyString(), eq(jwk));
+        verify(refreshTokenRepository, times(1)).save(any(RefreshToken.class));
     }
 }
