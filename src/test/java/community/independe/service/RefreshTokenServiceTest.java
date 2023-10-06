@@ -7,16 +7,20 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import community.independe.domain.token.RefreshToken;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.token.RefreshTokenRepository;
 import community.independe.security.provider.JwtParser;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.util.JwtTokenVerifier;
+import org.assertj.core.api.AbstractObjectAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.text.ParseException;
@@ -118,5 +122,33 @@ public class RefreshTokenServiceTest {
         verify(jwtParser, times(1)).getClaim(signedJWT, "username");
         verify(securitySigner, times(1)).getRefreshJwtToken(anyString(), eq(jwk));
         verify(refreshTokenRepository, times(1)).save(any(RefreshToken.class));
+    }
+
+    @Test
+    void reProvideRefreshTokenRefreshFailTest() throws JOSEException {
+        // given
+        String currentIp = "127.0.0.1";
+        String refreshToken = "Bearer smockToken.body.claim; Secure; HttpOnly";
+
+        // stub
+        doNothing().when(jwtTokenVerifier).verifyToken(anyString());
+        when(refreshTokenRepository.findByRefreshToken(anyString()))
+                .thenReturn(null);
+
+        // when
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(
+                () -> refreshTokenService.reProvideRefreshToken(currentIp, refreshToken))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
+
+        // then
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.REFRESH_TOKEN_NOT_MATCH);
+        });
+        verify(jwtTokenVerifier, times(1)).verifyToken(anyString());
+        verify(refreshTokenRepository, times(1)).findByRefreshToken(anyString());
+        verifyNoInteractions(jwtParser);
+        verifyNoInteractions(securitySigner);
+        verifyNoMoreInteractions(refreshTokenRepository);
     }
 }
