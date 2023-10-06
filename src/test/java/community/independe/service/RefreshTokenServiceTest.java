@@ -151,4 +151,33 @@ public class RefreshTokenServiceTest {
         verifyNoInteractions(securitySigner);
         verifyNoMoreInteractions(refreshTokenRepository);
     }
+
+    @Test
+    void reProvideRefreshTokenIpFailTest() {
+        // given
+        String currentIp = "127.0.0.1";
+        String refreshToken = "Bearer smockToken.body.claim; Secure; HttpOnly";
+        RefreshToken mockRefreshToken = RefreshToken.builder().ip("0.0.0.0").refreshToken(refreshToken).build();
+
+        // stub
+        doNothing().when(jwtTokenVerifier).verifyToken(anyString());
+        when(refreshTokenRepository.findByRefreshToken(anyString()))
+                .thenReturn(mockRefreshToken);
+
+        // when
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(
+                () -> refreshTokenService.reProvideRefreshToken(currentIp, refreshToken))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
+
+        // then
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.REFRESH_IP_NOT_MATCH);
+        });
+        verify(jwtTokenVerifier, times(1)).verifyToken(anyString());
+        verify(refreshTokenRepository, times(1)).findByRefreshToken(anyString());
+        verifyNoInteractions(jwtParser);
+        verifyNoInteractions(securitySigner);
+        verifyNoMoreInteractions(refreshTokenRepository);
+    }
 }
