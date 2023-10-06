@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -35,9 +36,12 @@ public class FilesServiceTest {
         // given
         Long postId = 1L;
         List<MultipartFile> multipartFiles = new ArrayList<>();
+        multipartFiles.add(new MockMultipartFile("firstFile", "firstFileContent".getBytes()));
+        multipartFiles.add(new MockMultipartFile("secondFile", "secondFileContent".getBytes()));
 
         // stub
         when(postRepository.findById(postId)).thenReturn(Optional.of(Post.builder().build()));
+        when(filesRepository.save(any(Files.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when
         List<Files> savedFiles = filesService.saveFiles(multipartFiles, postId);
@@ -46,8 +50,6 @@ public class FilesServiceTest {
         assertThat(savedFiles.size()).isEqualTo(multipartFiles.size());
         verify(filesRepository, times(multipartFiles.size())).save(any(Files.class));
     }
-
-    // todo save test
 
     @Test
     public void findByIdTest() {
