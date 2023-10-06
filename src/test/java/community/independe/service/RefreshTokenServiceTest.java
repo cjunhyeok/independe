@@ -180,4 +180,35 @@ public class RefreshTokenServiceTest {
         verifyNoInteractions(securitySigner);
         verifyNoMoreInteractions(refreshTokenRepository);
     }
+
+    @Test
+    void reProvideRefreshTokenParseFailTest() throws ParseException {
+        // given
+        String currentIp = "127.0.0.1";
+        String refreshToken = "Bearer smockToken.body.claim; Secure; HttpOnly";
+        RefreshToken mockRefreshToken = RefreshToken.builder().ip(currentIp).refreshToken(refreshToken).build();
+        
+        // stub
+        doNothing().when(jwtTokenVerifier).verifyToken(anyString());
+        when(refreshTokenRepository.findByRefreshToken(anyString()))
+                .thenReturn(mockRefreshToken);
+
+        when(jwtParser.parse(mockRefreshToken.getRefreshToken())).thenThrow(ParseException.class);
+
+        // when
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(
+                () -> refreshTokenService.reProvideRefreshToken(currentIp, refreshToken))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
+
+        // then
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.REFRESH_TOKEN_NOT_MATCH);
+        });
+        verify(jwtTokenVerifier, times(1)).verifyToken(anyString());
+        verify(refreshTokenRepository, times(1)).findByRefreshToken(anyString());
+        verify(jwtParser, times(1)).parse(mockRefreshToken.getRefreshToken());
+        verifyNoInteractions(securitySigner);
+        verifyNoMoreInteractions(refreshTokenRepository);
+    }
 }
