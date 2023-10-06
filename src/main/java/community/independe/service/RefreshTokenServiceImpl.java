@@ -2,11 +2,12 @@ package community.independe.service;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jwt.JWTParser;
+import com.nimbusds.jwt.JWT;
 import community.independe.domain.token.RefreshToken;
 import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.repository.token.RefreshTokenRepository;
+import community.independe.security.provider.JwtParser;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.util.JwtTokenVerifier;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final JwtTokenVerifier jwtTokenVerifier;
     private final SecuritySigner securitySigner;
     private final JWK jwk;
+    private final JwtParser jwtParser;
 
     @Override
     public String save(String ip, Set<String> authorities, String refreshToken, String username) {
@@ -71,8 +73,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         String username;
         String newRefreshToken;
         try {
-            username = (String) JWTParser.parse(findRefreshToken.getRefreshToken())
-                    .getJWTClaimsSet().getClaim("username");
+
+            JWT parsedJwt = jwtParser.parse(findRefreshToken.getRefreshToken());
+            username = jwtParser.getClaim(parsedJwt, "username");
 
             newRefreshToken = securitySigner.getRefreshJwtToken(username, jwk);
 
