@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
+
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,5 +57,25 @@ public class EmitterServiceTest {
         verify(emitterRepository, times(1)).save(anyLong(), any(SseEmitter.class));
         verify(emitterRepository, times(1)).findById(memberId);
         verifyNoMoreInteractions(emitterRepository);
+    }
+
+    @Test
+    void subscribeExceptionTest() throws IOException {
+        // given
+        Long memberId = 1L;
+        SseEmitter mockSseEmitter = mock(SseEmitter.class);
+
+        // stub
+        doNothing().when(emitterRepository).save(anyLong(), any(SseEmitter.class));
+        when(emitterRepository.findById(memberId)).thenReturn(mockSseEmitter);
+        doThrow(new IOException()).when(mockSseEmitter).send(any());
+
+        // when
+        emitterService.subscribe(memberId);
+
+        // then
+        verify(emitterRepository, times(1)).save(anyLong(), any(SseEmitter.class));
+        verify(emitterRepository, times(1)).findById(memberId);
+        verify(emitterRepository, times(1)).deleteById(memberId);
     }
 }
