@@ -3,8 +3,10 @@ package community.independe.service;
 import community.independe.domain.file.Files;
 import community.independe.domain.post.Post;
 import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.file.FilesRepository;
 import community.independe.repository.post.PostRepository;
+import org.assertj.core.api.AbstractObjectAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,7 +34,7 @@ public class FilesServiceTest {
     private PostRepository postRepository;
 
     @Test
-    public void saveFilesTest() throws IOException {
+    void saveFilesTest() throws IOException {
         // given
         Long postId = 1L;
         List<MultipartFile> multipartFiles = new ArrayList<>();
@@ -52,7 +54,28 @@ public class FilesServiceTest {
     }
 
     @Test
-    public void findByIdTest() {
+    void saveFilesPostFailTest() {
+        // given
+        Long postId = 1L;
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+
+        // stub
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+        // when
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> filesService.saveFiles(multipartFiles, postId))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
+
+        // then
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.POST_NOT_FOUND);
+        });
+        verifyNoInteractions(filesRepository);
+    }
+
+    @Test
+    void findByIdTest() {
         // given
         Long id = 1L;
         Files mockFiles = Files.builder().build();
