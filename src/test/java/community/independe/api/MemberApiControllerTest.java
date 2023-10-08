@@ -19,6 +19,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -242,6 +243,22 @@ public class MemberApiControllerTest {
 
         // then
          perform.andExpect(status().isOk());
+    }
+
+    @Test
+    void refreshTokenTest() throws Exception {
+        // given
+
+        // when
+        ResultActions perform = mockMvc.perform(post("/api/refreshToken")
+                .header("RefreshToken", "Bearer " + refreshToken));
+        Cookie cookie = perform.andReturn().getResponse().getCookie("refreshToken");
+        String header = perform.andReturn().getResponse().getHeader("Authorization");
+
+        // then
+        perform.andExpect(status().isOk());
+        assertThat(cookie.getValue()).isNotEmpty();
+        assertThat(header).isNotEmpty();
     }
 
     private void getAccessAndRefreshToken() throws Exception {
