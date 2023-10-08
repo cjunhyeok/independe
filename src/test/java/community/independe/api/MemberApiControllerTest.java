@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.TestExecutionEvent;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -56,21 +54,20 @@ public class MemberApiControllerTest {
 
     @Test
     void authenticateRegionTest() throws Exception {
-
         AuthenticationRegionRequest request = new AuthenticationRegionRequest();
         request.setRegion("경남");
 
         // 실행 및 검증
         mockMvc.perform(post("/api/members/region")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("Authorization", accessToken))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Success Region Authentication"));
     }
 
     @Test
     void createMemberTest() throws Exception {
-
         // given
         CreateMemberRequest createMemberRequest = new CreateMemberRequest();
         createMemberRequest.setUsername("username");
@@ -89,7 +86,6 @@ public class MemberApiControllerTest {
 
     @Test
     void createMemberFailTest() throws Exception {
-
         // given
         CreateMemberRequest createMemberRequest = new CreateMemberRequest();
         createMemberRequest.setUsername("testUsername");
@@ -108,7 +104,6 @@ public class MemberApiControllerTest {
 
     @Test
     void duplicateUsernameTest() throws Exception {
-
         // given
         DuplicateUsernameRequest duplicateUsernameRequest = new DuplicateUsernameRequest();
         duplicateUsernameRequest.setUsername("username");
@@ -125,7 +120,6 @@ public class MemberApiControllerTest {
 
     @Test
     void duplicateUsernameFailTest() throws Exception {
-
         // given
         DuplicateUsernameRequest duplicateUsernameRequest = new DuplicateUsernameRequest();
         duplicateUsernameRequest.setUsername("testUsername");
@@ -142,7 +136,6 @@ public class MemberApiControllerTest {
 
     @Test
     void duplicateNicknameTest() throws Exception {
-
         // given
         DuplicateNicknameRequest duplicateNicknameRequest = new DuplicateNicknameRequest();
         duplicateNicknameRequest.setNickname("nickname");
@@ -159,7 +152,6 @@ public class MemberApiControllerTest {
 
     @Test
     void duplicateNicknameFailTest() throws Exception {
-
         // given
         DuplicateNicknameRequest duplicateNicknameRequest = new DuplicateNicknameRequest();
         duplicateNicknameRequest.setNickname("testNickname");
@@ -176,12 +168,12 @@ public class MemberApiControllerTest {
 
     @Test
     void membersTest() throws Exception {
-
         // given
 
         // when
         ResultActions perform = mockMvc.perform(get("/api/members")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", accessToken)
                 .with(csrf()));
 
         // then
@@ -193,9 +185,7 @@ public class MemberApiControllerTest {
     }
 
     @Test
-    @WithUserDetails(value = "modifyMember", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void modifyOAuthMembersTest() throws Exception {
-
         // given
         OAuthMemberRequest oAuthMemberRequest = new OAuthMemberRequest();
         oAuthMemberRequest.setNickname("OAuthNick");
@@ -206,6 +196,7 @@ public class MemberApiControllerTest {
         ResultActions perform = mockMvc.perform(put("/api/oauth/members")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(oAuthMemberRequest))
+                .header("Authorization", accessToken)
                 .with(csrf()));
 
         // then
@@ -214,9 +205,7 @@ public class MemberApiControllerTest {
 
 
     @Test
-    @WithUserDetails(value = "modifyMember", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void modifyMembersTest() throws Exception {
-
         // given
         ModifyMemberRequest modifyMemberRequest = new ModifyMemberRequest();
         modifyMemberRequest.setUsername("modifyUsername");
@@ -227,6 +216,7 @@ public class MemberApiControllerTest {
         ResultActions perform = mockMvc.perform(put("/api/members")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(modifyMemberRequest))
+                .header("Authorization", accessToken)
                 .with(csrf()));
 
         // then
