@@ -3,6 +3,7 @@ package community.independe.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import community.independe.api.dtos.member.*;
 import community.independe.service.MemberService;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,7 @@ public class MemberApiControllerTest {
     private TransactionStatus transactionStatus;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private String accessToken;
+    private String refreshToken;
 
     @BeforeEach
     public void setup() throws Exception {
@@ -44,7 +46,7 @@ public class MemberApiControllerTest {
         memberService.join("testUsername", "testPasswrod1!", "testNickname", null, null);
         memberService.join("modifyMember", "testPasswrod1!", "modifyNickname", null, null);
 
-        getAccessToken();
+        getAccessAndRefreshToken();
     }
 
     @AfterEach
@@ -242,7 +244,7 @@ public class MemberApiControllerTest {
          perform.andExpect(status().isOk());
     }
 
-    private void getAccessToken() throws Exception {
+    private void getAccessAndRefreshToken() throws Exception {
         String username = "testUsername";
         String password = "testPasswrod1!";
 
@@ -254,6 +256,8 @@ public class MemberApiControllerTest {
                 )))
                 .with(csrf()));
 
-        this.accessToken = perform.andReturn().getResponse().getHeader("Authorization");
+        Cookie refreshTokenCookie = perform.andReturn().getResponse().getCookie("refreshToken");
+        refreshToken = refreshTokenCookie.getValue();
+        accessToken = perform.andReturn().getResponse().getHeader("Authorization");
     }
 }
