@@ -37,13 +37,16 @@ public class MemberApiControllerTest {
 
     private TransactionStatus transactionStatus;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private String accessToken;
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws Exception {
         transactionStatus = transactionManager.getTransaction(new DefaultTransactionDefinition());
 
         memberService.join("testUsername", "testPasswrod1!", "testNickname", null, null);
         memberService.join("modifyMember", "testPasswrod1!", "modifyNickname", null, null);
+
+        getAccessToken();
     }
 
     @AfterEach
@@ -52,7 +55,6 @@ public class MemberApiControllerTest {
     }
 
     @Test
-    @WithUserDetails(value = "testUsername", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void authenticateRegionTest() throws Exception {
 
         AuthenticationRegionRequest request = new AuthenticationRegionRequest();
@@ -173,7 +175,6 @@ public class MemberApiControllerTest {
     }
 
     @Test
-    @WithUserDetails(value = "testUsername", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void membersTest() throws Exception {
 
         // given
@@ -249,5 +250,20 @@ public class MemberApiControllerTest {
 
         // then
          perform.andExpect(status().isOk());
+    }
+
+    private void getAccessToken() throws Exception {
+        String username = "testUsername";
+        String password = "testPasswrod1!";
+
+        ResultActions perform = mockMvc.perform(post("/api/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of(
+                        "username", username,
+                        "password", password
+                )))
+                .with(csrf()));
+
+        this.accessToken = perform.andReturn().getResponse().getHeader("Authorization");
     }
 }
