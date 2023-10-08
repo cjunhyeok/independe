@@ -26,7 +26,8 @@ public abstract class UrlList {
             "/api/posts/update",
             "/api/chat/**",
             "/api/emitter/**",
-            "/api/comments/**"
+            "/api/comments/**",
+            "/api/members"
     };
 
     public static String[] getWhiteList() {
