@@ -22,11 +22,9 @@ public enum ErrorCode {
     POST_NOT_FOUND(HttpStatus.BAD_REQUEST, "게시글이 존재하지 않습니다."),
     FILE_NOT_FOUND(HttpStatus.BAD_REQUEST, "파일이 존재하지 않습니다."),
     CHAT_ROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "채팅방이 존재하지 않습니다."),
-    REGION_NOT_AUTHENTICATE(HttpStatus.FORBIDDEN, "위치 인증이 완료되지 않았습니다."),
+    REGION_NOT_AUTHENTICATE(HttpStatus.BAD_REQUEST, "위치 인증이 완료되지 않았습니다."),
     USERNAME_DUPLICATED(HttpStatus.BAD_REQUEST, "중복된 ID 입니다."),
     NICKNAME_DUPLICATED(HttpStatus.BAD_REQUEST, "중복된 닉네임 입니다.");
-
-
 
     private final HttpStatus status;
     private final String errorMessage;

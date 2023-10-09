@@ -103,7 +103,7 @@ public class MemberApiController {
         } else if (region.equals("경남")) {
             return RegionType.KYEONGNAM;
         } else {
-            throw new IllegalArgumentException("region not exist");
+            throw new CustomException(ErrorCode.REGION_NOT_AUTHENTICATE);
         }
     }
 
