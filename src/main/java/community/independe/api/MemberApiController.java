@@ -184,7 +184,7 @@ public class MemberApiController {
             username = (String) JWTParser.parse(sampleToken)
                     .getJWTClaimsSet().getClaim("username");
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            throw new CustomException(ErrorCode.TOKEN_NOT_VERIFY);
         }
         return username;
     }
