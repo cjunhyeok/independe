@@ -296,6 +296,19 @@ public class MemberApiControllerTest {
         perform.andExpect(status().isBadRequest());
     }
 
+    @Test
+    void refreshTokenParseFailTest() throws Exception {
+        // given
+        refreshToken = refreshToken.replace(".", ".adsfas");
+
+        // when
+        ResultActions perform = mockMvc.perform(post("/api/refreshToken")
+                .header("RefreshToken", "Bearer " + refreshToken));
+
+        // then
+        perform.andExpect(status().isUnauthorized());
+    }
+
     private void getAccessAndRefreshToken() throws Exception {
         String username = "testUsername";
         String password = "testPasswrod1!";
