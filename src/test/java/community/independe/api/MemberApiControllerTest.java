@@ -285,6 +285,17 @@ public class MemberApiControllerTest {
         assertThat(header).isNotEmpty();
     }
 
+    @Test
+    void refreshTokenFindFailTest() throws Exception {
+        // given
+
+        // when
+        ResultActions perform = mockMvc.perform(post("/api/refreshToken"));
+
+        // then
+        perform.andExpect(status().isBadRequest());
+    }
+
     private void getAccessAndRefreshToken() throws Exception {
         String username = "testUsername";
         String password = "testPasswrod1!";
