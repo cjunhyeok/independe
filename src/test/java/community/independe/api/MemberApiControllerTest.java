@@ -70,6 +70,30 @@ public class MemberApiControllerTest {
     }
 
     @Test
+    void authenticationBranchTest() throws Exception {
+        // given
+        AuthenticationRegionRequest request = new AuthenticationRegionRequest();
+        String[] regions = new String[]{"서울", "울산", "부산", "경남", "대전"};
+
+        // when
+        for (String region : regions) {
+            request.setRegion(region);
+
+            ResultActions perform = mockMvc.perform(post("/api/members/region")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request))
+                    .header("Authorization", accessToken));
+
+            // then
+            if (region.equals("대전")) {
+                perform.andExpect(status().isBadRequest());
+            } else {
+                perform.andExpect(status().isOk());
+            }
+        }
+    }
+
+    @Test
     void createMemberTest() throws Exception {
         // given
         CreateMemberRequest createMemberRequest = new CreateMemberRequest();
