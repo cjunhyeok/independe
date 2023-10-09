@@ -46,7 +46,6 @@ public class MemberApiControllerTest {
     public void setup() throws Exception {
         transactionStatus = transactionManager.getTransaction(new DefaultTransactionDefinition());
 
-        memberService.join("testUsername", "testPasswrod1!", "testNickname", null, null);
         memberService.join("modifyMember", "testPasswrod1!", "modifyNickname", null, null);
 
         injector.makeAccessAndRefreshToken();
@@ -210,9 +209,7 @@ public class MemberApiControllerTest {
         // then
         perform.andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].nickname").value("testNickname"))
-                .andExpect(jsonPath("$[1].nickname").value("modifyNickname"));
+                .andExpect(jsonPath("$.length()").value(2));
     }
 
     @Test

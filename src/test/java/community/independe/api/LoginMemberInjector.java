@@ -1,6 +1,7 @@
 package community.independe.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import community.independe.service.MemberService;
 import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -18,11 +19,15 @@ public class LoginMemberInjector {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private MemberService memberService;
     private ObjectMapper objectMapper = new ObjectMapper();
     private String refreshToken;
     private String accessToken;
 
     public void makeAccessAndRefreshToken() throws Exception {
+        memberService.join("testUsername", "testPasswrod1!", "testNickname", null, null);
+
         String username = "testUsername";
         String password = "testPasswrod1!";
 
