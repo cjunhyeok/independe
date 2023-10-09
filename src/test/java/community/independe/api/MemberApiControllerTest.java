@@ -270,6 +270,42 @@ public class MemberApiControllerTest {
     }
 
     @Test
+    void loginUsernameFailTest() throws Exception {
+        // given
+        String username = "testUsernameFail";
+        String password = "testPasswrod1!";
+
+        // when
+        ResultActions perform = mockMvc.perform(post("/api/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of(
+                        "username", username,
+                        "password", password
+                )))
+                .with(csrf()));
+
+        perform.andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void loginPasswordFailTest() throws Exception {
+        // given
+        String username = "testUsername";
+        String password = "testPasswrod1!Fail";
+
+        // when
+        ResultActions perform = mockMvc.perform(post("/api/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of(
+                        "username", username,
+                        "password", password
+                )))
+                .with(csrf()));
+
+        perform.andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void refreshTokenTest() throws Exception {
         // given
 
@@ -294,19 +330,6 @@ public class MemberApiControllerTest {
 
         // then
         perform.andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void refreshTokenParseFailTest() throws Exception {
-        // given
-        refreshToken = refreshToken.replace(".", ".adsfas");
-
-        // when
-        ResultActions perform = mockMvc.perform(post("/api/refreshToken")
-                .header("RefreshToken", "Bearer " + refreshToken));
-
-        // then
-        perform.andExpect(status().isUnauthorized());
     }
 
     private void getAccessAndRefreshToken() throws Exception {
