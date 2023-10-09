@@ -33,6 +33,8 @@ public class MemberApiControllerTest {
     @Autowired
     private MemberService memberService;
     @Autowired
+    private LoginMemberInjector injector;
+    @Autowired
     private PlatformTransactionManager transactionManager;
 
     private TransactionStatus transactionStatus;
@@ -47,7 +49,9 @@ public class MemberApiControllerTest {
         memberService.join("testUsername", "testPasswrod1!", "testNickname", null, null);
         memberService.join("modifyMember", "testPasswrod1!", "modifyNickname", null, null);
 
-        getAccessAndRefreshToken();
+        injector.makeAccessAndRefreshToken();
+        accessToken = injector.getAccessToken();
+        refreshToken = injector.getRefreshToken();
     }
 
     @AfterEach
@@ -330,22 +334,5 @@ public class MemberApiControllerTest {
 
         // then
         perform.andExpect(status().isBadRequest());
-    }
-
-    private void getAccessAndRefreshToken() throws Exception {
-        String username = "testUsername";
-        String password = "testPasswrod1!";
-
-        ResultActions perform = mockMvc.perform(post("/api/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Map.of(
-                        "username", username,
-                        "password", password
-                )))
-                .with(csrf()));
-
-        Cookie refreshTokenCookie = perform.andReturn().getResponse().getCookie("refreshToken");
-        refreshToken = refreshTokenCookie.getValue();
-        accessToken = perform.andReturn().getResponse().getHeader("Authorization");
     }
 }
