@@ -2,12 +2,13 @@ package community.independe.api;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jwt.JWTParser;
+import com.nimbusds.jwt.JWT;
 import community.independe.api.dtos.member.*;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
+import community.independe.security.provider.JwtParser;
 import community.independe.security.service.MemberContext;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.service.MemberService;
@@ -37,6 +38,7 @@ public class MemberApiController {
     private final RefreshTokenService refreshTokenService;
     private final SecuritySigner securitySigner;
     private final JWK jwk;
+    private final JwtParser jwtParser;
 
     @Operation(summary = "회원 등록 요청")
     @PostMapping("/api/members/new")
@@ -149,7 +151,7 @@ public class MemberApiController {
     }
 
     @PostMapping("/api/refreshToken")
-    public ResponseEntity refreshToken(HttpServletRequest request, HttpServletResponse response) throws JOSEException {
+    public ResponseEntity refreshToken(HttpServletRequest request, HttpServletResponse response) throws JOSEException, ParseException {
 
         String refreshToken = request.getHeader("RefreshToken");
 
@@ -175,17 +177,12 @@ public class MemberApiController {
         response.addHeader("Authorization", "Bearer " + jwtToken);
     }
 
-    private String getUsernameFromToken(String refreshToken) {
+    private String getUsernameFromToken(String refreshToken) throws ParseException {
         String sampleToken
                 = refreshToken.replace("; Secure; HttpOnly", "").replace("Bearer ", "");
 
-        String username;
-        try {
-            username = (String) JWTParser.parse(sampleToken)
-                    .getJWTClaimsSet().getClaim("username");
-        } catch (ParseException e) {
-            throw new CustomException(ErrorCode.TOKEN_NOT_VERIFY);
-        }
-        return username;
+        JWT parsedJwt = jwtParser.parse(sampleToken);
+
+        return jwtParser.getClaim(parsedJwt, "username");
     }
 }
