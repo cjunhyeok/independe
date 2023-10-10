@@ -71,7 +71,6 @@ public class PostApiController {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
 
-
         // 게시글 불러오기
 //        Page<Post> allIndependentPosts =
 //                postService.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
@@ -119,12 +118,8 @@ public class PostApiController {
                                                       @Parameter(description = "이미지") @RequestParam(required = false) List<MultipartFile> files,
                                                       @AuthenticationPrincipal MemberContext memberContext) throws IOException {
 
-        Long memberId = null;
-        if (memberContext == null) {
-            memberId = null;
-        } else {
-            memberId = memberContext.getMember().getId();
-        }
+        Member loginMember = memberContext.getMember();
+        Long memberId = loginMember.getId();
 
         Long independentPost = postService.createIndependentPost(
                 memberId,
@@ -189,12 +184,8 @@ public class PostApiController {
                                                  @Parameter(description = "이미지") @RequestParam(required = false) List<MultipartFile> files,
                                                  @AuthenticationPrincipal MemberContext memberContext) throws IOException {
 
-        Long memberId = null;
-        if (memberContext == null) {
-            memberId = null;
-        } else {
-            memberId = memberContext.getMember().getId();
-        }
+        Member loginMember = memberContext.getMember();
+        Long memberId = loginMember.getId();
 
         Long regionPost = postService.createRegionPost(
                 memberId,
