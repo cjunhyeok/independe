@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.TestExecutionEvent;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -39,14 +37,20 @@ public class CommentApiControllerTest {
     @Autowired
     private MemberService memberService;
     @Autowired
+    private LoginMemberInjector injector;
+    @Autowired
     private PlatformTransactionManager transactionManager;
     private TransactionStatus transactionStatus;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private String accessToken;
+    private String refreshToken;
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws Exception {
         transactionStatus = transactionManager.getTransaction(new DefaultTransactionDefinition());
-        memberService.join("username", "testPass1!", "testNick", null, null);
+        injector.makeAccessAndRefreshToken();
+        accessToken = injector.getAccessToken();
+        refreshToken = injector.getRefreshToken();
     }
 
     @AfterEach
@@ -55,12 +59,11 @@ public class CommentApiControllerTest {
     }
 
     @Test
-    @WithUserDetails(value = "username", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void createParentCommentTest() throws Exception {
         // given
         String content = "content";
         CreateParentCommentRequest createParentCommentRequest = new CreateParentCommentRequest();
-        Member testUser = memberService.findByUsername("username");
+        Member testUser = memberService.findByUsername("testUsername");
         Long savedIndependentPostId = postService.createIndependentPost(testUser.getId(), "title", "content", IndependentPostType.COOK);
         createParentCommentRequest.setContent(content);
         createParentCommentRequest.setPostId(savedIndependentPostId);
@@ -68,6 +71,7 @@ public class CommentApiControllerTest {
         // when
         ResultActions perform = mockMvc.perform(post("/api/comments/parent/new")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", accessToken)
                 .content(objectMapper.writeValueAsString(createParentCommentRequest)));
 
         // then
@@ -75,11 +79,10 @@ public class CommentApiControllerTest {
     }
 
     @Test
-    @WithUserDetails(value = "username", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void createChildComment() throws Exception {
         // given
         String content = "content";
-        Member testUser = memberService.findByUsername("username");
+        Member testUser = memberService.findByUsername("testUsername");
         Long savedIndependentPostId = postService.createIndependentPost(testUser.getId(), "title", "content", IndependentPostType.COOK);
         Long savedParentCommentId = commentService.createParentComment(testUser.getId(), savedIndependentPostId, content);
         CreateChildCommentRequest createChildCommentRequest = new CreateChildCommentRequest();
@@ -90,6 +93,7 @@ public class CommentApiControllerTest {
         // when
         ResultActions perform = mockMvc.perform(post("/api/comments/child/new")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", accessToken)
                 .content(objectMapper.writeValueAsString(createChildCommentRequest)));
 
         // then
