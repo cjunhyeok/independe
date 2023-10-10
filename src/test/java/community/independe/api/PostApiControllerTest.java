@@ -6,9 +6,9 @@ import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
-import community.independe.service.CommentService;
-import community.independe.service.MemberService;
-import community.independe.service.PostService;
+import community.independe.domain.video.Video;
+import community.independe.repository.video.VideoRepository;
+import community.independe.service.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,12 +17,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -40,6 +45,10 @@ public class PostApiControllerTest {
     private MemberService memberService;
     @Autowired
     private CommentService commentService;
+    @Autowired
+    private FilesService filesService;
+    @Autowired
+    private VideoRepository videoRepository;
     @Autowired
     private LoginMemberInjector injector;
     @Autowired
@@ -85,6 +94,45 @@ public class PostApiControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].recommendCount").value(0))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].commentCount").value(0))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].picture").value(false))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.count").value(1));
+    }
+
+    @Test
+    void independentPostKeywordTest() throws Exception {
+        // given
+        Member testUser = memberService.findByUsername("testUsername");
+        Long savedIndependentPost = postService.createIndependentPost(testUser.getId(),
+                "testTitle",
+                "testContent",
+                IndependentPostType.CLEAN);
+        Video video = Video.builder()
+                .videoTitle("만약 집에 씽크대가 있으면 꼭 봐야 할 영상!(놀라운 효과 증명) [싱크대/배수구/청소/냄새/악취/제거]")
+                .videoUrl("https://www.youtube.com/embed/2p96FCJHjUM")
+                .materName("살림톡")
+                .independentPostType(IndependentPostType.CLEAN)
+                .views(19000)
+                .build();
+        videoRepository.save(video);
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+        multipartFiles.add(new MockMultipartFile("firstFile", "firstFileContent".getBytes()));
+        filesService.saveFiles(multipartFiles, savedIndependentPost);
+
+
+        // when
+        ResultActions perform = mockMvc.perform(get("/api/posts/independent/CLEAN")
+                .param("keyword", "test"));
+
+        // then
+        perform
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].postId").value(savedIndependentPost))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].nickName").value("testNickname"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].title").value("testTitle"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].views").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].recommendCount").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].commentCount").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.postsResponses[0].picture").value(true))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.count").value(1));
     }
 
