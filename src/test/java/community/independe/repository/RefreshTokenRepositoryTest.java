@@ -3,9 +3,9 @@ package community.independe.repository;
 import community.independe.domain.token.RefreshToken;
 import community.independe.repository.token.RefreshTokenRepository;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashSet;
@@ -13,8 +13,9 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.*;
 
-@Disabled
+//@Disabled
 @SpringBootTest
+@AutoConfigureMockMvc
 public class RefreshTokenRepositoryTest {
 
     @Autowired
@@ -49,6 +50,7 @@ public class RefreshTokenRepositoryTest {
         assertThat(findRefreshToken.getRefreshToken()).isEqualTo(savedRefreshToken.getRefreshToken());
         assertThat(findRefreshToken.getUsername()).isEqualTo(savedRefreshToken.getUsername());
         assertThat(findRefreshToken.getAuthorities()).isEqualTo(savedRefreshToken.getAuthorities());
+        assertThat(findRefreshToken.getIp()).isEqualTo(savedRefreshToken.getIp());
     }
 
     @Test
