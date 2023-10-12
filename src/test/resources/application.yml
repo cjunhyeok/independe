@@ -13,3 +13,14 @@ spring:
         format_sql: true
         default_batch_fetch_size: 100
     defer-datasource-initialization: true
+
+cloud:
+  aws:
+    credentials:
+      access-key: "mockKey"
+      secret-key: "mockSecret"
+    s3:
+      bucket: mockBucket
+    stack.auto: false #기본 cloudFormation 구성 시작 사용 x
+    region:
+      static: ap-northeast-2
