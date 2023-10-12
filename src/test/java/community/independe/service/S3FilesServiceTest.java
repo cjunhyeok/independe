@@ -98,5 +98,24 @@ public class S3FilesServiceTest {
 
         // then
         assertThat(findFiles).isEqualTo(files);
+        verify(filesRepository, times(1)).findAllFilesByPostId(postId);
+    }
+
+    @Test
+    void findByIdTest() {
+        // given
+        Long filesId = 1L;
+        Files files = Files.builder().build();
+
+
+        // stub
+        when(filesRepository.findById(filesId)).thenReturn(Optional.of(files));
+
+        // when
+        Files findFiles = filesService.findById(filesId);
+
+        // then
+        assertThat(findFiles).isEqualTo(files);
+        verify(filesRepository, times(1)).findById(filesId);
     }
 }
