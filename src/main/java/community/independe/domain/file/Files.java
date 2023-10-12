@@ -20,17 +20,17 @@ public class Files {
 
     private String uploadFilename; // 사용자가 업로드한 파일명
     private String storeFilename; // 서버에 저장한 파일명
-    private String filePath; // 파일 저장 경로
+    private String s3Url; // 파일 저장 경로
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "post_id")
     private Post post; // 파일, 게시글 -> N : 1
 
     @Builder
-    public Files(String uploadFilename, String storeFilename, String filePath, Post post) {
+    public Files(String uploadFilename, String storeFilename, String s3Url, Post post) {
         this.uploadFilename = uploadFilename;
         this.storeFilename = storeFilename;
-        this.filePath = filePath;
+        this.s3Url = s3Url;
         this.post = post;
     }
 }

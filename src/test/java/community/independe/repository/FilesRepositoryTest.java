@@ -51,7 +51,7 @@ public class FilesRepositoryTest {
         Files files = Files.builder()
                 .uploadFilename("upload")
                 .storeFilename("store")
-                .filePath("path")
+                .s3Url("path")
                 .post(savedPost)
                 .build();
 
@@ -59,7 +59,7 @@ public class FilesRepositoryTest {
         Files savedFiles = filesRepository.save(files);
 
         // then
-        assertThat(savedFiles.getFilePath()).isEqualTo(files.getFilePath());
+        assertThat(savedFiles.getS3Url()).isEqualTo(files.getS3Url());
         assertThat(savedFiles.getUploadFilename()).isEqualTo(files.getUploadFilename());
         assertThat(savedFiles.getStoreFilename()).isEqualTo(files.getStoreFilename());
         assertThat(savedFiles.getPost()).isEqualTo(files.getPost());
@@ -88,7 +88,7 @@ public class FilesRepositoryTest {
             Files files = Files.builder()
                     .uploadFilename("upload" + i)
                     .storeFilename("store" + i)
-                    .filePath("path" + i)
+                    .s3Url("path" + i)
                     .post(savedPost)
                     .build();
             Files savedFiles = filesRepository.save(files);
@@ -103,7 +103,7 @@ public class FilesRepositoryTest {
         Files nextFiles = Files.builder()
                 .uploadFilename("nextUpload")
                 .storeFilename("nextStore")
-                .filePath("nextPath")
+                .s3Url("nextPath")
                 .post(savedNextPost)
                 .build();
         Files savedNextFiles = filesRepository.save(nextFiles);
@@ -113,7 +113,7 @@ public class FilesRepositoryTest {
 
         // then
         assertThat(findAllFilesByPostId.size()).isEqualTo(5);
-        assertThat(findAllFilesByPostId.get(2).getFilePath()).isEqualTo("path2");
+        assertThat(findAllFilesByPostId.get(2).getS3Url()).isEqualTo("path2");
     }
 
     @Test
@@ -137,7 +137,7 @@ public class FilesRepositoryTest {
         Files files = Files.builder()
                 .uploadFilename("upload")
                 .storeFilename("store")
-                .filePath("path")
+                .s3Url("path")
                 .post(savedPost)
                 .build();
         Files savedFiles = filesRepository.save(files);
