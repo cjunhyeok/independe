@@ -4,8 +4,11 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import community.independe.domain.file.Files;
 import community.independe.domain.post.Post;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.file.FilesRepository;
 import community.independe.repository.post.PostRepository;
+import org.assertj.core.api.AbstractObjectAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -55,5 +59,28 @@ public class S3FilesServiceTest {
         verify(postRepository, times(1)).findById(postId);
         verify(amazonS3Client, times(2)).putObject(any(PutObjectRequest.class)); // s3 업로드 횟수 확인
         verify(amazonS3Client, times(2)).getUrl(any(), any()); // s3 조회 횟수 확인
+    }
+
+    @Test
+    void saveFilesPostFailTest() {
+        // given
+        Long postId = 1L;
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+
+        // stub
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+        // when
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> filesService.saveFiles(multipartFiles, postId))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
+
+        // then
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.POST_NOT_FOUND);
+        });
+        verify(postRepository, times(1)).findById(postId);
+        verifyNoInteractions(amazonS3Client);
+        verifyNoInteractions(filesRepository);
     }
 }
