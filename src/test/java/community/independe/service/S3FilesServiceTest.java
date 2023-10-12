@@ -83,4 +83,20 @@ public class S3FilesServiceTest {
         verifyNoInteractions(amazonS3Client);
         verifyNoInteractions(filesRepository);
     }
+
+    @Test
+    void findAllFilesByPostIdTest() {
+        // given
+        Long postId = 1L;
+        List<Files> files = new ArrayList<>();
+
+        // stub
+        when(filesRepository.findAllFilesByPostId(postId)).thenReturn(files);
+
+        // when
+        List<Files> findFiles = filesService.findAllFilesByPostId(postId);
+
+        // then
+        assertThat(findFiles).isEqualTo(files);
+    }
 }
