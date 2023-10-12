@@ -107,7 +107,6 @@ public class S3FilesServiceTest {
         Long filesId = 1L;
         Files files = Files.builder().build();
 
-
         // stub
         when(filesRepository.findById(filesId)).thenReturn(Optional.of(files));
 
@@ -116,6 +115,26 @@ public class S3FilesServiceTest {
 
         // then
         assertThat(findFiles).isEqualTo(files);
+        verify(filesRepository, times(1)).findById(filesId);
+    }
+
+    @Test
+    void findByIdFailTest() {
+        // given
+        Long filesId = 1L;
+
+        // stub
+        when(filesRepository.findById(filesId)).thenReturn(Optional.empty());
+
+        // when
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> filesService.findById(filesId))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
+
+        // then
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.FILE_NOT_FOUND);
+        });
         verify(filesRepository, times(1)).findById(filesId);
     }
 }
