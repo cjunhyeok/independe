@@ -71,18 +71,17 @@ public class SecurityConfig {
 //        http.authorizeHttpRequests()
 //                        .anyRequest().permitAll();
 
-//        http.oauth2Login()
-//                .redirectionEndpoint()
-//                    .baseUri("/oauth2/login/oauth2/code/*")
-//                        .and()
-//                            .userInfoEndpoint()
-//                                .userService(customOAuth2UserService)
-//                                    .and()
-//                                        .authorizationEndpoint()
-//                                            .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
-//                                                .and()
-//                                                    .successHandler(oAuth2AuthenticationSuccessHandler());
-    //                                                                                .failureHandler(oAuth2AuthenticationFailureHandler())
+        http.oauth2Login()
+                .redirectionEndpoint()
+                    .baseUri("/oauth2/login/oauth2/code/*")
+                        .and()
+                            .userInfoEndpoint()
+                                .userService(customOAuth2UserService)
+                                    .and()
+                                        .authorizationEndpoint()
+                                            .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
+                                                .and()
+                                                    .successHandler(oAuth2AuthenticationSuccessHandler());
 
         http.addFilterBefore(jwtAuthorizationMacFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(macSecuritySigner, octetSequenceKey), JwtAuthorizationMacFilter.class);
@@ -133,6 +132,8 @@ public class SecurityConfig {
         config.addAllowedOrigin("https://www.independe.co.kr");
         config.addAllowedOrigin("https://independe.co.kr");
         config.addAllowedOrigin("https://api.independe.co.kr");
+        config.addAllowedOrigin("https://192.168.0.6:5000");
+        config.addAllowedOrigin("https://192.168.0.6:8080");
 //        config.addAllowedOrigin("https://api.independe.co.kr");
 //        config.addAllowedOrigin("http://localhost:8081");
 //        config.addAllowedOrigin("*");
