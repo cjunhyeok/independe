@@ -36,7 +36,7 @@ public class PostFileResponse {
     }
 
     public byte[] getImageBytes(Files files, Long postId) throws IOException {
-        UrlResource resource = new UrlResource("file:" + files.getFilePath());
+        UrlResource resource = new UrlResource("file:" + files.getS3Url());
 
         InputStream inputStream = resource.getInputStream();
         byte[] bytes = IOUtils.toByteArray(inputStream);
