@@ -8,15 +8,17 @@ import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Transactional
 public class RecommendCommentRepositoryTest {
 
     @Autowired
@@ -27,6 +29,8 @@ public class RecommendCommentRepositoryTest {
     private PostRepository postRepository;
     @Autowired
     private CommentRepository commentRepository;
+    @PersistenceContext
+    EntityManager em;
 
     @Test
     public void saveTest() {
@@ -64,6 +68,11 @@ public class RecommendCommentRepositoryTest {
 
         // then
         assertThat(savedRecommendComment).isEqualTo(recommendComment);
+        assertThat(savedRecommendComment.getId()).isEqualTo(recommendComment.getId());
+        assertThat(savedRecommendComment.getIsRecommend()).isEqualTo(recommendComment.getIsRecommend());
+        assertThat(savedRecommendComment.getMember()).isEqualTo(recommendComment.getMember());
+        assertThat(savedRecommendComment.getComment()).isEqualTo(recommendComment.getComment());
+        assertThat(savedRecommendComment.getCreatedDate()).isNotNull();
     }
 
     @Test
@@ -223,6 +232,49 @@ public class RecommendCommentRepositoryTest {
 
     @Test
     public void findBestCommentTest() {
+        // given
+        Member member = Member.builder()
+                .username("id")
+                .password("pass")
+                .nickname("nick")
+                .build();
+        Member savedMember = memberRepository.save(member);
+
+        Post post = Post.builder()
+                .title("title")
+                .content("content")
+                .independentPostType(IndependentPostType.ETC)
+                .member(savedMember)
+                .build();
+        Post savedPost = postRepository.save(post);
+
+        Comment comment = Comment.builder()
+                .content("content")
+                .member(savedMember)
+                .post(savedPost)
+                .build();
+        Comment savedComment = commentRepository.save(comment);
+
+        for (int i = 0; i < 7; i++) {
+            RecommendComment recommend = RecommendComment.builder()
+                    .member(savedMember)
+                    .comment(savedComment)
+                    .isRecommend(true)
+                    .build();
+            recommendCommentRepository.save(recommend);
+        }
+
+        // when
+        List<Object[]> bestComments = recommendCommentRepository.findBestComment();
+
+        // then
+        Object[] bestCommentObject = bestComments.get(0);
+        Comment bestComment = (Comment) bestCommentObject[0];
+        Long bestCommentRecommendCount = (Long) bestCommentObject[1];
+
+        System.out.println(bestCommentRecommendCount);
+
         // todo
+//        assertThat(bestComment.size()).isEqualTo(1);
     }
 }
