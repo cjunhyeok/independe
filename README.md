@@ -18,3 +18,5 @@
 ![Untitled](https://github.com/cjunhyeok/independe/assets/97434544/18b546d9-9086-4ace-87be-c23a60c9913e)
 # Trouble Shooting
 [Junit5 댓글 Repository 삭제 테스트 오류 해결](https://jhdevelopment.tistory.com/44)
+
+변경확인
