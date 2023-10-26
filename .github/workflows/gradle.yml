@@ -49,3 +49,24 @@ jobs:
     # 5. Docker Hub 이미지 푸시
     - name: docker Hub push
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/independe
+
+  run-docker-image-on-ec2:
+    # build (위)과정이 완료되어야 실행됩니다.
+    needs: build-docker-image
+    runs-on: self-hosted
+
+    steps:
+      # 최신 이미지를 풀받습니다
+      - name: docker pull
+        run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/independe
+
+      # 기존의 컨테이너를 중지시킵니다
+      - name: docker stop container
+        run: sudo docker stop $(sudo docker ps -q) 2>/dev/null || true
+
+      # 최신 이미지를 컨테이너화하여 실행시킵니다
+      - name: docker run new container
+        run: sudo docker run --independe --rm -d -e port=${{ secrets.PORT }} -e address=${{ secrets.ADDRESS }} -e schema=${{ secrets.SCHEMA }} -e username=${{ secrets.USERNAME }} -e password=${{ secrets.PASSWORD }} -e naver-id=${{ secrets.NAVER_ID }} -e naver-secret=${{ secrets.NAVER_SECRET }} -e kakao-id=${{ secrets.KAKAO_ID }} -e kakao-secret=${{ secrets.KAKAO_SECRET }} -e environment=${{ secrets.ENVIRONMENT }} -e ACCESS_KEY=${{ secrets.ACCESS_KEY }} -e SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY }} -e bucket=${{ secrets.BUCKET }} -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/independe
+
+      # 미사용 이미지를 정리합니다
+      - name: delete old docker image
