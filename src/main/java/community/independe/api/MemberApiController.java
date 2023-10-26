@@ -40,7 +40,7 @@ public class MemberApiController {
     private final JWK jwk;
     private final JwtParser jwtParser;
 
-    @Operation(summary = "회원 등록 요청")
+    @Operation(summary = "회원 등록 요청 *")
     @PostMapping("/api/members/new")
     public ResponseEntity<Long> createMember(@RequestBody @Valid CreateMemberRequest request) {
 
