@@ -202,7 +202,7 @@ public class PostApiController {
         return ResponseEntity.ok(regionPost);
     }
 
-    @Operation(summary = "게시글 수정")
+    @Operation(summary = "게시글 수정 *")
     @PutMapping(value = "/api/posts/{postId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Long> updatePost(@Parameter(name = "postId") @PathVariable Long postId,
                                            @Parameter(description = "제목") @RequestParam String title,
