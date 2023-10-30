@@ -12,6 +12,10 @@ import lombok.NoArgsConstructor;
 public class CreateMemberRequest {
 
     @NotEmpty
+    private Boolean isTermOfUseCheck;
+    @NotEmpty
+    private Boolean isPrivacyCheck;
+    @NotEmpty
     private String username;
     @NotEmpty
     @Size(min = 8)
