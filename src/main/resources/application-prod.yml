@@ -1,6 +1,4 @@
 spring:
-  server:
-    port: 8080
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${address}:${port}/${schema}?useSSL=false&allowPublicKeyRetrieval=true
