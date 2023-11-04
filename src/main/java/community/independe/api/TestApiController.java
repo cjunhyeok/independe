@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class TestApiController {
 
-    @Operation(description = "CI CD 적용 전")
+    @Operation(description = "CI CD 적용 후")
     @GetMapping("/api/test")
     public ResponseEntity test() {
         return new ResponseEntity<>(HttpStatus.OK);
