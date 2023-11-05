@@ -33,7 +33,7 @@ public class CommentApiController {
     private final AlarmService alarmService;
     private final PostService postService;
 
-    @Operation(description = "부모 댓글 생성 *")
+    @Operation(summary = "부모 댓글 생성 *")
     @PostMapping("/api/comments/parent/new")
     public ResponseEntity<Long> createParentComment(@RequestBody @Valid CreateParentCommentRequest request,
                                                     @AuthenticationPrincipal MemberContext memberContext) {
@@ -53,7 +53,7 @@ public class CommentApiController {
         return ResponseEntity.ok(parentComment);
     }
 
-    @Operation(description = "자식 댓글 생성 *")
+    @Operation(summary = "자식 댓글 생성 *")
     @PostMapping("/api/comments/child/new")
     public ResponseEntity<Long> createChildComment(@RequestBody @Valid CreateChildCommentRequest request,
                                                    @AuthenticationPrincipal MemberContext memberContext) {
