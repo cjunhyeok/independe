@@ -81,8 +81,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String targetUrl = null;
         if (role.equals("ROLE_USER")) {
-//            targetUrl = "http://localhost:8081";
-            targetUrl = "https://www.independe.co.kr";
+          targetUrl = "http://localhost:8081";
+//            targetUrl = "https://www.independe.co.kr";
             String token;
             try {
                 token = securitySigner.getOAuth2JwtToken(oAuth2User, jwk);
