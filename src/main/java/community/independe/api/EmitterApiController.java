@@ -20,7 +20,7 @@ public class EmitterApiController {
 
     private final EmitterService emitterService;
 
-    @Operation(description = "알림 구독 api *")
+    @Operation(summary = "알림 구독 api *")
     @GetMapping(value = "/api/emitter/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@RequestHeader(value = "Last-Event-Id", required = false, defaultValue = " ") String lastEventId,
                                 @AuthenticationPrincipal MemberContext memberContext) {

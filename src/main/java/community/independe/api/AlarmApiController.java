@@ -26,7 +26,7 @@ public class AlarmApiController {
     private final MemberRepository memberRepository;
 
     @GetMapping("/api/alarms")
-    @Operation(description = "내 알람 조회 *")
+    @Operation(summary = "내 알람 조회 *")
     public Result alarmList(@AuthenticationPrincipal MemberContext memberContext) {
 
         Member loginMember = memberContext.getMember();
