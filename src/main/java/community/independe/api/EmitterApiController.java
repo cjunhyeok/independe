@@ -3,6 +3,7 @@ package community.independe.api;
 import community.independe.domain.member.Member;
 import community.independe.security.service.MemberContext;
 import community.independe.service.EmitterService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ public class EmitterApiController {
 
     private final EmitterService emitterService;
 
+    @Operation(description = "알림 구독 api *")
     @GetMapping(value = "/api/emitter/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@RequestHeader(value = "Last-Event-Id", required = false, defaultValue = " ") String lastEventId,
                                 @AuthenticationPrincipal MemberContext memberContext) {

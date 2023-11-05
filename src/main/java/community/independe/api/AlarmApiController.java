@@ -7,6 +7,7 @@ import community.independe.domain.member.Member;
 import community.independe.repository.MemberRepository;
 import community.independe.security.service.MemberContext;
 import community.independe.service.AlarmService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +26,7 @@ public class AlarmApiController {
     private final MemberRepository memberRepository;
 
     @GetMapping("/api/alarms")
+    @Operation(description = "내 알람 조회 *")
     public Result alarmList(@AuthenticationPrincipal MemberContext memberContext) {
 
         Member loginMember = memberContext.getMember();
