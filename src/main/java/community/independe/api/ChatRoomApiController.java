@@ -9,6 +9,7 @@ import community.independe.security.service.MemberContext;
 import community.independe.service.MemberService;
 import community.independe.service.chat.ChatRoomService;
 import community.independe.service.chat.ChatService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,6 +30,7 @@ public class ChatRoomApiController {
     private final ChatService chatService;
 
     @GetMapping("/api/chat/rooms")
+    @Operation(description = "채팅방 목록 조회 *")
     public List<ChatRoomResponse> chatRooms(@AuthenticationPrincipal MemberContext memberContext) {
 
         Member loginMember = memberContext.getMember();
@@ -49,6 +51,7 @@ public class ChatRoomApiController {
     }
 
     @GetMapping("/api/chat/room")
+    @Operation(description = "채팅방 상세 조회 *")
     public ChatRoomResponse chatRoom(@RequestParam(name = "receiverId") Long receiverId,
                                      @AuthenticationPrincipal MemberContext memberContext) {
 
@@ -68,6 +71,7 @@ public class ChatRoomApiController {
     }
 
     @GetMapping("/api/chat/history")
+    @Operation(description = "채팅방 히스토리 조회 *")
     public List<ChatHistoryDto> chatHistory(@RequestParam("receiverId") Long receiverId,
                                             @AuthenticationPrincipal MemberContext memberContext) {
 

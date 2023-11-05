@@ -110,7 +110,7 @@ public class PostApiController {
     }
 
     // 자취 게시글 생성
-    @Operation(summary = "자취 게시글 생성")
+    @Operation(summary = "자취 게시글 생성 *")
     @PostMapping(value = "/api/posts/independent/new", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Long> createIndependentPost(@Parameter(description = "제목") @RequestParam String title,
                                                       @Parameter(description = "내용") @RequestParam String content,
@@ -175,7 +175,7 @@ public class PostApiController {
     }
 
     // 지역 게시글 생성
-    @Operation(summary = "지역 게시글 생성")
+    @Operation(summary = "지역 게시글 생성 *")
     @PostMapping(value = "/api/posts/region/new", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Long> createRegionPost(@Parameter(description = "제목") @RequestParam String title,
                                                  @Parameter(description = "내용") @RequestParam String content,
@@ -220,7 +220,7 @@ public class PostApiController {
         return ResponseEntity.ok(updatedPost);
     }
 
-    @Operation(summary = "게시글 삭제")
+    @Operation(summary = "게시글 삭제 *")
     @DeleteMapping("/api/posts/{postId}")
     public ResponseEntity deletePost(@PathVariable Long postId,
                                      @AuthenticationPrincipal MemberContext memberContext) {

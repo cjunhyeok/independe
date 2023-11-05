@@ -79,7 +79,7 @@ public class MemberApiController {
         }
     }
 
-    @Operation(summary = "위치 인증")
+    @Operation(summary = "위치 인증 *")
     @PostMapping("/api/members/region")
     public ResponseEntity authenticateRegion(@RequestBody AuthenticationRegionRequest request,
                                  @AuthenticationPrincipal MemberContext memberContext) {
@@ -110,6 +110,7 @@ public class MemberApiController {
     }
 
     @GetMapping("/api/members")
+    @Operation(description = "모든 회원 정보 반환")
     public List<MembersDto> members(@AuthenticationPrincipal MemberContext memberContext) {
 
         List<Member> members = memberService.findAll();
@@ -123,6 +124,7 @@ public class MemberApiController {
     }
 
     @PutMapping("/api/oauth/members")
+    @Operation(description = "소셜 로그인 후 추가 정보 입력 api *")
     public ResponseEntity modifyOAuthMembers(@RequestBody OAuthMemberRequest request,
                                         @AuthenticationPrincipal MemberContext memberContext) {
 
@@ -134,6 +136,7 @@ public class MemberApiController {
     }
 
     @PutMapping("/api/members")
+    @Operation(description = "회원 정보 수정 *")
     public ResponseEntity modifyMembers(@RequestBody ModifyMemberRequest request,
                                         @AuthenticationPrincipal MemberContext memberContext) {
 
