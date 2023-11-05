@@ -64,7 +64,7 @@ jobs:
 
       # 최신 이미지를 컨테이너화하여 실행시킵니다
       - name: docker run new container
-        run: sudo docker run --name independe --rm -d --network independe -e port=${{ secrets.PORT }} -e address=${{ secrets.ADDRESS }} -e schema=${{ secrets.SCHEMA }} -e username=${{ secrets.USERNAME }} -e password=${{ secrets.PASSWORD }} -e naver-id=${{ secrets.NAVER_ID }} -e naver-secret=${{ secrets.NAVER_SECRET }} -e kakao-id=${{ secrets.KAKAO_ID }} -e kakao-secret=${{ secrets.KAKAO_SECRET }} -e environment=${{ secrets.ENVIRONMENT }} -e ACCESS_KEY=${{ secrets.ACCESS_KEY }} -e SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY }} -e bucket=${{ secrets.BUCKET }} -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/independe
+        run: sudo docker run --name independe --rm -d --network independe -e SECRET_KEY=${{ secrets.SECRET_KEY }} -e port=${{ secrets.PORT }} -e address=${{ secrets.ADDRESS }} -e schema=${{ secrets.SCHEMA }} -e username=${{ secrets.USERNAME }} -e password=${{ secrets.PASSWORD }} -e naver-id=${{ secrets.NAVER_ID }} -e naver-secret=${{ secrets.NAVER_SECRET }} -e kakao-id=${{ secrets.KAKAO_ID }} -e kakao-secret=${{ secrets.KAKAO_SECRET }} -e environment=${{ secrets.ENVIRONMENT }} -e ACCESS_KEY=${{ secrets.ACCESS_KEY }} -e SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY }} -e bucket=${{ secrets.BUCKET }} -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/independe
 
       # 미사용 이미지를 정리합니다
       - name: delete old docker image
