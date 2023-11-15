@@ -103,6 +103,8 @@ public class MemberApiControllerTest {
         createMemberRequest.setUsername("username");
         createMemberRequest.setPassword("Aasdf123!@");
         createMemberRequest.setNickname("nick12");
+        createMemberRequest.setIsPrivacyCheck(true);
+        createMemberRequest.setIsTermOfUseCheck(true);
 
         // when
         ResultActions perform = mockMvc.perform(post("/api/members/new")
@@ -121,6 +123,8 @@ public class MemberApiControllerTest {
         createMemberRequest.setUsername("testUsername");
         createMemberRequest.setPassword("abc");
         createMemberRequest.setNickname("nick12");
+        createMemberRequest.setIsPrivacyCheck(true);
+        createMemberRequest.setIsTermOfUseCheck(true);
 
         // when
         ResultActions perform = mockMvc.perform(post("/api/members/new")
