@@ -55,7 +55,7 @@ public class ReportPostRepositoryTest {
 
         // when
         ReportPost findReportPost =
-                reportPostRepository.findByPostIdAndMemberId(savedMember.getId(), savedPost.getId());
+                reportPostRepository.findByPostIdAndMemberId(savedPost.getId(), savedMember.getId());
 
         // then
         assertThat(findReportPost).isEqualTo(savedReportPost);
@@ -79,7 +79,7 @@ public class ReportPostRepositoryTest {
 
         // when
         ReportPost findReportPost =
-                reportPostRepository.findByPostIdAndMemberIdAndIsRecommend(savedMember.getId(), savedPost.getId());
+                reportPostRepository.findByPostIdAndMemberIdAndIsRecommend(savedPost.getId(), savedMember.getId());
 
         // then
         assertThat(findReportPost).isEqualTo(savedReportPost);
