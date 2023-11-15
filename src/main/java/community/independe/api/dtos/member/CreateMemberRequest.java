@@ -1,9 +1,6 @@
 package community.independe.api.dtos.member;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,9 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateMemberRequest {
 
-    @NotEmpty
+    @AssertTrue
     private Boolean isTermOfUseCheck;
-    @NotEmpty
+    @AssertTrue
     private Boolean isPrivacyCheck;
     @NotEmpty
     private String username;
