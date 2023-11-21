@@ -1,7 +1,6 @@
 package community.independe.api;
 
 import community.independe.api.dtos.files.PostFileResponse;
-import community.independe.domain.file.Files;
 import community.independe.domain.post.Post;
 import community.independe.service.FilesService;
 import community.independe.service.PostService;
@@ -11,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -27,7 +24,7 @@ public class FilesApiController {
     public PostFileResponse postFiles(@PathVariable(name = "postId") Long postId) {
 
         Post findPost = postService.findById(postId);
-        List<Files> findAllFiles = filesService.findAllFilesByPostId(findPost.getId());
-        return new PostFileResponse(findPost, findAllFiles);
+        PostFileResponse findAllFiles = filesService.findAllFilesByPostId(findPost.getId());
+        return findAllFiles;
     }
 }
