@@ -17,7 +17,7 @@ public class Chat extends BaseEntity {
     @GeneratedValue
     @Column(name = "chat_id")
     private Long id;
-    private String content; // 메시지
+    private String message; // 메시지
     private Boolean isRead;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id")
@@ -28,8 +28,8 @@ public class Chat extends BaseEntity {
     private Member receiver; // 수신자
 
     @Builder
-    public Chat(String content, Boolean isRead, Member sender, Member receiver) {
-        this.content = content;
+    public Chat(String message, Boolean isRead, Member sender, Member receiver) {
+        this.message = message;
         this.isRead = isRead;
         this.sender = sender;
         this.receiver = receiver;
