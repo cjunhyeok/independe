@@ -3,6 +3,7 @@ package community.independe.service;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import community.independe.api.dtos.files.PostFileResponse;
 import community.independe.domain.file.Files;
 import community.independe.domain.post.Post;
 import community.independe.exception.CustomException;
@@ -90,8 +91,15 @@ public class S3FilesServiceImpl implements FilesService{
     }
 
     @Override
-    public List<Files> findAllFilesByPostId(Long postId) {
-        return filesRepository.findAllFilesByPostId(postId);
+    public PostFileResponse findAllFilesByPostId(Long postId) {
+        List<Files> findFiles = filesRepository.findAllFilesByPostId(postId);
+        PostFileResponse postFileResponse = new PostFileResponse();
+        List<String> s3Urls = new ArrayList<>();
+        for (Files findFile : findFiles) {
+            s3Urls.add(findFile.getS3Url());
+        }
+        postFileResponse.setS3Urls(s3Urls);
+        return postFileResponse;
     }
 
     @Override
