@@ -39,4 +39,19 @@ public class ChatRoomServiceImpl implements ChatRoomService{
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
         return savedChatRoom.getId();
     }
+
+    @Override
+    public ChatRoom findBySenderAndReceiver(Long senderId, Long receiverId) {
+        Member findSender = memberRepository.findById(senderId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+        );
+
+        Member findReceiver = memberRepository.findById(receiverId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+        );
+
+        String senderAndReceiver = SortedStringEditor.createSortedString(findSender.getId(), findReceiver.getId());
+
+        return chatRoomRepository.findBySenderAndReceiver(senderAndReceiver);
+    }
 }
