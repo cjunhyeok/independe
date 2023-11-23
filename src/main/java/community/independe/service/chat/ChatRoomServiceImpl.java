@@ -1,5 +1,6 @@
 package community.independe.service.chat;
 
+import community.independe.api.dtos.chat.ChatRoomResponse;
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
 import community.independe.exception.CustomException;
@@ -41,7 +42,7 @@ public class ChatRoomServiceImpl implements ChatRoomService{
     }
 
     @Override
-    public ChatRoom findBySenderAndReceiver(Long senderId, Long receiverId) {
+    public ChatRoomResponse findBySenderAndReceiver(Long senderId, Long receiverId) {
         Member findSender = memberRepository.findById(senderId).orElseThrow(
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
@@ -52,6 +53,10 @@ public class ChatRoomServiceImpl implements ChatRoomService{
 
         String senderAndReceiver = SortedStringEditor.createSortedString(findSender.getId(), findReceiver.getId());
 
-        return chatRoomRepository.findBySenderAndReceiver(senderAndReceiver);
+        ChatRoom findChatRoom = chatRoomRepository.findBySenderAndReceiver(senderAndReceiver);
+
+        return ChatRoomResponse.builder()
+                .chatRoomId(findChatRoom.getId())
+                .build();
     }
 }

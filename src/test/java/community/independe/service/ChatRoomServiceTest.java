@@ -1,5 +1,6 @@
 package community.independe.service;
 
+import community.independe.api.dtos.chat.ChatRoomResponse;
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
 import community.independe.exception.CustomException;
@@ -154,10 +155,12 @@ public class ChatRoomServiceTest {
         when(chatRoomRepository.findBySenderAndReceiver(senderAndReceiver)).thenReturn(ChatRoom.builder().senderAndReceiver(senderAndReceiver).build());
 
         // when
-        ChatRoom findChatRoom = chatRoomService.findBySenderAndReceiver(senderId, receiverId);
+        ChatRoomResponse chatRoomResponse = chatRoomService.findBySenderAndReceiver(senderId, receiverId);
 
         // then
-        assertThat(findChatRoom.getSenderAndReceiver()).isEqualTo(senderAndReceiver);
+        verify(memberRepository, times(1)).findById(senderId);
+        verify(memberRepository, times(1)).findById(receiverId);
+        verify(chatRoomRepository, times(1)).findBySenderAndReceiver(senderAndReceiver);
     }
 
     @Test
