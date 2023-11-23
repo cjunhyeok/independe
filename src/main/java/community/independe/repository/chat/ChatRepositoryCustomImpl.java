@@ -21,6 +21,8 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom{
         return queryFactory
                 .select(chat)
                 .from(chat)
+                .join(chat.sender).fetchJoin()
+                .join(chat.receiver).fetchJoin()
                 .where(chat.chatRoom.id.eq(chatRoomId))
                 .orderBy(chat.createdDate.desc())
                 .limit(1)
