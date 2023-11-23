@@ -8,7 +8,6 @@ import community.independe.repository.MemberRepository;
 import community.independe.repository.chat.ChatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,10 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ChatServiceImpl implements ChatService {
 
-    @Autowired
-    private ChatRepository chatRepository;
-    @Autowired
-    private MemberRepository memberRepository;
+    private final ChatRepository chatRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public Long saveChat(String message, Long senderId, Long receiverId) {
