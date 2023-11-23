@@ -1,11 +1,14 @@
 package community.independe.service;
 
 import community.independe.api.dtos.chat.ChatRoomResponse;
+import community.independe.api.dtos.chat.ChatRoomsResponse;
+import community.independe.domain.chat.Chat;
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
 import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
+import community.independe.repository.chat.ChatRepository;
 import community.independe.repository.chat.ChatRoomRepository;
 import community.independe.service.chat.ChatRoomServiceImpl;
 import community.independe.util.SortedStringEditor;
@@ -17,6 +20,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -32,6 +37,8 @@ public class ChatRoomServiceTest {
     private ChatRoomRepository chatRoomRepository;
     @Mock
     private MemberRepository memberRepository;
+    @Mock
+    private ChatRepository chatRepository;
 
     @Test
     void saveChatRoomTest() {
@@ -208,5 +215,31 @@ public class ChatRoomServiceTest {
         verify(memberRepository, times(1)).findById(senderId);
         verify(memberRepository, times(1)).findById(receiverId);
         verifyNoInteractions(chatRoomRepository);
+    }
+
+    @Test
+    void findChatRoomsTest() throws Exception {
+        // given
+        Long memberId = 1L;
+        List<ChatRoom> chatRooms = new ArrayList<>();
+        ChatRoom chatRoom = ChatRoom.builder().build();
+        chatRooms.add(chatRoom);
+        Member sender = Member.builder().build();
+        setPrivateField(sender, "id", memberId);
+        Member receiver = Member.builder().build();
+        setPrivateField(receiver, "id", 2L);
+        Chat lastChat = Chat.builder().chatRoom(chatRoom).isRead(false).message("lastMessage").sender(sender).receiver(receiver).build();
+
+        // stub
+        when(chatRoomRepository.findChatRoomsByMemberId(memberId)).thenReturn(chatRooms);
+        when(chatRepository.findLastChatByChatRoomId(null)).thenReturn(lastChat);
+
+        // when
+        List<ChatRoomsResponse> chatRoomsResponse = chatRoomService.findChatRooms(memberId);
+
+        // then
+        assertThat(chatRoomsResponse.size()).isEqualTo(1);
+        verify(chatRoomRepository, times(1)).findChatRoomsByMemberId(memberId);
+        verify(chatRepository, times(1)).findLastChatByChatRoomId(null);
     }
 }
