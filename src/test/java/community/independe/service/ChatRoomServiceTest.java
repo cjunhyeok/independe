@@ -48,7 +48,7 @@ public class ChatRoomServiceTest {
         });
         when(memberRepository.findById(receiverId)).thenAnswer(invocation -> {
             setPrivateField(receiver, "id", receiverId);
-            Optional<Member> receiverOptional = Optional.of(sender);
+            Optional<Member> receiverOptional = Optional.of(receiver);
             return receiverOptional;
         });
         when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(ChatRoom.builder().build());
@@ -119,6 +119,82 @@ public class ChatRoomServiceTest {
 
         // when
         AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> chatRoomService.saveChatRoom(senderId, receiverId))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
+
+        // then
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.MEMBER_NOT_FOUND);
+        });
+        verify(memberRepository, times(1)).findById(senderId);
+        verify(memberRepository, times(1)).findById(receiverId);
+        verifyNoInteractions(chatRoomRepository);
+    }
+
+    @Test
+    void findBySenderAndReceiverTest() {
+        // given
+        Long senderId = 1L;
+        Long receiverId = 2L;
+        Member sender = Member.builder().build();
+        Member receiver = Member.builder().build();
+        String senderAndReceiver = SortedStringEditor.createSortedString(senderId, receiverId);
+
+        // stub
+        when(memberRepository.findById(senderId)).thenAnswer(invocation -> {
+            setPrivateField(sender, "id", senderId);
+            Optional<Member> senderOptional = Optional.of(sender);
+            return senderOptional;
+        });
+        when(memberRepository.findById(receiverId)).thenAnswer(invocation -> {
+            setPrivateField(receiver, "id", receiverId);
+            Optional<Member> receiverOptional = Optional.of(receiver);
+            return receiverOptional;
+        });
+        when(chatRoomRepository.findBySenderAndReceiver(senderAndReceiver)).thenReturn(ChatRoom.builder().senderAndReceiver(senderAndReceiver).build());
+
+        // when
+        ChatRoom findChatRoom = chatRoomService.findBySenderAndReceiver(senderId, receiverId);
+
+        // then
+        assertThat(findChatRoom.getSenderAndReceiver()).isEqualTo(senderAndReceiver);
+    }
+
+    @Test
+    void findBySenderAndReceiverSenderFailTest() {
+        // given
+        Long senderId = 1L;
+        Long receiverId = 2L;
+
+        // stub
+        when(memberRepository.findById(senderId)).thenReturn(Optional.empty());
+
+        // when
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> chatRoomService.findBySenderAndReceiver(senderId, receiverId))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
+
+        // then
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.MEMBER_NOT_FOUND);
+        });
+        verify(memberRepository, times(1)).findById(senderId);
+        verifyNoMoreInteractions(memberRepository);
+        verifyNoInteractions(chatRoomRepository);
+    }
+
+    @Test
+    void findBySenderAndReceiverReceiverFailTest() {
+        // given
+        Long senderId = 1L;
+        Long receiverId = 2L;
+
+        // stub
+        when(memberRepository.findById(senderId)).thenReturn(Optional.of(Member.builder().build()));
+        when(memberRepository.findById(receiverId)).thenReturn(Optional.empty());
+
+        // when
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> chatRoomService.findBySenderAndReceiver(senderId, receiverId))
                 .isInstanceOf(CustomException.class)
                 .extracting(ex -> (CustomException) ex);
 
