@@ -32,10 +32,11 @@ public class Chat extends BaseEntity {
     private ChatRoom chatRoom;
 
     @Builder
-    public Chat(String message, Boolean isRead, Member sender, Member receiver) {
+    public Chat(String message, Boolean isRead, Member sender, Member receiver, ChatRoom chatRoom) {
         this.message = message;
         this.isRead = isRead;
         this.sender = sender;
         this.receiver = receiver;
+        this.chatRoom = chatRoom;
     }
 }
