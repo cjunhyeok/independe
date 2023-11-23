@@ -27,6 +27,10 @@ public class Chat extends BaseEntity {
     @JoinColumn(name = "receiver_id")
     private Member receiver; // 수신자
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_room_id")
+    private ChatRoom chatRoom;
+
     @Builder
     public Chat(String message, Boolean isRead, Member sender, Member receiver) {
         this.message = message;
