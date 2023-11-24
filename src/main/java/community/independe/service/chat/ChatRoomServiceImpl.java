@@ -1,6 +1,5 @@
 package community.independe.service.chat;
 
-import community.independe.api.dtos.chat.ChatRoomResponse;
 import community.independe.api.dtos.chat.ChatRoomsResponse;
 import community.independe.domain.chat.Chat;
 import community.independe.domain.chat.ChatRoom;
@@ -50,7 +49,7 @@ public class ChatRoomServiceImpl implements ChatRoomService{
     }
 
     @Override
-    public ChatRoomResponse findBySenderAndReceiver(Long senderId, Long receiverId) {
+    public ChatRoom findBySenderAndReceiver(Long senderId, Long receiverId) {
         Member findSender = memberRepository.findById(senderId).orElseThrow(
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
@@ -63,9 +62,7 @@ public class ChatRoomServiceImpl implements ChatRoomService{
 
         ChatRoom findChatRoom = chatRoomRepository.findBySenderAndReceiver(senderAndReceiver);
 
-        return ChatRoomResponse.builder()
-                .chatRoomId(findChatRoom.getId())
-                .build();
+        return findChatRoom;
     }
 
     @Override
@@ -78,6 +75,7 @@ public class ChatRoomServiceImpl implements ChatRoomService{
             Chat findLastChat = chatRepository.findLastChatByChatRoomId(findChatRoom.getId());
             ChatRoomsResponse chatRoomsResponse = ChatRoomsResponse.builder()
                     .chatRoomId(findChatRoom.getId())
+                    .receiverId(findLastChat.getReceiver().getId())
                     .senderNickname(findLastChat.getSender().getNickname())
                     .receiverNickname(findLastChat.getReceiver().getNickname())
                     .isRead(findLastChat.getIsRead())

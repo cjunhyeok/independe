@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class ChatRoomsResponse {
 
     private Long chatRoomId;
+    private Long receiverId;
     private String senderNickname;
     private String receiverNickname;
     private String lastMessage;
