@@ -31,6 +31,7 @@ public class ChatRoomServiceImpl implements ChatRoomService{
 
 
     @Override
+    @Transactional
     public Long saveChatRoom(Long senderId, Long receiverId) {
         Member findSender = memberRepository.findById(senderId).orElseThrow(
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
