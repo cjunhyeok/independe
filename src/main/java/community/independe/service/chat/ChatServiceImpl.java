@@ -24,6 +24,7 @@ public class ChatServiceImpl implements ChatService {
     private final ChatRoomRepository chatRoomRepository;
 
     @Override
+    @Transactional
     public Long saveChat(String message, Long senderId, Long receiverId, Long chatRoomId) {
         Member findSender = memberRepository.findById(senderId).orElseThrow(
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
