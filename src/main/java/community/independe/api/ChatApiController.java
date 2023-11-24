@@ -42,7 +42,7 @@ public class ChatApiController {
         message.setCreatedDate(LocalDateTime.now());
 
         simpMessagingTemplate.convertAndSendToUser(message.getChatRoomId().toString(),"/private",message);
-        Long savedChat = chatService.saveChat(message.getMessage(), loginMember.getId(), message.getReceiverId());
+        Long savedChat = chatService.saveChat(message.getMessage(), loginMember.getId(), message.getReceiverId(), message.getChatRoomId());
 
         emitterService.notify(message.getReceiverId(), CHAT_MESSAGE);
         alarmService.saveAlarm(CHAT_MESSAGE, false, AlarmType.TALK, message.getReceiverId());
