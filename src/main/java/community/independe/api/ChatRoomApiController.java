@@ -4,6 +4,7 @@ import community.independe.api.dtos.Result;
 import community.independe.api.dtos.chat.ChatRoomRequest;
 import community.independe.api.dtos.chat.ChatRoomResponse;
 import community.independe.api.dtos.chat.ChatRoomsResponse;
+import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
 import community.independe.security.service.MemberContext;
 import community.independe.service.MemberService;
@@ -37,12 +38,17 @@ public class ChatRoomApiController {
         Long senderId = loginMember.getId();
         Long receiverId = chatRoomRequest.getReceiverId();
 
-        ChatRoomResponse chatRoomResponse = chatRoomService.findBySenderAndReceiver(senderId, receiverId);
+        ChatRoom findChatRoom = chatRoomService.findBySenderAndReceiver(senderId, receiverId);
 
-        if (chatRoomResponse == null) {
+        if (findChatRoom == null) {
             chatRoomService.saveChatRoom(senderId, receiverId);
-            chatRoomResponse = chatRoomService.findBySenderAndReceiver(senderId, receiverId);
+            findChatRoom = chatRoomService.findBySenderAndReceiver(senderId, receiverId);
         }
+
+        ChatRoomResponse chatRoomResponse = ChatRoomResponse.builder()
+                .chatRoomId(findChatRoom.getId())
+                .build();
+
         return new Result(chatRoomResponse);
     }
 
