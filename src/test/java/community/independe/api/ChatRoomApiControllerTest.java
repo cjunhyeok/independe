@@ -1,6 +1,7 @@
 package community.independe.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import community.independe.api.dtos.chat.ChatRoomRequest;
 import community.independe.api.dtos.chat.ChatRoomsResponse;
 import community.independe.domain.member.Member;
 import community.independe.service.MemberService;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -21,6 +23,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -78,5 +81,42 @@ public class ChatRoomApiControllerTest {
         // then
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.size()").value(2));
+    }
+
+    @Test
+    void chatRoomTest() throws Exception {
+        // given
+        Long receiverId = memberService.join("receiver", "pass1", "receiver", null, null);
+        ChatRoomRequest request = new ChatRoomRequest();
+        request.setReceiverId(receiverId);
+
+        // when
+        ResultActions perform = mockMvc.perform(post("/api/chat/room")
+                .header("Authorization", accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+
+        // then
+        perform.andExpect(status().isOk());
+    }
+
+    @Test
+    void chatRoomExistTest() throws Exception {
+        // given
+        Member sender = memberService.findByUsername("testUsername");
+        Long receiverId = memberService.join("receiver", "pass1", "receiver", null, null);
+        ChatRoomRequest request = new ChatRoomRequest();
+        request.setReceiverId(receiverId);
+        Long savedChatRoomId = chatRoomService.saveChatRoom(sender.getId(), receiverId);
+
+        // when
+        ResultActions perform = mockMvc.perform(post("/api/chat/room")
+                .header("Authorization", accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+
+        // then
+        perform.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.chatRoomId").value(savedChatRoomId));
     }
 }
