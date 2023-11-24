@@ -3,6 +3,7 @@ package community.independe.api;
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.chat.ChatRoomRequest;
 import community.independe.api.dtos.chat.ChatRoomResponse;
+import community.independe.api.dtos.chat.ChatRoomsResponse;
 import community.independe.domain.member.Member;
 import community.independe.security.service.MemberContext;
 import community.independe.service.MemberService;
@@ -12,9 +13,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -40,5 +44,15 @@ public class ChatRoomApiController {
             chatRoomResponse = chatRoomService.findBySenderAndReceiver(senderId, receiverId);
         }
         return new Result(chatRoomResponse);
+    }
+
+    @GetMapping("/api/chat/rooms")
+    @Operation(summary = "채팅방 목록 조회 *")
+    public Result chatRooms(@AuthenticationPrincipal MemberContext memberContext) {
+        Member loginMember = memberContext.getMember();
+
+        List<ChatRoomsResponse> chatRoomsResponses = chatRoomService.findChatRooms(loginMember.getId());
+
+        return new Result<>(chatRoomsResponses);
     }
 }
