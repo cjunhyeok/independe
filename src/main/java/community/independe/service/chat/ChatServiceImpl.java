@@ -1,11 +1,13 @@
 package community.independe.service.chat;
 
 import community.independe.domain.chat.Chat;
+import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
 import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.chat.ChatRepository;
+import community.independe.repository.chat.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,9 +21,10 @@ public class ChatServiceImpl implements ChatService {
 
     private final ChatRepository chatRepository;
     private final MemberRepository memberRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     @Override
-    public Long saveChat(String message, Long senderId, Long receiverId) {
+    public Long saveChat(String message, Long senderId, Long receiverId, Long chatRoomId) {
         Member findSender = memberRepository.findById(senderId).orElseThrow(
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
@@ -30,11 +33,16 @@ public class ChatServiceImpl implements ChatService {
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
+        ChatRoom findChatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(
+                () -> new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND)
+        );
+
         Chat chat = Chat.builder()
                 .message(message)
                 .sender(findSender)
                 .receiver(findReceiver)
                 .isRead(false)
+                .chatRoom(findChatRoom)
                 .build();
         Chat savedChat = chatRepository.save(chat);
 
