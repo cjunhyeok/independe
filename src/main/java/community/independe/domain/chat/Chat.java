@@ -1,6 +1,7 @@
 package community.independe.domain.chat;
 
 import community.independe.domain.BaseEntity;
+import community.independe.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -16,16 +17,26 @@ public class Chat extends BaseEntity {
     @GeneratedValue
     @Column(name = "chat_id")
     private Long id;
-    private String content; // 메시지
+    private String message; // 메시지
     private Boolean isRead;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id")
+    private Member sender; // 발신자
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver_id")
+    private Member receiver; // 수신자
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
 
     @Builder
-    public Chat(String content, Boolean isRead, ChatRoom chatRoom) {
-        this.content = content;
+    public Chat(String message, Boolean isRead, Member sender, Member receiver, ChatRoom chatRoom) {
+        this.message = message;
         this.isRead = isRead;
+        this.sender = sender;
+        this.receiver = receiver;
         this.chatRoom = chatRoom;
     }
 }

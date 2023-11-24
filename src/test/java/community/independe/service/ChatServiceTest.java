@@ -4,18 +4,18 @@ import community.independe.domain.chat.Chat;
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
 import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.chat.ChatRepository;
 import community.independe.repository.chat.ChatRoomRepository;
 import community.independe.service.chat.ChatServiceImpl;
+import org.assertj.core.api.AbstractObjectAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -30,55 +30,59 @@ public class ChatServiceTest {
     @Mock
     private ChatRepository chatRepository;
     @Mock
-    private ChatRoomRepository chatRoomRepository;
-    @Mock
     private MemberRepository memberRepository;
+    @Mock
+    private ChatRoomRepository chatRoomRepository;
 
     @Test
     void saveChatTest() {
         // given
+        String message = "message";
         Long senderId = 1L;
-        Member sender = Member.builder().build();
         Long receiverId = 2L;
+        Long chatRoomId = 1L;
+        Member sender = Member.builder().build();
         Member receiver = Member.builder().build();
-        String content = "content";
-        ChatRoom chatRoom = ChatRoom.builder().sender(sender).receiver(receiver).build();
-        Boolean isRead = false;
+        ChatRoom chatRoom = ChatRoom.builder().build();
 
         // stub
         when(memberRepository.findById(senderId)).thenReturn(Optional.of(sender));
         when(memberRepository.findById(receiverId)).thenReturn(Optional.of(receiver));
-        when(chatRoomRepository.findByLoginMemberIdWithReceiverId(null, null))
-                .thenReturn(chatRoom);
+        when(chatRoomRepository.findById(chatRoomId)).thenReturn(Optional.of(chatRoom));
         when(chatRepository.save(any(Chat.class))).thenReturn(Chat.builder().build());
 
         // when
-        chatService.saveChat(senderId, receiverId, content, isRead);
+        chatService.saveChat(message, senderId, receiverId, chatRoomId);
 
         // then
         verify(memberRepository, times(1)).findById(senderId);
         verify(memberRepository, times(1)).findById(receiverId);
-        verify(chatRoomRepository, times(1)).findByLoginMemberIdWithReceiverId(null, null);
+        verify(chatRoomRepository, times(1)).findById(chatRoomId);
         verify(chatRepository, times(1)).save(any(Chat.class));
     }
 
     @Test
     void saveChatSenderFailTest() {
         // given
+        String message = "message";
         Long senderId = 1L;
         Long receiverId = 2L;
-        String content = "fail";
-        Boolean isRead = false;
+        Long chatRoomId = 1L;
 
         // stub
         when(memberRepository.findById(senderId)).thenReturn(Optional.empty());
 
         // when
-        assertThatThrownBy(() -> chatService.saveChat(senderId, receiverId, content, isRead))
-                .isInstanceOf(CustomException.class);
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> chatService.saveChat(message, senderId, receiverId, chatRoomId))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
 
         // then
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.MEMBER_NOT_FOUND);
+        });
         verify(memberRepository, times(1)).findById(senderId);
+        verifyNoMoreInteractions(memberRepository);
         verifyNoInteractions(chatRoomRepository);
         verifyNoInteractions(chatRepository);
     }
@@ -86,20 +90,24 @@ public class ChatServiceTest {
     @Test
     void saveChatReceiverFailTest() {
         // given
+        String message = "message";
         Long senderId = 1L;
         Long receiverId = 2L;
-        String content = "fail";
-        Boolean isRead = false;
+        Long chatRoomId = 1L;
 
         // stub
         when(memberRepository.findById(senderId)).thenReturn(Optional.of(Member.builder().build()));
         when(memberRepository.findById(receiverId)).thenReturn(Optional.empty());
 
         // when
-        assertThatThrownBy(() -> chatService.saveChat(senderId, receiverId, content, isRead))
-                .isInstanceOf(CustomException.class);
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> chatService.saveChat(message, senderId, receiverId, chatRoomId))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
 
         // then
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.MEMBER_NOT_FOUND);
+        });
         verify(memberRepository, times(1)).findById(senderId);
         verify(memberRepository, times(1)).findById(receiverId);
         verifyNoInteractions(chatRoomRepository);
@@ -107,74 +115,30 @@ public class ChatServiceTest {
     }
 
     @Test
-    void findChatRoomsTest() {
+    void saveChatChatRoomFailTest() {
         // given
-        Long memberId = 1L;
-        Member mockMember = Member.builder().build();
-        List<Chat> chats = new ArrayList<>();
-
-        // stub
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
-        when(chatRepository.findChatRooms(null)).thenReturn(chats);
-
-        // when
-        List<Chat> chatRooms = chatService.findChatRooms(memberId);
-
-        // then
-        verify(memberRepository, times(1)).findById(memberId);
-        verify(chatRepository, times(1)).findChatRooms(null);
-        assertThat(chatRooms).isEqualTo(chats);
-    }
-
-    @Test
-    void findChatRoomsFailTest() {
-        // given
-        Long memberId = 1L;
-
-        // stub
-        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
-
-        // when
-        assertThatThrownBy(() -> chatService.findChatRooms(memberId))
-                .isInstanceOf(CustomException.class);
-
-        // then
-        verify(memberRepository, times(1)).findById(memberId);
-    }
-
-    @Test
-    void findChatHistoryTest() {
-        // given
-        Long loginMemberId = 1L;
+        String message = "message";
+        Long senderId = 1L;
         Long receiverId = 2L;
-        List<Chat> history = new ArrayList<>();
-        history.add(Chat.builder().build());
+        Long chatRoomId = 1L;
 
         // stub
-        when(chatRepository.findChatHistory(loginMemberId, receiverId)).thenReturn(history);
+        when(memberRepository.findById(senderId)).thenReturn(Optional.of(Member.builder().build()));
+        when(memberRepository.findById(receiverId)).thenReturn(Optional.of(Member.builder().build()));
+        when(chatRoomRepository.findById(chatRoomId)).thenReturn(Optional.empty());
 
         // when
-        List<Chat> chatHistory = chatService.findChatHistory(loginMemberId, receiverId);
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> chatService.saveChat(message, senderId, receiverId, chatRoomId))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
 
         // then
-        assertThat(chatHistory).isNotEmpty();
-        verify(chatRepository, times(1)).findChatHistory(loginMemberId, receiverId);
-    }
-
-    @Test
-    void findTopByChatRoomOrderByDateDescTest() {
-        // given
-        ChatRoom chatRoom = ChatRoom.builder().build();
-        Chat mockChat = Chat.builder().build();
-
-        // stub
-        when(chatRepository.findTopByChatRoomOrderByDateDesc(chatRoom)).thenReturn(mockChat);
-
-        // when
-        Chat findChat = chatService.findTopByChatRoomOrderByDateDesc(chatRoom);
-
-        // then
-        assertThat(findChat).isEqualTo(mockChat);
-        verify(chatRepository, times(1)).findTopByChatRoomOrderByDateDesc(chatRoom);
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.CHAT_ROOM_NOT_FOUND);
+        });
+        verify(memberRepository, times(1)).findById(senderId);
+        verify(memberRepository, times(1)).findById(receiverId);
+        verify(chatRoomRepository, times(1)).findById(chatRoomId);
+        verifyNoInteractions(chatRepository);
     }
 }

@@ -15,7 +15,8 @@ public abstract class UrlList {
             "/api/members/nickname",
             "/api/posts/main",
             "/api/posts/**",
-            "/api/refreshToken"};
+            "/api/refreshToken",
+            "/api/files/**"};
 
     private static final String[] blackList = {
             "/api/posts/new",
@@ -27,7 +28,8 @@ public abstract class UrlList {
             "/api/chat/**",
             "/api/emitter/**",
             "/api/comments/**",
-            "/api/members"
+            "/api/members",
+            "/api/alarms/**"
     };
 
     public static String[] getWhiteList() {

@@ -2,6 +2,7 @@ package community.independe.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import community.independe.api.dtos.files.PostFileResponse;
 import community.independe.domain.file.Files;
 import community.independe.domain.post.Post;
 import community.independe.exception.CustomException;
@@ -89,15 +90,16 @@ public class S3FilesServiceTest {
         // given
         Long postId = 1L;
         List<Files> files = new ArrayList<>();
+        files.add(Files.builder().s3Url("s3Url").build());
 
         // stub
         when(filesRepository.findAllFilesByPostId(postId)).thenReturn(files);
 
         // when
-        List<Files> findFiles = filesService.findAllFilesByPostId(postId);
+        PostFileResponse findAllFiles = filesService.findAllFilesByPostId(postId);
 
         // then
-        assertThat(findFiles).isEqualTo(files);
+        assertThat(findAllFiles.getS3Urls().size()).isEqualTo(1);
         verify(filesRepository, times(1)).findAllFilesByPostId(postId);
     }
 

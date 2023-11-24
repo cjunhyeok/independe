@@ -1,9 +1,11 @@
 package community.independe.repository;
 
+import community.independe.domain.chat.Chat;
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
+import community.independe.repository.chat.ChatRepository;
 import community.independe.repository.chat.ChatRoomRepository;
-import org.junit.jupiter.api.BeforeEach;
+import community.independe.util.SortedStringEditor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -13,129 +15,76 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
-class ChatRoomRepositoryTest {
+public class ChatRoomRepositoryTest {
 
     @Autowired
     private ChatRoomRepository chatRoomRepository;
     @Autowired
+    private ChatRepository chatRepository;
+    @Autowired
     private MemberRepository memberRepository;
-
-    @BeforeEach
-    public void initData() {
-        Member sender = Member.builder().username("sender").build();
-        memberRepository.save(sender);
-        Member receiver = Member.builder().username("receiver").build();
-        memberRepository.save(receiver);
-        String title = "initSenderToReceiver";
-
-        ChatRoom chatRoom = ChatRoom
-                .builder()
-                .title(title)
-                .sender(sender)
-                .receiver(receiver)
-                .build();
-        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
-    }
 
     @Test
     void saveTest() {
         // given
-        Member sender = Member.builder().build();
-        memberRepository.save(sender);
-        Member receiver = Member.builder().build();
-        memberRepository.save(receiver);
-        String title = "senderToReceiver";
-
-        ChatRoom chatRoom = ChatRoom
-                .builder()
-                .title(title)
-                .sender(sender)
-                .receiver(receiver)
-                .build();
+        String senderAndReceiver = "senderIdAndReceiverId";
+        ChatRoom chatRoom = ChatRoom.builder().senderAndReceiver(senderAndReceiver).build();
 
         // when
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
 
         // then
-        assertThat(savedChatRoom.getSender()).isEqualTo(sender);
-        assertThat(savedChatRoom.getReceiver()).isEqualTo(receiver);
-        assertThat(savedChatRoom.getTitle()).isEqualTo(title);
+        assertThat(savedChatRoom).isEqualTo(chatRoom);
+        assertThat(savedChatRoom.getId()).isEqualTo(chatRoom.getId());
+        assertThat(savedChatRoom.getSenderAndReceiver()).isEqualTo(chatRoom.getSenderAndReceiver());
     }
 
     @Test
-    void findByTitleTest() {
+    void findBySenderAndReceiverTest() {
         // given
-        String title = "initSenderToReceiver";
+        Long senderId = 1L;
+        Long receiverId = 2L;
+        String senderAndReceiver = SortedStringEditor.createSortedString(senderId, receiverId);
+        ChatRoom chatRoom = ChatRoom.builder().senderAndReceiver(senderAndReceiver).build();
+        chatRoomRepository.save(chatRoom);
 
         // when
-        ChatRoom findChatRoom = chatRoomRepository.findByTitle(title);
+        ChatRoom findChatRoom = chatRoomRepository.findBySenderAndReceiver(senderAndReceiver);
 
         // then
-        assertThat(findChatRoom.getTitle()).isEqualTo(title);
-        assertThat(findChatRoom.getSender().getUsername()).isEqualTo("sender");
-        assertThat(findChatRoom.getReceiver().getUsername()).isEqualTo("receiver");
+        assertThat(findChatRoom.getSenderAndReceiver()).isEqualTo(senderAndReceiver);
     }
 
     @Test
-    void findAllByLoginMemberIdTest() {
+    void findChatRoomsByMemberIdTest() {
         // given
-        Member sender = memberRepository.findByUsername("sender");
-        Member receiver = memberRepository.findByUsername("receiver");
+        Member member = Member.builder().build();
+        Member savedMember = memberRepository.save(member);
+        Member firstReceiver = Member.builder().build();
+        Member savedFirstReceiver = memberRepository.save(firstReceiver);
+        Member secondReceiver = Member.builder().build();
+        Member savedSecondReceiver = memberRepository.save(secondReceiver);
 
-        ChatRoom chatRoom = ChatRoom
-                .builder()
-                .sender(receiver)
-                .receiver(sender)
-                .title("receiverToSender")
-                .build();
-        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+        String firstSendAndReceive = SortedStringEditor.createSortedString(savedMember.getId(), savedFirstReceiver.getId());
+        ChatRoom firstChatRoom = ChatRoom.builder().senderAndReceiver(firstSendAndReceive).build();
+        ChatRoom savedFirstChatRoom = chatRoomRepository.save(firstChatRoom);
+
+        String secondSendAndReceive = SortedStringEditor.createSortedString(savedMember.getId(), savedSecondReceiver.getId());
+        ChatRoom secondChatRoom = ChatRoom.builder().senderAndReceiver(secondSendAndReceive).build();
+        ChatRoom savedSecondChatRoom = chatRoomRepository.save(secondChatRoom);
+
+        Chat firstChat = Chat.builder().sender(savedMember).receiver(savedFirstReceiver).chatRoom(savedFirstChatRoom).build();
+        Chat savedFirstChat = chatRepository.save(firstChat);
+
+        Chat secondChat = Chat.builder().sender(savedMember).receiver(savedSecondReceiver).chatRoom(savedSecondChatRoom).build();
+        Chat savedSecondChat = chatRepository.save(secondChat);
 
         // when
-        List<ChatRoom> findChatRooms =
-                chatRoomRepository.findAllByLoginMemberId(sender.getId());
+        List<ChatRoom> findChatRooms = chatRoomRepository.findChatRoomsByMemberId(member.getId());
 
         // then
         assertThat(findChatRooms.size()).isEqualTo(2);
-    }
-
-    @Test
-    void findAllByLoginMemberIdFailTest() {
-        // given
-        Long loginMemberId = -1L;
-
-        // when
-        List<ChatRoom> findChatRooms =
-                chatRoomRepository.findAllByLoginMemberId(loginMemberId);
-
-        // then
-        assertThat(findChatRooms).isEmpty();
-    }
-
-
-    @Test
-    void findByLoginMemberIdWithReceiverIdTest() {
-        // given
-        Member sender = memberRepository.findByUsername("sender");
-        Member receiver = memberRepository.findByUsername("receiver");
-
-        // when
-        ChatRoom findChatRoom = chatRoomRepository.findByLoginMemberIdWithReceiverId(sender.getId(), receiver.getId());
-
-        // then
-        assertThat(findChatRoom.getSender()).isEqualTo(sender);
-        assertThat(findChatRoom.getReceiver()).isEqualTo(receiver);
-    }
-
-    @Test
-    void findByLoginMemberIdWithReceiverIdFailTest() {
-        // given
-        Member sender = memberRepository.findByUsername("sender");
-        Long receiverId = -1L;
-
-        // when
-        ChatRoom findChatRoom = chatRoomRepository.findByLoginMemberIdWithReceiverId(sender.getId(), receiverId);
-
-        // then
-        assertThat(findChatRoom).isNull();
+        assertThat(findChatRooms.get(0).getId()).isEqualTo(savedFirstChatRoom.getId());
+        assertThat(findChatRooms.get(1).getId()).isEqualTo(savedSecondChatRoom.getId());
     }
 }

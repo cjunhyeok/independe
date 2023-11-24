@@ -88,7 +88,7 @@ public class PostApiController {
                         p.getViews(),
                         recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).isEmpty()
+                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
                 ))
                 .collect(Collectors.toList());
 
@@ -167,7 +167,7 @@ public class PostApiController {
                         p.getViews(),
                         recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).isEmpty()
+                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
                 ))
                 .collect(Collectors.toList());
 
@@ -330,7 +330,7 @@ public class PostApiController {
                         p.getViews(),
                         recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).isEmpty()
+                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
                 ))
                 .collect(Collectors.toList());
 
@@ -360,7 +360,7 @@ public class PostApiController {
                         p.getViews(),
                         recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).isEmpty()
+                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
                 )).collect(Collectors.toList());
 
         // 추천수 자취 게시글 10개
@@ -373,7 +373,7 @@ public class PostApiController {
                         p.getIndependentPostType(),
                         recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).isEmpty()
+                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
                 )).collect(Collectors.toList());
 
         // 전체 지역 게시글 5개
@@ -384,7 +384,7 @@ public class PostApiController {
                         p.getTitle(),
                         recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).isEmpty()
+                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
                 )).collect(Collectors.toList());
 
         // 전체 아닌 지역 게시글 5개
@@ -399,7 +399,7 @@ public class PostApiController {
                         p.getRegionPostType(),
                         recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
                         commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).isEmpty()
+                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
                 )).collect(Collectors.toList());
 
         // 인기 검색어 10개

@@ -1,67 +1,89 @@
 package community.independe.service.chat;
 
+import community.independe.api.dtos.chat.ChatRoomsResponse;
+import community.independe.domain.chat.Chat;
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
 import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
+import community.independe.repository.chat.ChatRepository;
 import community.independe.repository.chat.ChatRoomRepository;
+import community.independe.util.SortedStringEditor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ChatRoomServiceImpl implements ChatRoomService{
 
-    private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatRepository chatRepository;
+    private final MemberRepository memberRepository;
+
 
     @Override
     @Transactional
-    public Long saveChatRoom(String title, Long senderId, Long receiverId) {
-
-        Member findFirstMember = memberRepository.findById(senderId).orElseThrow(
+    public Long saveChatRoom(Long senderId, Long receiverId) {
+        Member findSender = memberRepository.findById(senderId).orElseThrow(
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
-        Member findSecondMember = memberRepository.findById(receiverId).orElseThrow(
+        Member findReceiver = memberRepository.findById(receiverId).orElseThrow(
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
         ChatRoom chatRoom = ChatRoom.builder()
-                .title(title)
-                .sender(findFirstMember)
-                .receiver(findSecondMember)
+                .senderAndReceiver(SortedStringEditor.createSortedString(findSender.getId(), findReceiver.getId()))
                 .build();
 
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
-
         return savedChatRoom.getId();
     }
 
     @Override
-    public ChatRoom findByTitle(String title) {
-        return chatRoomRepository.findByTitle(title);
-    }
-
-    @Override
-    public ChatRoom findById(Long id) {
-        return chatRoomRepository.findById(id).orElseThrow(
-                () -> new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND)
+    public ChatRoom findBySenderAndReceiver(Long senderId, Long receiverId) {
+        Member findSender = memberRepository.findById(senderId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
+
+        Member findReceiver = memberRepository.findById(receiverId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+        );
+
+        String senderAndReceiver = SortedStringEditor.createSortedString(findSender.getId(), findReceiver.getId());
+
+        ChatRoom findChatRoom = chatRoomRepository.findBySenderAndReceiver(senderAndReceiver);
+
+        return findChatRoom;
     }
 
     @Override
-    public List<ChatRoom> findAllByLoginMember(Long loginMemberId) {
-        return chatRoomRepository.findAllByLoginMemberId(loginMemberId);
-    }
+    public List<ChatRoomsResponse> findChatRooms(Long memberId) {
+        List<ChatRoom> findChatRooms = chatRoomRepository.findChatRoomsByMemberId(memberId);
 
-    @Override
-    public ChatRoom findByLoginMemberIdWithReceiverId(Long loginMemberId, Long receiverId) {
-        return chatRoomRepository.findByLoginMemberIdWithReceiverId(loginMemberId, receiverId);
+        List<ChatRoomsResponse> chatRoomsResponses = new ArrayList<>();
+
+        for (ChatRoom findChatRoom : findChatRooms) {
+            Chat findLastChat = chatRepository.findLastChatByChatRoomId(findChatRoom.getId());
+            ChatRoomsResponse chatRoomsResponse = ChatRoomsResponse.builder()
+                    .chatRoomId(findChatRoom.getId())
+                    .receiverId(findLastChat.getReceiver().getId())
+                    .senderNickname(findLastChat.getSender().getNickname())
+                    .receiverNickname(findLastChat.getReceiver().getNickname())
+                    .isRead(findLastChat.getIsRead())
+                    .lastMessage(findLastChat.getMessage())
+                    .build();
+            chatRoomsResponses.add(chatRoomsResponse);
+        }
+
+        return chatRoomsResponses;
     }
 }
