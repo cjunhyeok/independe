@@ -53,3 +53,5 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             jwk-set-uri: https://kauth.kakao.com/.well-known/jwks.json
             user-name-attribute: id # OpenID Connect 로 인가서버와 통신하지 않을 경우
+
+cicd:
