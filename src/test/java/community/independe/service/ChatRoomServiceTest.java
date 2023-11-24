@@ -1,6 +1,5 @@
 package community.independe.service;
 
-import community.independe.api.dtos.chat.ChatRoomResponse;
 import community.independe.api.dtos.chat.ChatRoomsResponse;
 import community.independe.domain.chat.Chat;
 import community.independe.domain.chat.ChatRoom;
@@ -162,7 +161,7 @@ public class ChatRoomServiceTest {
         when(chatRoomRepository.findBySenderAndReceiver(senderAndReceiver)).thenReturn(ChatRoom.builder().senderAndReceiver(senderAndReceiver).build());
 
         // when
-        ChatRoomResponse chatRoomResponse = chatRoomService.findBySenderAndReceiver(senderId, receiverId);
+        ChatRoom findChatRoom = chatRoomService.findBySenderAndReceiver(senderId, receiverId);
 
         // then
         verify(memberRepository, times(1)).findById(senderId);
