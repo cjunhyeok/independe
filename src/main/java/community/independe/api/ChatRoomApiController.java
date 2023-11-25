@@ -1,9 +1,7 @@
 package community.independe.api;
 
 import community.independe.api.dtos.Result;
-import community.independe.api.dtos.chat.ChatRoomRequest;
-import community.independe.api.dtos.chat.ChatRoomResponse;
-import community.independe.api.dtos.chat.ChatRoomsResponse;
+import community.independe.api.dtos.chat.*;
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
 import community.independe.security.service.MemberContext;
@@ -60,5 +58,14 @@ public class ChatRoomApiController {
         List<ChatRoomsResponse> chatRoomsResponses = chatRoomService.findChatRooms(loginMember.getId());
 
         return new Result<>(chatRoomsResponses);
+    }
+
+    @GetMapping("/api/chat/history")
+    @Operation(summary = "채팅 내역 조회 * ")
+    public Result chatHistory(@RequestBody ChatHistoryRequest request) {
+
+        List<ChatHistoryResponse> chatHistory = chatService.findChatHistory(request.getChatRoomId());
+
+        return new Result(chatHistory);
     }
 }

@@ -1,5 +1,6 @@
 package community.independe.service.chat;
 
+import community.independe.api.dtos.chat.ChatHistoryResponse;
 import community.independe.domain.chat.Chat;
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
@@ -12,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -48,5 +52,24 @@ public class ChatServiceImpl implements ChatService {
         Chat savedChat = chatRepository.save(chat);
 
         return savedChat.getId();
+    }
+
+    @Override
+    public List<ChatHistoryResponse> findChatHistory(Long chatRoomId) {
+        List<Chat> chatHistory = chatRepository.findChatHistory(chatRoomId);
+
+        List<ChatHistoryResponse> chatHistoryResponses = new ArrayList<>();
+
+        for (Chat chat : chatHistory) {
+            ChatHistoryResponse chatHistoryResponse = new ChatHistoryResponse();
+            chatHistoryResponse.setSenderNickname(chat.getSender().getNickname());
+            chatHistoryResponse.setReceiverNickname(chat.getReceiver().getNickname());
+            chatHistoryResponse.setMessage(chat.getMessage());
+            chatHistoryResponse.setIsRead(chat.getIsRead());
+            chatHistoryResponse.setCreatedDate(chat.getCreatedDate());
+            chatHistoryResponses.add(chatHistoryResponse);
+        }
+
+        return chatHistoryResponses;
     }
 }

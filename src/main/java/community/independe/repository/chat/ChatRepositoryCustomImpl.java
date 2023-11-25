@@ -4,6 +4,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import community.independe.domain.chat.Chat;
 import jakarta.persistence.EntityManager;
 
+import java.util.List;
+
 import static community.independe.domain.chat.QChat.chat;
 
 public class ChatRepositoryCustomImpl implements ChatRepositoryCustom{
@@ -27,5 +29,17 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom{
                 .orderBy(chat.createdDate.desc())
                 .limit(1)
                 .fetchOne();
+    }
+
+    @Override
+    public List<Chat> findChatHistory(Long chatRoomId) {
+        return queryFactory
+                .select(chat)
+                .from(chat)
+                .join(chat.sender).fetchJoin()
+                .join(chat.receiver).fetchJoin()
+                .where(chat.chatRoom.id.eq(chatRoomId))
+                .orderBy(chat.createdDate.desc())
+                .fetch();
     }
 }
