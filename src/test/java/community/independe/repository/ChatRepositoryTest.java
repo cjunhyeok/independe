@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
@@ -65,5 +67,26 @@ public class ChatRepositoryTest {
 
         // then
         assertThat(findLastChat).isEqualTo(savedLastChat);
+    }
+
+    @Test
+    void findChatHistoryTest() {
+        // given
+        Member sender = Member.builder().build();
+        Member savedSender = memberRepository.save(sender);
+        Member receiver = Member.builder().build();
+        Member savedReceiver = memberRepository.save(receiver);
+        ChatRoom chatRoom = ChatRoom.builder().senderAndReceiver(SortedStringEditor.createSortedString(savedSender.getId(), savedReceiver.getId())).build();
+        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+        Chat chat = Chat.builder().isRead(false).message("firstMessage").sender(savedSender).receiver(savedReceiver).chatRoom(savedChatRoom).build();
+        Chat savedChat = chatRepository.save(chat);
+        Chat secondChat = Chat.builder().isRead(false).message("secondMessage").sender(savedSender).receiver(savedReceiver).chatRoom(savedChatRoom).build();
+        Chat savedSecondChat = chatRepository.save(secondChat);
+
+        // when
+        List<Chat> chatHistory = chatRepository.findChatHistory(savedChatRoom.getId());
+
+        // then
+        assertThat(chatHistory.size()).isEqualTo(2);
     }
 }
