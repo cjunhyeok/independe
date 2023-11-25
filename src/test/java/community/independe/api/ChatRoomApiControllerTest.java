@@ -1,6 +1,7 @@
 package community.independe.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import community.independe.api.dtos.chat.ChatHistoryRequest;
 import community.independe.api.dtos.chat.ChatRoomRequest;
 import community.independe.api.dtos.chat.ChatRoomsResponse;
 import community.independe.domain.member.Member;
@@ -118,5 +119,30 @@ public class ChatRoomApiControllerTest {
         // then
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.chatRoomId").value(savedChatRoomId));
+    }
+
+    @Test
+    void chatHistoryTest() throws Exception {
+        // given
+        ChatHistoryRequest request = new ChatHistoryRequest();
+
+        Member sender = memberService.findByUsername("testUsername");
+        Long senderId = sender.getId();
+        Long receiverId = memberService.join("receiver", "pass1", "receiver", null, null);
+        Long chatRoomId = chatRoomService.saveChatRoom(senderId, receiverId);
+        chatService.saveChat("message", senderId, receiverId, chatRoomId);
+        chatService.saveChat("secondMessage", senderId, receiverId, chatRoomId);
+
+        request.setChatRoomId(chatRoomId);
+
+        // when
+        ResultActions perform = mockMvc.perform(get("/api/chat/history")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .header("Authorization", accessToken));
+
+        // then
+        perform.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isArray());
     }
 }
