@@ -1,5 +1,6 @@
 package community.independe.service;
 
+import community.independe.api.dtos.chat.ChatHistoryResponse;
 import community.independe.domain.chat.Chat;
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
@@ -16,6 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -140,5 +143,28 @@ public class ChatServiceTest {
         verify(memberRepository, times(1)).findById(receiverId);
         verify(chatRoomRepository, times(1)).findById(chatRoomId);
         verifyNoInteractions(chatRepository);
+    }
+
+    @Test
+    void findChatHistoryTest() {
+        // given
+        Long chatRoomId = 1L;
+        List<Chat> chats = new ArrayList<>();
+        Member sender = Member.builder().nickname("sender").build();
+        Member receiver = Member.builder().nickname("receiver").build();
+        Chat chat = Chat.builder().sender(sender).receiver(receiver).message("message").isRead(false).build();
+        Chat secondChat = Chat.builder().sender(sender).receiver(receiver).message("secondMessage").isRead(false).build();
+        chats.add(chat);
+        chats.add(secondChat);
+
+        // stub
+        when(chatRepository.findChatHistory(chatRoomId)).thenReturn(chats);
+
+        // when
+        List<ChatHistoryResponse> chatHistory = chatService.findChatHistory(chatRoomId);
+
+        // then
+        verify(chatRepository, times(1)).findChatHistory(chatRoomId);
+        assertThat(chatHistory.size()).isEqualTo(2);
     }
 }
