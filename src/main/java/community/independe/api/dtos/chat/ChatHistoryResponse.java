@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-public class ChatHistoryDto {
+public class ChatHistoryResponse {
 
     private String senderNickname;
     private String receiverNickname;
@@ -17,7 +17,7 @@ public class ChatHistoryDto {
     private Boolean isRead;
 
     @Builder
-    public ChatHistoryDto(String senderNickname, String receiverNickname, String message, LocalDateTime createdDate, Boolean isRead) {
+    public ChatHistoryResponse(String senderNickname, String receiverNickname, String message, LocalDateTime createdDate, Boolean isRead) {
         this.senderNickname = senderNickname;
         this.receiverNickname = receiverNickname;
         this.message = message;
