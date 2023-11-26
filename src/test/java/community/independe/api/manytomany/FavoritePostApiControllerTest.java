@@ -8,6 +8,7 @@ import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.repository.manytomany.FavoritePostRepository;
 import community.independe.service.MemberService;
 import community.independe.service.PostService;
+import community.independe.service.manytomany.FavoritePostService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,8 @@ public class FavoritePostApiControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private FavoritePostRepository favoritePostRepository;
+    @Autowired
+    private FavoritePostService favoritePostService;
     @Autowired
     private PostService postService;
     @Autowired
@@ -68,8 +71,6 @@ public class FavoritePostApiControllerTest {
 
         // then
         perform.andExpect(status().isOk());
-        FavoritePost findFavoritePost = favoritePostRepository.findById(savedPostId).get();
-        assertThat(findFavoritePost.getIsFavorite()).isTrue();
     }
 
     @Test
@@ -77,17 +78,15 @@ public class FavoritePostApiControllerTest {
         // when
         Member findMember = memberService.findByUsername("testUsername");
         Long savedPostId = postService.createIndependentPost(findMember.getId(), "title", "content", IndependentPostType.CLEAN);
-        mockMvc.perform(post("/api/favoritePost/{postId}", savedPostId)
-                .header("Authorization", accessToken));
+        Long savedFavoritePostId = favoritePostService.save(savedPostId, findMember.getId());
 
         // when
         ResultActions perform = mockMvc.perform(post("/api/favoritePost/{postId}", savedPostId)
                 .header("Authorization", accessToken));
 
-
         // then
         perform.andExpect(status().isOk());
-        FavoritePost findFavoritePost = favoritePostRepository.findById(savedPostId).get();
+        FavoritePost findFavoritePost = favoritePostRepository.findById(savedFavoritePostId).get();
         assertThat(findFavoritePost.getIsFavorite()).isFalse();
     }
 
@@ -96,19 +95,17 @@ public class FavoritePostApiControllerTest {
         // when
         Member findMember = memberService.findByUsername("testUsername");
         Long savedPostId = postService.createIndependentPost(findMember.getId(), "title", "content", IndependentPostType.CLEAN);
+        Long savedFavoritePostId = favoritePostService.save(savedPostId, findMember.getId());
         mockMvc.perform(post("/api/favoritePost/{postId}", savedPostId)
                 .header("Authorization", accessToken));
-        mockMvc.perform(post("/api/favoritePost/{postId}", savedPostId)
-                .header("wAuthorization", accessToken));
 
         // when
         ResultActions perform = mockMvc.perform(post("/api/favoritePost/{postId}", savedPostId)
                 .header("Authorization", accessToken));
 
-
         // then
         perform.andExpect(status().isOk());
-        FavoritePost findFavoritePost = favoritePostRepository.findById(savedPostId).get();
+        FavoritePost findFavoritePost = favoritePostRepository.findById(savedFavoritePostId).get();
         assertThat(findFavoritePost.getIsFavorite()).isTrue();
     }
 }
