@@ -1,6 +1,8 @@
 package community.independe.security.service;
 
 import community.independe.domain.member.Member;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         Member findMember = memberRepository.findByUsername(username);
 
         if (findMember == null) {
-            throw new UsernameNotFoundException("Invalid Username");
+            throw new CustomException(ErrorCode.INVALID_USERNAME);
         }
 
         List<GrantedAuthority> roles = new ArrayList<>();
