@@ -29,7 +29,11 @@ public abstract class UrlList {
             "/api/emitter/**",
             "/api/comments/**",
             "/api/members",
-            "/api/alarms/**"
+            "/api/alarms/**",
+            "/api/reportPost/**",
+            "/api/recommendPost/**",
+            "/api/recommendComment/**",
+            "/api/favoritePost/**"
     };
 
     public static String[] getWhiteList() {

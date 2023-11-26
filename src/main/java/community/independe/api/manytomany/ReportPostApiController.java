@@ -20,7 +20,7 @@ public class ReportPostApiController {
 
     private final ReportPostService reportPostService;
 
-    @Operation(summary = "게시글 신고")
+    @Operation(summary = "게시글 신고 *")
     @PostMapping("/api/reportPost/{postId}")
     public ResponseEntity addReportPost(@PathVariable(name = "postId") Long postId,
                                         @AuthenticationPrincipal MemberContext memberContext) {

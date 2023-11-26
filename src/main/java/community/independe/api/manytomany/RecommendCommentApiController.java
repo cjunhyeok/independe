@@ -20,7 +20,7 @@ public class RecommendCommentApiController {
 
     private final RecommendCommentService recommendCommentService;
 
-    @Operation(summary = "댓글 추천")
+    @Operation(summary = "댓글 추천 *")
     @PostMapping("/api/recommendComment/{commentId}")
     public ResponseEntity addRecommendComment(@PathVariable(name = "commentId") Long commentId,
                                               @AuthenticationPrincipal MemberContext memberContext) {

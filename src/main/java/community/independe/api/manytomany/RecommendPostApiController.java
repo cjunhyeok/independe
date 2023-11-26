@@ -22,7 +22,7 @@ public class RecommendPostApiController {
     private final RecommendPostService recommendPostService;
     private final PostService postService;
 
-    @Operation(summary = "게시글 추천")
+    @Operation(summary = "게시글 추천 *")
     @PostMapping("/api/recommendPost/{postId}")
     public ResponseEntity addRecommendPost(@PathVariable(name = "postId") Long postId,
                                                  @AuthenticationPrincipal MemberContext memberContext) {
