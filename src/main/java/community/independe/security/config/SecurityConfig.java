@@ -8,7 +8,6 @@ import community.independe.security.filter.CorsFilter;
 import community.independe.security.filter.JwtAuthorizationMacFilter;
 import community.independe.security.handler.OAuth2AuthenticationFailureHandler;
 import community.independe.security.handler.OAuth2AuthenticationSuccessHandler;
-import community.independe.security.provider.JwtAuthenticationProvider;
 import community.independe.security.repository.HttpCookieOAuth2AuthorizationRequestRepository;
 import community.independe.security.service.oauth2.CustomOAuth2UserService;
 import community.independe.security.signature.MacSecuritySigner;
@@ -43,7 +42,6 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final JwtTokenVerifier jwtTokenVerifier;
     private final RefreshTokenService refreshTokenService;
-    private final JwtAuthenticationProvider jwtAuthenticationProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
