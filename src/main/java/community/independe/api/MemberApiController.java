@@ -13,6 +13,7 @@ import community.independe.security.service.MemberContext;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.service.MemberService;
 import community.independe.service.RefreshTokenService;
+import community.independe.service.dtos.LoginResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -77,6 +78,23 @@ public class MemberApiController {
         } else {
             return new DuplicateResponse(false);
         }
+    }
+
+    @Operation(summary = "로그인")
+    @PostMapping("/api/member/login")
+    public ResponseEntity login(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
+
+        LoginResponse loginResponse = memberService.login(loginRequest.getUsername(), loginRequest.getPassword(), request.getRemoteAddr());
+
+        response.addHeader("Authorization", "Bearer " + loginResponse.getAccessToken());
+        Cookie refreshTokenCookie = new Cookie("refreshToken", loginResponse.getRefreshToken());
+
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setHttpOnly(true);
+
+        response.addCookie(refreshTokenCookie);
+
+        return ResponseEntity.ok("Login Success");
     }
 
     @Operation(summary = "위치 인증 *")
