@@ -1,9 +1,15 @@
 package community.independe.service;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.JWK;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
+import community.independe.security.signature.SecuritySigner;
+import community.independe.service.dtos.LoginResponse;
+import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +19,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,6 +36,12 @@ public class MemberServiceTest {
     private MemberRepository memberRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private SecuritySigner securitySigner;
+    @Mock
+    private RefreshTokenService refreshTokenService;
+    @Mock
+    private JWK jwk;
 
     @Test
     public void joinTest() {
@@ -99,6 +113,116 @@ public class MemberServiceTest {
         // then
         abstractThrowableAssert
                 .isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void loginTest() throws JOSEException {
+        // given
+        String username = "username";
+        String password = "password";
+        String ip = "ip";
+        Member member = Member.builder().username(username).role("ROLE_USER").password(password).build();
+        Set<String> authorities = new HashSet<>();
+        authorities.add(member.getRole());
+        String jwtToken = "jwtToken";
+        String refreshToken = "refreshToken";
+
+        // stub
+        when(memberRepository.findByUsername(username)).thenReturn(member);
+        when(passwordEncoder.matches(password, password)).thenReturn(true);
+        when(securitySigner.getJwtToken(username, jwk)).thenReturn(jwtToken);
+        when(securitySigner.getRefreshJwtToken(username, jwk)).thenReturn(refreshToken);
+        when(refreshTokenService.save(ip, authorities, refreshToken, username)).thenReturn(refreshToken);
+
+        // when
+        LoginResponse loginResponse = memberService.login(username, password, ip);
+
+        // then
+        assertThat(loginResponse.getAccessToken()).isEqualTo(jwtToken);
+        assertThat(loginResponse.getRefreshToken()).isEqualTo(refreshToken);
+    }
+
+    @Test
+    void loginUsernameFailTest() {
+        // given
+        String username = "username";
+        String password = "password";
+        String ip = "ip";
+
+        // stub
+        when(memberRepository.findByUsername(username)).thenReturn(null);
+
+        // when
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> memberService.login(username, password, ip))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
+
+        // then
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_USERNAME);
+        });
+        verify(memberRepository, times(1)).findByUsername(username);
+        verifyNoInteractions(passwordEncoder);
+        verifyNoInteractions(securitySigner);
+        verifyNoInteractions(refreshTokenService);
+    }
+
+    @Test
+    void loginPasswordFailTest() {
+        // given
+        String username = "username";
+        String password = "password";
+        String ip = "ip";
+        Member member = Member.builder().username(username).role("ROLE_USER").password(password).build();
+
+        // stub
+        when(memberRepository.findByUsername(username)).thenReturn(member);
+        when(passwordEncoder.matches(password, password)).thenReturn(false);
+
+        // when
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> memberService.login(username, password, ip))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
+
+        // then
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_PASSWORD);
+        });
+        verify(memberRepository, times(1)).findByUsername(username);
+        verify(passwordEncoder, times(1)).matches(password, password);
+        verifyNoInteractions(securitySigner);
+        verifyNoInteractions(refreshTokenService);
+    }
+
+    @Test
+    void loginTokenFailTest() throws JOSEException {
+        // given
+        String username = "username";
+        String password = "password";
+        String ip = "ip";
+        Member member = Member.builder().username(username).role("ROLE_USER").password(password).build();
+        Set<String> authorities = new HashSet<>();
+        authorities.add(member.getRole());
+        String jwtToken = "jwtToken";
+        String refreshToken = "refreshToken";
+
+        // stub
+        when(memberRepository.findByUsername(username)).thenReturn(member);
+        when(passwordEncoder.matches(password, password)).thenReturn(true);
+        when(securitySigner.getJwtToken(username, jwk)).thenThrow(JOSEException.class);
+        // when
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> memberService.login(username, password, ip))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
+
+        // then
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INTERNAL_SERVER_ERROR);
+        });
+        verify(memberRepository, times(1)).findByUsername(username);
+        verify(passwordEncoder, times(1)).matches(password, password);
+        verify(securitySigner, times(1)).getJwtToken(username, jwk);
+        verifyNoInteractions(refreshTokenService);
     }
 
     @Test
