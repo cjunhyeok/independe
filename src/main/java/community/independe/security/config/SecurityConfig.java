@@ -5,7 +5,6 @@ import community.independe.repository.MemberRepository;
 import community.independe.security.exception.JwtAccessDeniedHandler;
 import community.independe.security.exception.JwtAuthenticationEntryPoint;
 import community.independe.security.filter.CorsFilter;
-import community.independe.security.filter.JwtAuthenticationFilter;
 import community.independe.security.filter.JwtAuthorizationMacFilter;
 import community.independe.security.handler.OAuth2AuthenticationFailureHandler;
 import community.independe.security.handler.OAuth2AuthenticationSuccessHandler;
@@ -84,9 +83,6 @@ public class SecurityConfig {
                                                     .successHandler(oAuth2AuthenticationSuccessHandler());
 
         http.addFilterBefore(jwtAuthorizationMacFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(jwtAuthenticationFilter(macSecuritySigner, octetSequenceKey), JwtAuthorizationMacFilter.class);
-
-        http.authenticationProvider(jwtAuthenticationProvider);
 
         http.userDetailsService(userDetailsService);
 
@@ -112,13 +108,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         // Authentication Manger
         return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(MacSecuritySigner macSecuritySigner, OctetSequenceKey octetSequenceKey) throws Exception {
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(macSecuritySigner, octetSequenceKey, refreshTokenService);
-        jwtAuthenticationFilter.setAuthenticationManager(authenticationManager(null));
-        return jwtAuthenticationFilter;
     }
 
     @Bean

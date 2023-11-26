@@ -262,7 +262,7 @@ public class MemberApiControllerTest {
         String password = "testPasswrod1!";
 
         // when
-        ResultActions perform = mockMvc.perform(post("/api/login")
+        ResultActions perform = mockMvc.perform(post("/api/member/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(Map.of(
                         "username", username,
@@ -281,7 +281,7 @@ public class MemberApiControllerTest {
         String password = "testPasswrod1!";
 
         // when
-        ResultActions perform = mockMvc.perform(post("/api/login")
+        ResultActions perform = mockMvc.perform(post("/api/member/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(Map.of(
                         "username", username,
@@ -299,7 +299,7 @@ public class MemberApiControllerTest {
         String password = "testPasswrod1!Fail";
 
         // when
-        ResultActions perform = mockMvc.perform(post("/api/login")
+        ResultActions perform = mockMvc.perform(post("/api/member/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(Map.of(
                         "username", username,

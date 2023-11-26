@@ -31,7 +31,7 @@ public class LoginMemberInjector {
         String username = "testUsername";
         String password = "testPasswrod1!";
 
-        ResultActions perform = mockMvc.perform(post("/api/login")
+        ResultActions perform = mockMvc.perform(post("/api/member/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(Map.of(
                         "username", username,

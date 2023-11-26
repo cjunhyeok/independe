@@ -1,14 +1,14 @@
-package community.independe.security.filter.dto;
+package community.independe.api.dtos.member;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
-public class LoginDto {
+@Data
+@NoArgsConstructor
+public class LoginRequest {
 
     @NotEmpty
     private String username;

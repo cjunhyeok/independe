@@ -1,17 +1,23 @@
 package community.independe.service;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.JWK;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
+import community.independe.security.signature.SecuritySigner;
+import community.independe.service.dtos.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -21,7 +27,9 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final SecuritySigner securitySigner;
+    private final RefreshTokenService refreshTokenService;
+    private final JWK jwk;
 
     @Override
     @Transactional
@@ -45,6 +53,37 @@ public class MemberServiceImpl implements MemberService {
                 .build();
         Member savedMember = memberRepository.save(member);
         return savedMember.getId();
+    }
+
+    @Override
+    public LoginResponse login(String username, String password, String ip) {
+
+        Member findMember = memberRepository.findByUsername(username);
+        if (findMember == null) {
+            throw new CustomException(ErrorCode.INVALID_USERNAME);
+        }
+
+        if (!passwordEncoder.matches(password, findMember.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+        }
+        String jwtToken;
+        String refreshToken;
+        Set<String> authorities = new HashSet<>();
+        authorities.add(findMember.getRole());
+        String findUsername = findMember.getUsername();
+
+        try {
+            jwtToken = securitySigner.getJwtToken(findUsername, jwk);
+            refreshToken = securitySigner.getRefreshJwtToken(findUsername, jwk);
+            refreshTokenService.save(ip, authorities, refreshToken, findUsername);
+
+            return LoginResponse.builder()
+                    .accessToken(jwtToken)
+                    .refreshToken(refreshToken)
+                    .build();
+        } catch (JOSEException e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private boolean checkUsername(String username) {

@@ -9,7 +9,7 @@ public abstract class UrlList {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/oauth2/**",
-            "/api/login",
+            "/api/member/login",
             "/api/members/new",
             "/api/members/username",
             "/api/members/nickname",
