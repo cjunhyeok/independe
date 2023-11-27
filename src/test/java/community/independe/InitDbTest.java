@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -33,6 +34,7 @@ public class InitDbTest {
     private PasswordEncoder passwordEncoder;
 
     @Test
+    @Transactional
     void initDb() {
         // given
         InitDB.InitService initService = new InitDB.InitService(em, memberRepository, postRepository, commentRepository, keywordRepository, videoRepository, passwordEncoder);
