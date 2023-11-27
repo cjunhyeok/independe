@@ -20,7 +20,7 @@ public class FavoritePostApiController {
 
     private final FavoritePostService favoritePostService;
 
-    @Operation(summary = "즐겨찾기 추가")
+    @Operation(summary = "즐겨찾기 추가 *")
     @PostMapping("/api/favoritePost/{postId}")
     public ResponseEntity addFavoritePost(@PathVariable(name = "postId") Long postId,
                                           @AuthenticationPrincipal MemberContext memberContext) {
