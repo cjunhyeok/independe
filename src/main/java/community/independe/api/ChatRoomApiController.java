@@ -62,9 +62,12 @@ public class ChatRoomApiController {
 
     @GetMapping("/api/chat/history")
     @Operation(summary = "채팅 내역 조회 * ")
-    public Result chatHistory(@RequestBody ChatHistoryRequest request) {
+    public Result chatHistory(@RequestBody ChatHistoryRequest request,
+                              @AuthenticationPrincipal MemberContext memberContext) {
 
-        List<ChatHistoryResponse> chatHistory = chatService.findChatHistory(request.getChatRoomId());
+        Member loginMember = memberContext.getMember();
+
+        List<ChatHistoryResponse> chatHistory = chatService.findChatHistory(request.getChatRoomId(), loginMember.getId());
 
         return new Result(chatHistory);
     }

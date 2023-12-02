@@ -55,12 +55,20 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<ChatHistoryResponse> findChatHistory(Long chatRoomId) {
+    public List<ChatHistoryResponse> findChatHistory(Long chatRoomId, Long memberId) {
         List<Chat> chatHistory = chatRepository.findChatHistory(chatRoomId);
+        Member findMember = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+        );
 
         List<ChatHistoryResponse> chatHistoryResponses = new ArrayList<>();
 
         for (Chat chat : chatHistory) {
+
+            if (chat.getReceiver() == findMember) {
+                chat.updateIsReadTrue();
+            }
+
             ChatHistoryResponse chatHistoryResponse = new ChatHistoryResponse();
             chatHistoryResponse.setSenderNickname(chat.getSender().getNickname());
             chatHistoryResponse.setReceiverNickname(chat.getReceiver().getNickname());

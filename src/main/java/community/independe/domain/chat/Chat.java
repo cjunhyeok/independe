@@ -39,4 +39,8 @@ public class Chat extends BaseEntity {
         this.receiver = receiver;
         this.chatRoom = chatRoom;
     }
+
+    public void updateIsReadTrue() {
+        this.isRead = true;
+    }
 }
