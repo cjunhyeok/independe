@@ -7,5 +7,5 @@ import java.util.List;
 public interface ChatService {
 
     Long saveChat(String message, Long senderId, Long receiverId, Long chatRoomId);
-    List<ChatHistoryResponse> findChatHistory(Long chatRoomId);
+    List<ChatHistoryResponse> findChatHistory(Long chatRoomId, Long memberId);
 }
