@@ -149,22 +149,30 @@ public class ChatServiceTest {
     void findChatHistoryTest() {
         // given
         Long chatRoomId = 1L;
+        Long memberId = 1L;
         List<Chat> chats = new ArrayList<>();
         Member sender = Member.builder().nickname("sender").build();
         Member receiver = Member.builder().nickname("receiver").build();
         Chat chat = Chat.builder().sender(sender).receiver(receiver).message("message").isRead(false).build();
         Chat secondChat = Chat.builder().sender(sender).receiver(receiver).message("secondMessage").isRead(false).build();
+        Chat lastChat = Chat.builder().sender(receiver).receiver(sender).message("lastMessage").isRead(false).build();
         chats.add(chat);
         chats.add(secondChat);
+        chats.add(lastChat);
 
         // stub
         when(chatRepository.findChatHistory(chatRoomId)).thenReturn(chats);
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(receiver));
 
         // when
-        List<ChatHistoryResponse> chatHistory = chatService.findChatHistory(chatRoomId);
+        List<ChatHistoryResponse> chatHistory = chatService.findChatHistory(chatRoomId, memberId);
 
         // then
         verify(chatRepository, times(1)).findChatHistory(chatRoomId);
-        assertThat(chatHistory.size()).isEqualTo(2);
+        verify(memberRepository, times(1)).findById(memberId);
+        assertThat(chatHistory.size()).isEqualTo(3);
+        assertThat(chatHistory.get(0).getIsRead()).isTrue();
+        assertThat(chatHistory.get(1).getIsRead()).isTrue();
+        assertThat(chatHistory.get(2).getIsRead()).isFalse();
     }
 }
