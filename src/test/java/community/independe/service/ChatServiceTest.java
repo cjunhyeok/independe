@@ -175,4 +175,34 @@ public class ChatServiceTest {
         assertThat(chatHistory.get(1).getIsRead()).isTrue();
         assertThat(chatHistory.get(2).getIsRead()).isFalse();
     }
+
+    @Test
+    void findChatHistoryFailTest() {
+        // given
+        Long chatRoomId = 1L;
+        Long memberId = 1L;
+        List<Chat> chats = new ArrayList<>();
+        Member sender = Member.builder().nickname("sender").build();
+        Member receiver = Member.builder().nickname("receiver").build();
+        Chat chat = Chat.builder().sender(sender).receiver(receiver).message("message").isRead(false).build();
+        Chat secondChat = Chat.builder().sender(sender).receiver(receiver).message("secondMessage").isRead(false).build();
+        Chat lastChat = Chat.builder().sender(receiver).receiver(sender).message("lastMessage").isRead(false).build();
+        chats.add(chat);
+        chats.add(secondChat);
+        chats.add(lastChat);
+
+        // stub
+        when(chatRepository.findChatHistory(chatRoomId)).thenReturn(chats);
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // when
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> chatService.findChatHistory(chatRoomId, memberId))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
+
+        // then
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.MEMBER_NOT_FOUND);
+        });
+    }
 }
