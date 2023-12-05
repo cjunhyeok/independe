@@ -27,4 +27,9 @@ public class VideoServiceImpl implements VideoService{
     public List<Video> findAllByIndependentPostType(IndependentPostType independentPostType) {
         return videoRepository.findAllByIndependentPostType(independentPostType);
     }
+
+    @Override
+    public List<Video> findAll() {
+        return videoRepository.findAll();
+    }
 }
