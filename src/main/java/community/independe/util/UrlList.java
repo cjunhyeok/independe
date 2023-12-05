@@ -16,7 +16,8 @@ public abstract class UrlList {
             "/api/posts/main",
             "/api/posts/**",
             "/api/refreshToken",
-            "/api/files/**"};
+            "/api/files/**",
+            "/api/videos"};
 
     private static final String[] blackList = {
             "/api/posts/new",
