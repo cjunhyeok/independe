@@ -57,4 +57,22 @@ public class VideoServiceTest {
         assertThat(findVideos).isEqualTo(videos);
         verify(videoRepository, times(1)).findAllByIndependentPostType(independentPostType);
     }
+
+    @Test
+    void findAllTest() {
+        // given
+        IndependentPostType independentPostType = IndependentPostType.COOK;
+        List<Video> videos = new ArrayList<>();
+        videos.add(Video.builder().independentPostType(independentPostType).build());
+
+        // stub
+        when(videoRepository.findAll()).thenReturn(videos);
+
+        // when
+        List<Video> findVideos = videoService.findAll();
+
+        // then
+        assertThat(findVideos.size()).isEqualTo(1);
+        verify(videoRepository, times(1)).findAll();
+    }
 }
