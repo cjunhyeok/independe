@@ -12,10 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -62,12 +59,12 @@ public class ChatRoomApiController {
 
     @GetMapping("/api/chat/history")
     @Operation(summary = "채팅 내역 조회 * ")
-    public Result chatHistory(@RequestBody ChatHistoryRequest request,
+    public Result chatHistory(@RequestParam("chatRoomId") Long chatRoomId,
                               @AuthenticationPrincipal MemberContext memberContext) {
 
         Member loginMember = memberContext.getMember();
 
-        List<ChatHistoryResponse> chatHistory = chatService.findChatHistory(request.getChatRoomId(), loginMember.getId());
+        List<ChatHistoryResponse> chatHistory = chatService.findChatHistory(chatRoomId, loginMember.getId());
 
         return new Result(chatHistory);
     }
