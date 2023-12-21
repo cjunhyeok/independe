@@ -205,4 +205,27 @@ public class ChatServiceTest {
             assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.MEMBER_NOT_FOUND);
         });
     }
+
+    @Test
+    void updateChatIsReadTest() {
+        // given
+        Long chatId = 1L;
+        Long chatRoomId = 1L;
+        Long memberId = 1L;
+        Member sender = Member.builder().build();
+        Member receiver = Member.builder().build();
+        ChatRoom chatRoom = ChatRoom.builder().senderAndReceiver("1_2").build();
+        Chat chat = Chat.builder().message("message").isRead(false).sender(sender).receiver(receiver).chatRoom(chatRoom).build();
+
+        // stub
+        when(chatRepository.findById(chatId)).thenReturn(Optional.of(chat));
+        when(chatRoomRepository.findById(chatRoomId)).thenReturn(Optional.of(chatRoom));
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(receiver));
+
+        // when
+        chatService.updateChatIsRead(chatId, chatRoomId, memberId);
+
+        // then
+        assertThat(chat.getIsRead()).isTrue();
+    }
 }
