@@ -19,6 +19,8 @@ public enum ErrorCode {
     REFRESH_TOKEN_NOT_MATCH(HttpStatus.BAD_REQUEST, "잘못된 refresh token 요청 입니다."),
     REFRESH_IP_NOT_MATCH(HttpStatus.BAD_REQUEST, "저장된 토큰의 IP와 일치하지 않습니다."),
     CHAT_ROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "채팅방이 존재하지 않습니다."),
+    CHAT_NOT_FOUND(HttpStatus.BAD_REQUEST, "채팅이 존재하지 않습니다."),
+    CHAT_ROOM_CHAT_NOT_MATCH(HttpStatus.BAD_REQUEST, "해당 채팅방에 존재하는 채팅이 아닙니다."),
     FAVORITE_POST_NOT_FOUND(HttpStatus.BAD_REQUEST, "즐겨찾기 정보가 존재하지 않습니다."),
     RECOMMEND_POST_NOT_FOUND(HttpStatus.BAD_REQUEST, "게시글 추천 정보가 존재하지 않습니다."),
     COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "댓글이 존재하지 않습니다"),
