@@ -38,14 +38,23 @@ public class ChatApiController {
 
         Member loginMember = ((MemberContext) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getMember();
 
-        message.setSenderNickname(loginMember.getNickname());
-        message.setCreatedDate(LocalDateTime.now());
+        if (message.getIsReadData()) {
+            // 읽음처리
+            Long isReadChatRoomId = message.getIsReadChatRoomId(); // 채팅 방 번호
+            Long isReadChatId = message.getIsReadChatId(); // 채팅 번호
 
-        simpMessagingTemplate.convertAndSendToUser(message.getChatRoomId().toString(),"/private",message);
-        Long savedChat = chatService.saveChat(message.getMessage(), loginMember.getId(), message.getReceiverId(), message.getChatRoomId());
+            chatService.updateChatIsRead(isReadChatId, isReadChatRoomId, loginMember.getId());
+        } else {
+            message.setSenderNickname(loginMember.getNickname());
+            message.setCreatedDate(LocalDateTime.now());
 
-        emitterService.notify(message.getReceiverId(), CHAT_MESSAGE);
-        alarmService.saveAlarm(CHAT_MESSAGE, false, AlarmType.TALK, message.getReceiverId());
+            Long savedChat = chatService.saveChat(message.getMessage(), loginMember.getId(), message.getReceiverId(), message.getChatRoomId());
+            message.setChatId(savedChat);
+            simpMessagingTemplate.convertAndSendToUser(message.getChatRoomId().toString(),"/private",message);
+
+            emitterService.notify(message.getReceiverId(), CHAT_MESSAGE);
+            alarmService.saveAlarm(CHAT_MESSAGE, false, AlarmType.TALK, message.getReceiverId());
+        }
 
         return message;
     }
