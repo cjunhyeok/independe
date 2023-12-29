@@ -121,9 +121,9 @@ public class MemberServiceTest {
         String username = "username";
         String password = "password";
         String ip = "ip";
-        Member member = Member.builder().username(username).role("ROLE_USER").password(password).build();
-        Set<String> authorities = new HashSet<>();
-        authorities.add(member.getRole());
+        String role = "ROLE_USER";
+        Member member = Member.builder().username(username).role(role).password(password).build();
+
         String jwtToken = "jwtToken";
         String refreshToken = "refreshToken";
 
@@ -132,7 +132,7 @@ public class MemberServiceTest {
         when(passwordEncoder.matches(password, password)).thenReturn(true);
         when(securitySigner.getJwtToken(username, jwk)).thenReturn(jwtToken);
         when(securitySigner.getRefreshJwtToken(username, jwk)).thenReturn(refreshToken);
-        when(refreshTokenService.save(ip, authorities, refreshToken, username)).thenReturn(refreshToken);
+        when(refreshTokenService.save(ip, role, refreshToken, username)).thenReturn(refreshToken);
 
         // when
         LoginResponse loginResponse = memberService.login(username, password, ip);
