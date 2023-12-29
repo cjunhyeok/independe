@@ -15,9 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Service
@@ -68,14 +66,13 @@ public class MemberServiceImpl implements MemberService {
         }
         String jwtToken;
         String refreshToken;
-        Set<String> authorities = new HashSet<>();
-        authorities.add(findMember.getRole());
+        String role = findMember.getRole();
         String findUsername = findMember.getUsername();
 
         try {
             jwtToken = securitySigner.getJwtToken(findUsername, jwk);
             refreshToken = securitySigner.getRefreshJwtToken(findUsername, jwk);
-            refreshTokenService.save(ip, authorities, refreshToken, findUsername);
+            refreshTokenService.save(ip, role, refreshToken, findUsername);
 
             return LoginResponse.builder()
                     .accessToken(jwtToken)
