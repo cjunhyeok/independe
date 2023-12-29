@@ -2,100 +2,71 @@ package community.independe.service;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jwt.JWT;
-import community.independe.domain.token.RefreshToken;
+import community.independe.domain.token.RefreshTokenMapper;
 import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
-import community.independe.repository.token.RefreshTokenRepository;
-import community.independe.security.provider.JwtParser;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.util.JwtTokenVerifier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.util.Set;
+import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
-    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenVerifier jwtTokenVerifier;
     private final SecuritySigner securitySigner;
     private final JWK jwk;
-    private final JwtParser jwtParser;
+    private final RedisTemplate redisTemplate;
 
     @Override
-    public String save(String ip, Set<String> authorities, String refreshToken, String username) {
+    @Transactional
+    public String save(String ip, String role, String refreshToken, String username) {
 
-        RefreshToken findRefreshToken = refreshTokenRepository.findByUsername(username);
+        String findRefreshToken = (String) redisTemplate.opsForHash().get(username, "refreshToken");
 
         if (findRefreshToken != null) {
-            refreshTokenRepository.deleteById(findRefreshToken.getId());
+            redisTemplate.delete(username);
         }
 
-        RefreshToken savedRefreshToken = saveRefreshToken(ip, authorities, refreshToken, username);
-
-        return savedRefreshToken.getId();
+        Map<String, String> stringStringMap = saveRefreshToken(ip, role, refreshToken, username);
+        return stringStringMap.get("username");
     }
 
     @Override
-    public String reProvideRefreshToken(String currentIp, String refreshToken) throws JOSEException {
-
-        RefreshToken findRefreshToken = RefreshTokenExceptionCheck(refreshToken, currentIp);
-        return getAndSaveRefreshToken(findRefreshToken, currentIp);
-    }
-
-    private RefreshToken RefreshTokenExceptionCheck(String refreshToken, String currentIp) {
+    @Transactional
+    public String reProvideRefreshToken(String username, String currentIp, String refreshToken) throws JOSEException {
 
         String bearerToken = refreshToken.replace("; Secure; HttpOnly", "");
         jwtTokenVerifier.verifyToken(bearerToken);
 
-        String sampleToken = bearerToken.replace("Bearer ", "");
-
-        RefreshToken findRefreshToken = refreshTokenRepository.findByRefreshToken(sampleToken);
+        String findRefreshToken = (String) redisTemplate.opsForHash().get(username, "refreshToken");
         if (findRefreshToken == null) {
             throw new CustomException(ErrorCode.REFRESH_TOKEN_NOT_MATCH);
         }
 
-        String savedIp = findRefreshToken.getIp();
+        String savedIp = (String) redisTemplate.opsForHash().get(username, "ip");
         if (!currentIp.equals(savedIp)) {
             throw new CustomException(ErrorCode.REFRESH_IP_NOT_MATCH);
         }
 
-        return findRefreshToken;
-    }
-
-    private String getAndSaveRefreshToken(RefreshToken findRefreshToken, String currentIp) throws JOSEException {
-        String username;
-        String newRefreshToken;
-        try {
-
-            JWT parsedJwt = jwtParser.parse(findRefreshToken.getRefreshToken());
-            username = jwtParser.getClaim(parsedJwt, "username");
-
-            newRefreshToken = securitySigner.getRefreshJwtToken(username, jwk);
-
-            saveRefreshToken(currentIp, findRefreshToken.getAuthorities(), newRefreshToken, username);
-
-        } catch (ParseException e) {
-            throw new CustomException(ErrorCode.REFRESH_TOKEN_NOT_MATCH);
-        }
+        String role = (String) redisTemplate.opsForHash().get(username, "role");
+        String newRefreshToken = securitySigner.getRefreshJwtToken(username, jwk);
+        saveRefreshToken(currentIp, role, newRefreshToken, username);
 
         return newRefreshToken;
     }
 
-    private RefreshToken saveRefreshToken(String currentIp, Set<String> authorities, String refreshToken, String username) {
+    private Map<String, String> saveRefreshToken(String currentIp, String role, String refreshToken, String username) {
 
-        RefreshToken token = RefreshToken.builder()
-                .ip(currentIp)
-                .authorities(authorities)
-                .refreshToken(refreshToken)
-                .username(username)
-                .build();
-        return refreshTokenRepository.save(token);
+        Map<String, String> refreshTokenMap = RefreshTokenMapper.refreshTokenMap(refreshToken, username, role, currentIp);
+        redisTemplate.opsForHash().putAll(username, refreshTokenMap);
+        return refreshTokenMap;
     }
 }

@@ -1,16 +1,9 @@
 package community.independe.service;
 
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
-import community.independe.domain.token.RefreshToken;
 import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
-import community.independe.repository.token.RefreshTokenRepository;
-import community.independe.security.provider.JwtParser;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.util.JwtTokenVerifier;
 import org.assertj.core.api.AbstractObjectAssert;
@@ -19,13 +12,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.text.ParseException;
-import java.util.HashSet;
-import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
 public class RefreshTokenServiceTest {
@@ -33,111 +26,106 @@ public class RefreshTokenServiceTest {
     @InjectMocks
     private RefreshTokenServiceImpl refreshTokenService;
     @Mock
-    private RefreshTokenRepository refreshTokenRepository;
-    @Mock
     private JwtTokenVerifier jwtTokenVerifier;
     @Mock
     private SecuritySigner securitySigner;
     @Mock
     private JWK jwk;
     @Mock
-    private JwtParser jwtParser;
+    private RedisTemplate<String, String> redisTemplate;
+    @Mock
+    private HashOperations hashOperations;
 
     @Test
     void saveTest() {
         // given
         String ip = "mockIp";
         String username = "username";
-        Set<String> authorities = new HashSet<>();
+        String role = "ROLE_USER";
         String token = "mockRefreshToken";
-        RefreshToken refreshToken = RefreshToken.builder()
-                .ip(ip)
-                .authorities(authorities)
-                .username(username)
-                .refreshToken(token)
-                .build();
 
         // stub
-        when(refreshTokenRepository.findByUsername(username)).thenReturn(refreshToken);
-        doNothing().when(refreshTokenRepository).deleteById(refreshToken.getId());
-        when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(refreshToken);
+        when(redisTemplate.opsForHash()).thenReturn(hashOperations);
+        when(hashOperations.get(username, "refreshToken")).thenReturn(token);
+        when(redisTemplate.delete(username)).thenReturn(true);
+        doNothing().when(hashOperations).putAll(anyString(), anyMap());
 
         // when
-        refreshTokenService.save(ip, authorities, token, username);
+        refreshTokenService.save(ip, role, token, username);
 
         // then
-        verify(refreshTokenRepository, times(1)).findByUsername(username);
-        verify(refreshTokenRepository, times(1)).deleteById(refreshToken.getId());
-        verify(refreshTokenRepository, times(1)).save(any(RefreshToken.class));
+        verify(redisTemplate, times(2)).opsForHash();
+        verify(hashOperations, times(1)).get(username, "refreshToken");
+        verify(redisTemplate, times(1)).delete(username);
+        verify(hashOperations, times(1)).putAll(anyString(), anyMap());
     }
 
     @Test
     void saveNoInteractionDeleteTest() {
-        // given
         String ip = "mockIp";
         String username = "username";
-        Set<String> authorities = new HashSet<>();
+        String role = "ROLE_USER";
         String token = "mockRefreshToken";
 
         // stub
-        when(refreshTokenRepository.findByUsername(username)).thenReturn(null);
-        when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(RefreshToken.builder().build());
+        when(redisTemplate.opsForHash()).thenReturn(hashOperations);
+        when(hashOperations.get(username, "refreshToken")).thenReturn(null);
+        doNothing().when(hashOperations).putAll(anyString(), anyMap());
 
         // when
-        refreshTokenService.save(ip, authorities, token, username);
+        refreshTokenService.save(ip, role, token, username);
 
         // then
-        verify(refreshTokenRepository, times(1)).findByUsername(username);
-        verify(refreshTokenRepository, times(1)).save(any(RefreshToken.class));
-        verifyNoMoreInteractions(refreshTokenRepository);
+        verify(redisTemplate, times(2)).opsForHash();
+        verify(hashOperations, times(1)).get(username, "refreshToken");
+        verify(hashOperations, times(1)).putAll(anyString(), anyMap());
+        verifyNoMoreInteractions(redisTemplate);
     }
 
     @Test
     void reProvideRefreshTokenTest() throws JOSEException, ParseException {
         // given
+        String username = "username";
         String currentIp = "127.0.0.1";
         String refreshToken = "Bearer smockToken.body.claim; Secure; HttpOnly";
-        RefreshToken mockRefreshToken = RefreshToken.builder().ip(currentIp).refreshToken(refreshToken).build();
-        JWSHeader header = new JWSHeader.Builder(new JWSAlgorithm("SHA1")).build();
-        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder().build();
-        SignedJWT signedJWT = new SignedJWT(header, jwtClaimsSet);
 
         // stub
         doNothing().when(jwtTokenVerifier).verifyToken(anyString());
-        when(refreshTokenRepository.findByRefreshToken(anyString()))
-                .thenReturn(mockRefreshToken);
-        when(jwtParser.parse(mockRefreshToken.getRefreshToken())).thenReturn(signedJWT);
-        when(jwtParser.getClaim(signedJWT, "username")).thenReturn("username");
+        when(redisTemplate.opsForHash()).thenReturn(hashOperations);
+        when(hashOperations.get(username, "refreshToken")).thenReturn(refreshToken);
+        when(hashOperations.get(username, "ip")).thenReturn(currentIp);
+        when(hashOperations.get(username, "role")).thenReturn("ROLE_USER");
         when(securitySigner.getRefreshJwtToken(anyString(), eq(jwk))).thenReturn("token");
-        when(refreshTokenRepository.save(any(RefreshToken.class)))
-                .thenReturn(RefreshToken.builder().build());
+        doNothing().when(hashOperations).putAll(anyString(), anyMap());
 
         // when
-        refreshTokenService.reProvideRefreshToken(currentIp, refreshToken);
+        refreshTokenService.reProvideRefreshToken(username, currentIp, refreshToken);
 
         // then
         verify(jwtTokenVerifier, times(1)).verifyToken(anyString());
-        verify(refreshTokenRepository, times(1)).findByRefreshToken(anyString());
-        verify(jwtParser, times(1)).parse(mockRefreshToken.getRefreshToken());
-        verify(jwtParser, times(1)).getClaim(signedJWT, "username");
+        verify(redisTemplate, times(4)).opsForHash();
+        verify(hashOperations, times(1)).get(username, "refreshToken");
+        verify(hashOperations, times(1)).get(username, "ip");
+        verify(hashOperations, times(1)).get(username, "role");
         verify(securitySigner, times(1)).getRefreshJwtToken(anyString(), eq(jwk));
-        verify(refreshTokenRepository, times(1)).save(any(RefreshToken.class));
+        verify(hashOperations, times(1)).putAll(anyString(), anyMap());
     }
 
     @Test
     void reProvideRefreshTokenRefreshFailTest() throws JOSEException {
         // given
+        String username = "username";
         String currentIp = "127.0.0.1";
         String refreshToken = "Bearer smockToken.body.claim; Secure; HttpOnly";
 
         // stub
         doNothing().when(jwtTokenVerifier).verifyToken(anyString());
-        when(refreshTokenRepository.findByRefreshToken(anyString()))
-                .thenReturn(null);
+        when(redisTemplate.opsForHash()).thenReturn(hashOperations);
+        when(hashOperations.get(username, "refreshToken")).thenReturn(null);
 
         // when
         AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(
-                () -> refreshTokenService.reProvideRefreshToken(currentIp, refreshToken))
+                () -> refreshTokenService.reProvideRefreshToken(username, currentIp, refreshToken))
                 .isInstanceOf(CustomException.class)
                 .extracting(ex -> (CustomException) ex);
 
@@ -146,27 +134,29 @@ public class RefreshTokenServiceTest {
             assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.REFRESH_TOKEN_NOT_MATCH);
         });
         verify(jwtTokenVerifier, times(1)).verifyToken(anyString());
-        verify(refreshTokenRepository, times(1)).findByRefreshToken(anyString());
-        verifyNoInteractions(jwtParser);
+        verify(redisTemplate, times(1)).opsForHash();
+        verify(hashOperations, times(1)).get(username, "refreshToken");
         verifyNoInteractions(securitySigner);
-        verifyNoMoreInteractions(refreshTokenRepository);
+        verifyNoMoreInteractions(redisTemplate);
+        verifyNoMoreInteractions(hashOperations);
     }
 
     @Test
     void reProvideRefreshTokenIpFailTest() {
         // given
+        String username = "username";
         String currentIp = "127.0.0.1";
         String refreshToken = "Bearer smockToken.body.claim; Secure; HttpOnly";
-        RefreshToken mockRefreshToken = RefreshToken.builder().ip("0.0.0.0").refreshToken(refreshToken).build();
 
         // stub
         doNothing().when(jwtTokenVerifier).verifyToken(anyString());
-        when(refreshTokenRepository.findByRefreshToken(anyString()))
-                .thenReturn(mockRefreshToken);
+        when(redisTemplate.opsForHash()).thenReturn(hashOperations);
+        when(hashOperations.get(username, "refreshToken")).thenReturn(refreshToken);
+        when(hashOperations.get(username, "ip")).thenReturn("failIp");
 
         // when
         AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(
-                () -> refreshTokenService.reProvideRefreshToken(currentIp, refreshToken))
+                () -> refreshTokenService.reProvideRefreshToken(username, currentIp, refreshToken))
                 .isInstanceOf(CustomException.class)
                 .extracting(ex -> (CustomException) ex);
 
@@ -175,40 +165,11 @@ public class RefreshTokenServiceTest {
             assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.REFRESH_IP_NOT_MATCH);
         });
         verify(jwtTokenVerifier, times(1)).verifyToken(anyString());
-        verify(refreshTokenRepository, times(1)).findByRefreshToken(anyString());
-        verifyNoInteractions(jwtParser);
+        verify(redisTemplate, times(2)).opsForHash();
+        verify(hashOperations, times(1)).get(username, "refreshToken");
+        verify(hashOperations, times(1)).get(username, "ip");
         verifyNoInteractions(securitySigner);
-        verifyNoMoreInteractions(refreshTokenRepository);
-    }
-
-    @Test
-    void reProvideRefreshTokenParseFailTest() throws ParseException {
-        // given
-        String currentIp = "127.0.0.1";
-        String refreshToken = "Bearer smockToken.body.claim; Secure; HttpOnly";
-        RefreshToken mockRefreshToken = RefreshToken.builder().ip(currentIp).refreshToken(refreshToken).build();
-        
-        // stub
-        doNothing().when(jwtTokenVerifier).verifyToken(anyString());
-        when(refreshTokenRepository.findByRefreshToken(anyString()))
-                .thenReturn(mockRefreshToken);
-
-        when(jwtParser.parse(mockRefreshToken.getRefreshToken())).thenThrow(ParseException.class);
-
-        // when
-        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(
-                () -> refreshTokenService.reProvideRefreshToken(currentIp, refreshToken))
-                .isInstanceOf(CustomException.class)
-                .extracting(ex -> (CustomException) ex);
-
-        // then
-        extracting.satisfies(ex -> {
-            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.REFRESH_TOKEN_NOT_MATCH);
-        });
-        verify(jwtTokenVerifier, times(1)).verifyToken(anyString());
-        verify(refreshTokenRepository, times(1)).findByRefreshToken(anyString());
-        verify(jwtParser, times(1)).parse(mockRefreshToken.getRefreshToken());
-        verifyNoInteractions(securitySigner);
-        verifyNoMoreInteractions(refreshTokenRepository);
+        verifyNoMoreInteractions(redisTemplate);
+        verifyNoMoreInteractions(hashOperations);
     }
 }

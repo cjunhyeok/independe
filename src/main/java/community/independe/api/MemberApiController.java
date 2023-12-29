@@ -181,8 +181,8 @@ public class MemberApiController {
             throw new CustomException(ErrorCode.REFRESH_TOKEN_NOT_MATCH);
         }
 
-        String newRefreshToken = refreshTokenService.reProvideRefreshToken(request.getRemoteAddr(), refreshToken);
-        String username = getUsernameFromToken(newRefreshToken);
+        String username = getUsernameFromToken(refreshToken);
+        String newRefreshToken = refreshTokenService.reProvideRefreshToken(username, request.getRemoteAddr(), refreshToken);
         String jwtToken = securitySigner.getJwtToken(username, jwk);
         makeRefreshTokenToCookieAndJwtInHeader(response, newRefreshToken, jwtToken);
 

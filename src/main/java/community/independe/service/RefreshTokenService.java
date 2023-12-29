@@ -5,7 +5,7 @@ import com.nimbusds.jose.JOSEException;
 import java.util.Set;
 
 public interface RefreshTokenService {
-    String save(String ip, Set<String> authorities, String refreshToken, String username);
+    String save(String ip, String role, String refreshToken, String username);
 
-    String reProvideRefreshToken(String currentIp, String refreshToken) throws JOSEException;
+    String reProvideRefreshToken(String username, String currentIp, String refreshToken) throws JOSEException;
 }

@@ -1,120 +1,94 @@
 package community.independe.repository;
 
-import community.independe.domain.token.RefreshToken;
-import community.independe.repository.token.RefreshTokenRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import community.independe.domain.token.RefreshTokenMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
 
-//@Disabled
 @SpringBootTest
 @AutoConfigureMockMvc
 public class RefreshTokenRepositoryTest {
 
     @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
+    private RedisTemplate<String, String> redisTemplate;
 
     @AfterEach
     public void deleteData() {
-        refreshTokenRepository.deleteAll();
+        redisTemplate.delete("username");
     }
 
     @Test
-    void saveTest() {
+    void saveTest() throws JsonProcessingException {
         // given
-        Set<String> roles = new HashSet<>();
-        roles.add("ROLE_USER");
-
-        RefreshToken refreshToken = RefreshToken.builder()
-                .ip("mockIp")
-                .refreshToken("mockRefreshToken")
-                .username("mockUsername")
-                .authorities(roles)
-                .build();
+        String token = "refreshToken";
+        String username = "username";
+        String role = "role";
+        String ip = "ip";
+        Map<String, String> refreshToken = RefreshTokenMapper.refreshTokenMap(token, username, role, ip);
 
         // when
-        RefreshToken savedRefreshToken = refreshTokenRepository.save(refreshToken);
-        RefreshToken findRefreshToken = refreshTokenRepository.findById(savedRefreshToken.getId()).orElseThrow(
-                () -> new IllegalArgumentException()
-        );
+        redisTemplate.opsForHash().putAll(username, refreshToken);
 
         // then
-        assertThat(findRefreshToken.getId()).isEqualTo(savedRefreshToken.getId());
-        assertThat(findRefreshToken.getRefreshToken()).isEqualTo(savedRefreshToken.getRefreshToken());
-        assertThat(findRefreshToken.getUsername()).isEqualTo(savedRefreshToken.getUsername());
-        assertThat(findRefreshToken.getAuthorities()).isEqualTo(savedRefreshToken.getAuthorities());
-        assertThat(findRefreshToken.getIp()).isEqualTo(savedRefreshToken.getIp());
-    }
-
-    @Test
-    void findByRefreshTokenTest() {
-        // given
-        RefreshToken refreshToken = RefreshToken.builder()
-                .ip("mockIp")
-                .refreshToken("mockRefreshToken")
-                .build();
-        RefreshToken savedRefreshToken = refreshTokenRepository.save(refreshToken);
-
-        // when
-        RefreshToken findRefreshToken = refreshTokenRepository.findByRefreshToken("mockRefreshToken");
-
-        // then
-        assertThat(findRefreshToken.getId()).isEqualTo(savedRefreshToken.getId());
-        assertThat(findRefreshToken.getRefreshToken()).isEqualTo(savedRefreshToken.getRefreshToken());
+        String findToken = (String) redisTemplate.opsForHash().get(username, "refreshToken");
+        assertThat(findToken).isEqualTo(token);
     }
 
     @Test
     void deleteByIdTest() {
         // given
-        RefreshToken refreshToken = RefreshToken.builder()
-                .ip("mockIp")
-                .refreshToken("mockRefreshToken")
-                .build();
-        RefreshToken savedRefreshToken = refreshTokenRepository.save(refreshToken);
+        String token = "refreshToken";
+        String username = "username";
+        String role = "role";
+        String ip = "ip";
+        Map<String, String> refreshToken = RefreshTokenMapper.refreshTokenMap(token, username, role, ip);
+        redisTemplate.opsForHash().putAll(username, refreshToken);
 
         // when
-        refreshTokenRepository.deleteById(refreshToken.getId());
+        redisTemplate.delete(username);
 
         // then
-        assertThat(refreshTokenRepository.findById(refreshToken.getId())).isEmpty();
+        String findToken = (String) redisTemplate.opsForHash().get(username, "refreshToken");
+        assertThat(findToken).isNull();
     }
 
     @Test
     void findByUsernameTest() {
         // given
-        RefreshToken refreshToken = RefreshToken.builder()
-                .username("username")
-                .ip("mockIp")
-                .refreshToken("mockRefreshToken")
-                .build();
-        RefreshToken savedRefreshToken = refreshTokenRepository.save(refreshToken);
+        String token = "refreshToken";
+        String username = "username";
+        String role = "role";
+        String ip = "ip";
+        Map<String, String> refreshToken = RefreshTokenMapper.refreshTokenMap(token, username, role, ip);
+        redisTemplate.opsForHash().putAll(username, refreshToken);
 
         // when
-        RefreshToken findRefreshToken = refreshTokenRepository.findByUsername("username");
+        String findUsername = (String) redisTemplate.opsForHash().get(username, username);
 
         // then
-        assertThat(findRefreshToken.getIp()).isEqualTo(savedRefreshToken.getIp());
+        assertThat(findUsername).isEqualTo(username);
     }
 
     @Test
     void findByUsernameFailTest() {
         // given
-        RefreshToken refreshToken = RefreshToken.builder()
-                .username("username")
-                .ip("mockIp")
-                .refreshToken("mockRefreshToken")
-                .build();
-        RefreshToken savedRefreshToken = refreshTokenRepository.save(refreshToken);
+        String token = "refreshToken";
+        String username = "username";
+        String role = "role";
+        String ip = "ip";
+        Map<String, String> refreshToken = RefreshTokenMapper.refreshTokenMap(token, username, role, ip);
+        redisTemplate.opsForHash().putAll(username, refreshToken);
 
         // when
-        RefreshToken findRefreshToken = refreshTokenRepository.findByUsername("fail");
+        String findRefreshToken = (String) redisTemplate.opsForHash().get(username, "fail");
 
         // then
         assertThat(findRefreshToken).isNull();
