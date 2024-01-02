@@ -55,6 +55,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    @Transactional
     public List<ChatHistoryResponse> findChatHistory(Long chatRoomId, Long memberId) {
         List<Chat> chatHistory = chatRepository.findChatHistory(chatRoomId);
         Member findMember = memberRepository.findById(memberId).orElseThrow(
