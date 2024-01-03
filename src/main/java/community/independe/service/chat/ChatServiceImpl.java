@@ -29,7 +29,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     @Transactional
-    public Long saveChat(String message, Long senderId, Long receiverId, Long chatRoomId) {
+    public Long saveChat(String message, Long senderId, Long receiverId, Long chatRoomId, Boolean isRead) {
         Member findSender = memberRepository.findById(senderId).orElseThrow(
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
@@ -46,7 +46,7 @@ public class ChatServiceImpl implements ChatService {
                 .message(message)
                 .sender(findSender)
                 .receiver(findReceiver)
-                .isRead(false)
+                .isRead(isRead)
                 .chatRoom(findChatRoom)
                 .build();
         Chat savedChat = chatRepository.save(chat);
@@ -55,6 +55,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    @Transactional
     public List<ChatHistoryResponse> findChatHistory(Long chatRoomId, Long memberId) {
         List<Chat> chatHistory = chatRepository.findChatHistory(chatRoomId);
         Member findMember = memberRepository.findById(memberId).orElseThrow(

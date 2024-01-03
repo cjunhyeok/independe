@@ -44,6 +44,7 @@ public class ChatServiceTest {
         Long senderId = 1L;
         Long receiverId = 2L;
         Long chatRoomId = 1L;
+        Boolean isRead = false;
         Member sender = Member.builder().build();
         Member receiver = Member.builder().build();
         ChatRoom chatRoom = ChatRoom.builder().build();
@@ -55,7 +56,7 @@ public class ChatServiceTest {
         when(chatRepository.save(any(Chat.class))).thenReturn(Chat.builder().build());
 
         // when
-        chatService.saveChat(message, senderId, receiverId, chatRoomId);
+        chatService.saveChat(message, senderId, receiverId, chatRoomId, isRead);
 
         // then
         verify(memberRepository, times(1)).findById(senderId);
@@ -71,12 +72,13 @@ public class ChatServiceTest {
         Long senderId = 1L;
         Long receiverId = 2L;
         Long chatRoomId = 1L;
+        Boolean isRead = false;
 
         // stub
         when(memberRepository.findById(senderId)).thenReturn(Optional.empty());
 
         // when
-        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> chatService.saveChat(message, senderId, receiverId, chatRoomId))
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> chatService.saveChat(message, senderId, receiverId, chatRoomId, isRead))
                 .isInstanceOf(CustomException.class)
                 .extracting(ex -> (CustomException) ex);
 
@@ -97,13 +99,14 @@ public class ChatServiceTest {
         Long senderId = 1L;
         Long receiverId = 2L;
         Long chatRoomId = 1L;
+        Boolean isRead = false;
 
         // stub
         when(memberRepository.findById(senderId)).thenReturn(Optional.of(Member.builder().build()));
         when(memberRepository.findById(receiverId)).thenReturn(Optional.empty());
 
         // when
-        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> chatService.saveChat(message, senderId, receiverId, chatRoomId))
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> chatService.saveChat(message, senderId, receiverId, chatRoomId, isRead))
                 .isInstanceOf(CustomException.class)
                 .extracting(ex -> (CustomException) ex);
 
@@ -124,6 +127,7 @@ public class ChatServiceTest {
         Long senderId = 1L;
         Long receiverId = 2L;
         Long chatRoomId = 1L;
+        Boolean isRead = false;
 
         // stub
         when(memberRepository.findById(senderId)).thenReturn(Optional.of(Member.builder().build()));
@@ -131,7 +135,7 @@ public class ChatServiceTest {
         when(chatRoomRepository.findById(chatRoomId)).thenReturn(Optional.empty());
 
         // when
-        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> chatService.saveChat(message, senderId, receiverId, chatRoomId))
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> chatService.saveChat(message, senderId, receiverId, chatRoomId, false))
                 .isInstanceOf(CustomException.class)
                 .extracting(ex -> (CustomException) ex);
 
