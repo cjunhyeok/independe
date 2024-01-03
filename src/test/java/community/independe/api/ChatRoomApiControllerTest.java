@@ -70,8 +70,8 @@ public class ChatRoomApiControllerTest {
         Long secondReceiverId = memberService.join("secondReceiver", "pass1", "secondReceiver", null, null);
         Long chatRoomId = chatRoomService.saveChatRoom(senderId, receiverId);
         Long secondChatRoomId = chatRoomService.saveChatRoom(senderId, secondReceiverId);
-        chatService.saveChat("message", senderId, receiverId, chatRoomId);
-        chatService.saveChat("secondMessage", senderId, secondReceiverId, secondChatRoomId);
+        chatService.saveChat("message", senderId, receiverId, chatRoomId, false);
+        chatService.saveChat("secondMessage", senderId, secondReceiverId, secondChatRoomId, false);
 
         List<ChatRoomsResponse> chatRooms = chatRoomService.findChatRooms(senderId);
 
@@ -130,8 +130,8 @@ public class ChatRoomApiControllerTest {
         Long senderId = sender.getId();
         Long receiverId = memberService.join("receiver", "pass1", "receiver", null, null);
         Long chatRoomId = chatRoomService.saveChatRoom(senderId, receiverId);
-        chatService.saveChat("message", senderId, receiverId, chatRoomId);
-        chatService.saveChat("secondMessage", senderId, receiverId, chatRoomId);
+        chatService.saveChat("message", senderId, receiverId, chatRoomId, false);
+        chatService.saveChat("secondMessage", senderId, receiverId, chatRoomId, false);
 
         request.setChatRoomId(chatRoomId);
 
