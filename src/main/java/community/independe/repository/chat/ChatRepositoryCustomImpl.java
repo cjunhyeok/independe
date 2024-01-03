@@ -39,7 +39,7 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom{
                 .join(chat.sender).fetchJoin()
                 .join(chat.receiver).fetchJoin()
                 .where(chat.chatRoom.id.eq(chatRoomId))
-                .orderBy(chat.createdDate.desc())
+                .orderBy(chat.createdDate.asc())
                 .fetch();
     }
 }
