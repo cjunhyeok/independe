@@ -10,16 +10,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Message {
 
-    // 읽음 처리를 위한 데이터가 아닐경우
     private String message;
-
-    // 채팅을 위한 데이터
     private Long chatId;
     private Long receiverId;
     private Long chatRoomId;
     private String senderNickname;
     private LocalDateTime createdDate;
-
+    private Boolean isRead;
 
     @Builder
     public Message(String message, Long chatId, Long receiverId, Long chatRoomId, String senderNickname, LocalDateTime createdDate) {
@@ -29,5 +26,6 @@ public class Message {
         this.chatRoomId = chatRoomId;
         this.senderNickname = senderNickname;
         this.createdDate = createdDate;
+        this.isRead = false;
     }
 }
