@@ -10,6 +10,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -32,16 +34,25 @@ public class ChatSessionServiceImpl implements ChatSessionService{
     }
 
     @Override
+    @Transactional
+    public Set<String> getChatRoomMembers(String chatRoomId) {
+        return redisTemplate.opsForSet().members(chatRoomId);
+    }
+
+    @Override
+    @Transactional
     public void enterSocketSession(String sessionId, Long memberId) {
         redisTemplate.opsForValue().set(SOCKETSESSIONPREIX +  sessionId, memberId.toString());
     }
 
     @Override
+    @Transactional
     public void removeSocketSession(String sessionId) {
         redisTemplate.opsForValue().getOperations().delete(SOCKETSESSIONPREIX + sessionId);
     }
 
     @Override
+    @Transactional
     public Member getMemberSocketSession(String sessionId) {
         String sessionMemberId = redisTemplate.opsForValue().get(SOCKETSESSIONPREIX + sessionId);
         return memberRepository.findById(Long.parseLong(sessionMemberId)).orElseThrow(
