@@ -26,9 +26,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.setApplicationDestinationPrefixes("/pub");
-        registry.enableSimpleBroker("/user");
-        registry.setUserDestinationPrefix("/user");
+        registry.setApplicationDestinationPrefixes("/pub"); // @MessageMapping 로 라우팅
+        registry.enableSimpleBroker("/user"); // 해당 경로로 구독한 사용자에게 메시지를 보낼 수 있다.
+        registry.setUserDestinationPrefix("/user"); // convertAndSentToUser 메서드의 prefix 설정
     }
 
     @Override
