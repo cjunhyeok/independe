@@ -5,6 +5,7 @@ import community.independe.domain.alarm.AlarmType;
 import community.independe.domain.member.Member;
 import community.independe.service.AlarmService;
 import community.independe.service.EmitterService;
+import community.independe.service.MemberService;
 import community.independe.service.chat.ChatService;
 import community.independe.service.chat.ChatSessionService;
 import lombok.RequiredArgsConstructor;
@@ -29,12 +30,14 @@ public class ChatApiController {
     private final EmitterService emitterService;
     private final AlarmService alarmService;
     private final ChatSessionService chatSessionService;
+    private final MemberService memberService;
 
     @MessageMapping("/private-message")
     public Message receivePrivateMessage(@Payload Message message, @Header("simpSessionId") String sessionId){
 
         Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
         Set<String> chatRoomMembers = chatSessionService.getChatRoomMembers(message.getChatRoomId().toString());
+        Member receiver = memberService.findById(message.getReceiverId());
 
         for (String chatRoomMember : chatRoomMembers) {
             if (!chatRoomMember.equals(loginMember.getId().toString())) {
@@ -49,7 +52,11 @@ public class ChatApiController {
 
         Long savedChat = chatService.saveChat(message.getMessage(), loginMember.getId(), message.getReceiverId(), message.getChatRoomId(), message.getIsRead());
         message.setChatId(savedChat);
+        // /user/{chatRoomId}/private 로 보낸다
+//        simpMessagingTemplate.convertAndSend("/user/" + message.getChatRoomId().toString() + "/private", message);
         simpMessagingTemplate.convertAndSendToUser(message.getChatRoomId().toString(),"/private",message);
+        // /user/{username}/room 로 보낸다 (채팅방 내용)
+        simpMessagingTemplate.convertAndSendToUser(receiver.getUsername(), "/room", message);
 
         if (!message.getIsRead()) {
             emitterService.notify(message.getReceiverId(), CHAT_MESSAGE);
