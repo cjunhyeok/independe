@@ -41,13 +41,14 @@ public class StompHandler implements ChannelInterceptor {
 
             chatSessionService.enterSocketSession(sessionId, loginMember.getId());
         } else if (command == StompCommand.SUBSCRIBE) {
-
             String destination = accessor.getDestination();
-            Long chatRoomId = Long.parseLong(extractChatRoomId(destination));
-            Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
+            if (destination.contains("/private")) {
+                Long chatRoomId = Long.parseLong(extractChatRoomId(destination));
+                Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
 
-            // 세션(redis)에 회원 정보를 넣음
-            chatSessionService.enterChatRoom(loginMember.getId(), chatRoomId);
+                // 세션(redis)에 회원 정보를 넣음
+                chatSessionService.enterChatRoom(loginMember.getId(), chatRoomId);
+            }
         } else if (command == StompCommand.UNSUBSCRIBE) {
             // 세션(redis)에 회원 정보를 삭제
             Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
