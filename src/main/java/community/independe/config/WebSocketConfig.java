@@ -1,5 +1,6 @@
 package community.independe.config;
 
+import community.independe.config.handler.StompErrorHandler;
 import community.independe.config.handler.StompHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompHandler stompHandler;
+    private final StompErrorHandler stompErrorHandler;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -22,6 +24,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //                .setAllowedOrigins("http://localhost:8081")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
+
+        registry.setErrorHandler(stompErrorHandler);
     }
 
     @Override
