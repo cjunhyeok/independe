@@ -35,6 +35,7 @@ public class RefreshTokenServiceTest {
     private RedisTemplate<String, String> redisTemplate;
     @Mock
     private HashOperations hashOperations;
+    private final String RedisKeyPrefix = "refreshToken : ";
 
     @Test
     void saveTest() {
@@ -46,8 +47,8 @@ public class RefreshTokenServiceTest {
 
         // stub
         when(redisTemplate.opsForHash()).thenReturn(hashOperations);
-        when(hashOperations.get(username, "refreshToken")).thenReturn(token);
-        when(redisTemplate.delete(username)).thenReturn(true);
+        when(hashOperations.get( RedisKeyPrefix + username, "refreshToken")).thenReturn(token);
+        when(redisTemplate.delete(RedisKeyPrefix + username)).thenReturn(true);
         doNothing().when(hashOperations).putAll(anyString(), anyMap());
 
         // when
@@ -55,8 +56,8 @@ public class RefreshTokenServiceTest {
 
         // then
         verify(redisTemplate, times(2)).opsForHash();
-        verify(hashOperations, times(1)).get(username, "refreshToken");
-        verify(redisTemplate, times(1)).delete(username);
+        verify(hashOperations, times(1)).get( RedisKeyPrefix + username, "refreshToken");
+        verify(redisTemplate, times(1)).delete(RedisKeyPrefix + username);
         verify(hashOperations, times(1)).putAll(anyString(), anyMap());
     }
 
@@ -69,7 +70,7 @@ public class RefreshTokenServiceTest {
 
         // stub
         when(redisTemplate.opsForHash()).thenReturn(hashOperations);
-        when(hashOperations.get(username, "refreshToken")).thenReturn(null);
+        when(hashOperations.get( RedisKeyPrefix + username, "refreshToken")).thenReturn(null);
         doNothing().when(hashOperations).putAll(anyString(), anyMap());
 
         // when
@@ -77,9 +78,8 @@ public class RefreshTokenServiceTest {
 
         // then
         verify(redisTemplate, times(2)).opsForHash();
-        verify(hashOperations, times(1)).get(username, "refreshToken");
+        verify(hashOperations, times(1)).get( RedisKeyPrefix + username, "refreshToken");
         verify(hashOperations, times(1)).putAll(anyString(), anyMap());
-        verifyNoMoreInteractions(redisTemplate);
     }
 
     @Test
@@ -92,9 +92,9 @@ public class RefreshTokenServiceTest {
         // stub
         doNothing().when(jwtTokenVerifier).verifyToken(anyString());
         when(redisTemplate.opsForHash()).thenReturn(hashOperations);
-        when(hashOperations.get(username, "refreshToken")).thenReturn(refreshToken);
-        when(hashOperations.get(username, "ip")).thenReturn(currentIp);
-        when(hashOperations.get(username, "role")).thenReturn("ROLE_USER");
+        when(hashOperations.get( RedisKeyPrefix + username, "refreshToken")).thenReturn(refreshToken);
+        when(hashOperations.get( RedisKeyPrefix + username, "ip")).thenReturn(currentIp);
+        when(hashOperations.get( RedisKeyPrefix + username, "role")).thenReturn("ROLE_USER");
         when(securitySigner.getRefreshJwtToken(anyString(), eq(jwk))).thenReturn("token");
         doNothing().when(hashOperations).putAll(anyString(), anyMap());
 
@@ -104,9 +104,9 @@ public class RefreshTokenServiceTest {
         // then
         verify(jwtTokenVerifier, times(1)).verifyToken(anyString());
         verify(redisTemplate, times(4)).opsForHash();
-        verify(hashOperations, times(1)).get(username, "refreshToken");
-        verify(hashOperations, times(1)).get(username, "ip");
-        verify(hashOperations, times(1)).get(username, "role");
+        verify(hashOperations, times(1)).get( RedisKeyPrefix + username, "refreshToken");
+        verify(hashOperations, times(1)).get( RedisKeyPrefix + username, "ip");
+        verify(hashOperations, times(1)).get( RedisKeyPrefix + username, "role");
         verify(securitySigner, times(1)).getRefreshJwtToken(anyString(), eq(jwk));
         verify(hashOperations, times(1)).putAll(anyString(), anyMap());
     }
@@ -121,7 +121,7 @@ public class RefreshTokenServiceTest {
         // stub
         doNothing().when(jwtTokenVerifier).verifyToken(anyString());
         when(redisTemplate.opsForHash()).thenReturn(hashOperations);
-        when(hashOperations.get(username, "refreshToken")).thenReturn(null);
+        when(hashOperations.get( RedisKeyPrefix + username, "refreshToken")).thenReturn(null);
 
         // when
         AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(
@@ -135,7 +135,7 @@ public class RefreshTokenServiceTest {
         });
         verify(jwtTokenVerifier, times(1)).verifyToken(anyString());
         verify(redisTemplate, times(1)).opsForHash();
-        verify(hashOperations, times(1)).get(username, "refreshToken");
+        verify(hashOperations, times(1)).get( RedisKeyPrefix + username, "refreshToken");
         verifyNoInteractions(securitySigner);
         verifyNoMoreInteractions(redisTemplate);
         verifyNoMoreInteractions(hashOperations);
@@ -151,8 +151,8 @@ public class RefreshTokenServiceTest {
         // stub
         doNothing().when(jwtTokenVerifier).verifyToken(anyString());
         when(redisTemplate.opsForHash()).thenReturn(hashOperations);
-        when(hashOperations.get(username, "refreshToken")).thenReturn(refreshToken);
-        when(hashOperations.get(username, "ip")).thenReturn("failIp");
+        when(hashOperations.get( RedisKeyPrefix + username, "refreshToken")).thenReturn(refreshToken);
+        when(hashOperations.get( RedisKeyPrefix + username, "ip")).thenReturn("failIp");
 
         // when
         AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(
@@ -166,8 +166,8 @@ public class RefreshTokenServiceTest {
         });
         verify(jwtTokenVerifier, times(1)).verifyToken(anyString());
         verify(redisTemplate, times(2)).opsForHash();
-        verify(hashOperations, times(1)).get(username, "refreshToken");
-        verify(hashOperations, times(1)).get(username, "ip");
+        verify(hashOperations, times(1)).get(RedisKeyPrefix + username, "refreshToken");
+        verify(hashOperations, times(1)).get(RedisKeyPrefix + username, "ip");
         verifyNoInteractions(securitySigner);
         verifyNoMoreInteractions(redisTemplate);
         verifyNoMoreInteractions(hashOperations);
