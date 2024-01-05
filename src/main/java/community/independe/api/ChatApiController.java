@@ -3,6 +3,7 @@ package community.independe.api;
 import community.independe.api.dtos.chat.Message;
 import community.independe.domain.alarm.AlarmType;
 import community.independe.domain.member.Member;
+import community.independe.exception.CustomException;
 import community.independe.service.AlarmService;
 import community.independe.service.EmitterService;
 import community.independe.service.MemberService;
@@ -11,6 +12,7 @@ import community.independe.service.chat.ChatSessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -64,5 +66,27 @@ public class ChatApiController {
         }
 
         return message;
+    }
+
+    @MessageExceptionHandler(CustomException.class)
+    public Message handleCustomException(CustomException ex, @Payload Message message, @Header("simpSessionId") String sessionId) {
+
+        Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
+
+        message.setIsExceptionData(true);
+        message.setMessage(ex.getErrorCode().getErrorMessage());
+        simpMessagingTemplate.convertAndSendToUser(loginMember.getUsername(), "/room", message);
+        return message;
+    }
+
+    @MessageExceptionHandler(Exception.class)
+    public Message exceptionHandler(Exception ex, @Payload Message message, @Header("simpSessionId") String sessionId) {
+
+        Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
+
+        message.setIsExceptionData(true);
+        message.setMessage(ex.getMessage());
+        simpMessagingTemplate.convertAndSendToUser(loginMember.getUsername(), "/room", message);
+        return Message.builder().build();
     }
 }
