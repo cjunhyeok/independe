@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ChatHistoryResponse {
 
+    private Long chatId;
     private String senderNickname;
     private String receiverNickname;
     private String message;
@@ -17,7 +18,8 @@ public class ChatHistoryResponse {
     private Boolean isRead;
 
     @Builder
-    public ChatHistoryResponse(String senderNickname, String receiverNickname, String message, LocalDateTime createdDate, Boolean isRead) {
+    public ChatHistoryResponse(Long chatId, String senderNickname, String receiverNickname, String message, LocalDateTime createdDate, Boolean isRead) {
+        this.chatId = chatId;
         this.senderNickname = senderNickname;
         this.receiverNickname = receiverNickname;
         this.message = message;
