@@ -16,5 +16,7 @@ public class ChatRoomsResponse {
     private String senderNickname;
     private String receiverNickname;
     private String lastMessage;
-    private Boolean isRead;
+    private Integer isReadCount;
+    private Long opponentId;
+    private String opponentNickname;
 }
