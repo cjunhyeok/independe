@@ -71,6 +71,7 @@ public class ChatServiceImpl implements ChatService {
             }
 
             ChatHistoryResponse chatHistoryResponse = new ChatHistoryResponse();
+            chatHistoryResponse.setChatId(chat.getId());
             chatHistoryResponse.setSenderNickname(chat.getSender().getNickname());
             chatHistoryResponse.setReceiverNickname(chat.getReceiver().getNickname());
             chatHistoryResponse.setMessage(chat.getMessage());

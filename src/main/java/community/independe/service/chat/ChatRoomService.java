@@ -10,4 +10,5 @@ public interface ChatRoomService {
     Long saveChatRoom(Long senderId, Long receiverId);
     ChatRoom findBySenderAndReceiver(Long senderId, Long receiverId);
     List<ChatRoomsResponse> findChatRooms(Long memberId);
+    Integer findIsReadCountByChatRoomId(Long chatRoomId, Long memberId);
 }

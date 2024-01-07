@@ -42,4 +42,16 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom{
                 .orderBy(chat.createdDate.asc())
                 .fetch();
     }
+
+    @Override
+    public List<Chat> findIsReadCountByChatRoomId(Long chatRoomId, Long memberId) {
+        return queryFactory
+                .select(chat)
+                .from(chat)
+                .join(chat.receiver).fetchJoin()
+                .where(chat.chatRoom.id.eq(chatRoomId)
+                        .and(chat.receiver.id.eq(memberId)
+                                .and(chat.isRead.isFalse())))
+                .fetch();
+    }
 }

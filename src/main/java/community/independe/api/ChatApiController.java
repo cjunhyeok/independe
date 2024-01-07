@@ -1,5 +1,7 @@
 package community.independe.api;
 
+import community.independe.api.dtos.chat.ChatRoomsResponse;
+import community.independe.api.dtos.chat.ExceptionMessage;
 import community.independe.api.dtos.chat.Message;
 import community.independe.domain.alarm.AlarmType;
 import community.independe.domain.member.Member;
@@ -7,6 +9,7 @@ import community.independe.exception.CustomException;
 import community.independe.service.AlarmService;
 import community.independe.service.EmitterService;
 import community.independe.service.MemberService;
+import community.independe.service.chat.ChatRoomService;
 import community.independe.service.chat.ChatService;
 import community.independe.service.chat.ChatSessionService;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +36,7 @@ public class ChatApiController {
     private final AlarmService alarmService;
     private final ChatSessionService chatSessionService;
     private final MemberService memberService;
+    private final ChatRoomService chatRoomService;
 
     @MessageMapping("/private-message")
     public Message receivePrivateMessage(@Payload Message message, @Header("simpSessionId") String sessionId){
@@ -40,6 +44,7 @@ public class ChatApiController {
         Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
         Set<String> chatRoomMembers = chatSessionService.getChatRoomMembers(message.getChatRoomId().toString());
         Member receiver = memberService.findById(message.getReceiverId());
+        message.setIsRead(false);
 
         for (String chatRoomMember : chatRoomMembers) {
             if (!chatRoomMember.equals(loginMember.getId().toString())) {
@@ -57,8 +62,22 @@ public class ChatApiController {
         // /user/{chatRoomId}/private 로 보낸다
 //        simpMessagingTemplate.convertAndSend("/user/" + message.getChatRoomId().toString() + "/private", message);
         simpMessagingTemplate.convertAndSendToUser(message.getChatRoomId().toString(),"/private",message);
+
         // /user/{username}/room 로 보낸다 (채팅방 내용)
-        simpMessagingTemplate.convertAndSendToUser(receiver.getUsername(), "/room", message);
+        Member findReceiver = memberService.findById(message.getReceiverId());
+        Integer isReadCount = chatRoomService.findIsReadCountByChatRoomId(message.getChatRoomId(), loginMember.getId());
+
+        ChatRoomsResponse chatRoomsResponse = ChatRoomsResponse.builder()
+                .lastMessage(message.getMessage())
+                .chatRoomId(message.getChatRoomId())
+                .receiverId(findReceiver.getId())
+                .receiverNickname(findReceiver.getNickname())
+                .senderNickname(loginMember.getNickname())
+                .isReadCount(isReadCount)
+                .opponentId(loginMember.getId())
+                .opponentNickname(loginMember.getNickname())
+                .build();
+        simpMessagingTemplate.convertAndSendToUser(receiver.getNickname(), "/room", chatRoomsResponse);
 
         if (!message.getIsRead()) {
             emitterService.notify(message.getReceiverId(), CHAT_MESSAGE);
@@ -72,10 +91,13 @@ public class ChatApiController {
     public Message handleCustomException(CustomException ex, @Payload Message message, @Header("simpSessionId") String sessionId) {
 
         Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
+        ExceptionMessage exceptionMessage = ExceptionMessage.builder()
+                .exceptionMessage(ex.getMessage())
+                .chatId(message.getChatId())
+                .chatRoomId(message.getChatRoomId())
+                .build();
 
-        message.setIsExceptionData(true);
-        message.setMessage(ex.getErrorCode().getErrorMessage());
-        simpMessagingTemplate.convertAndSendToUser(loginMember.getUsername(), "/room", message);
+        simpMessagingTemplate.convertAndSendToUser(loginMember.getUsername(), "/room", exceptionMessage);
         return message;
     }
 
@@ -83,10 +105,13 @@ public class ChatApiController {
     public Message exceptionHandler(Exception ex, @Payload Message message, @Header("simpSessionId") String sessionId) {
 
         Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
+        ExceptionMessage exceptionMessage = ExceptionMessage.builder()
+                .exceptionMessage(ex.getMessage())
+                .chatId(message.getChatId())
+                .chatRoomId(message.getChatRoomId())
+                .build();
 
-        message.setIsExceptionData(true);
-        message.setMessage(ex.getMessage());
-        simpMessagingTemplate.convertAndSendToUser(loginMember.getUsername(), "/room", message);
+        simpMessagingTemplate.convertAndSendToUser(loginMember.getUsername(), "/room", exceptionMessage);
         return Message.builder().build();
     }
 }

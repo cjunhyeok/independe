@@ -8,4 +8,5 @@ public interface ChatRepositoryCustom {
 
     Chat findLastChatByChatRoomId(Long chatRoomId);
     List<Chat> findChatHistory(Long chatRoomId);
+    List<Chat> findIsReadCountByChatRoomId(Long chatRoomId, Long memberId);
 }
