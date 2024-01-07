@@ -1,5 +1,6 @@
 package community.independe.api;
 
+import community.independe.api.dtos.chat.ExceptionMessage;
 import community.independe.api.dtos.chat.Message;
 import community.independe.domain.alarm.AlarmType;
 import community.independe.domain.member.Member;
@@ -72,10 +73,13 @@ public class ChatApiController {
     public Message handleCustomException(CustomException ex, @Payload Message message, @Header("simpSessionId") String sessionId) {
 
         Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
+        ExceptionMessage exceptionMessage = ExceptionMessage.builder()
+                .exceptionMessage(ex.getMessage())
+                .chatId(message.getChatId())
+                .chatRoomId(message.getChatRoomId())
+                .build();
 
-        message.setIsExceptionData(true);
-        message.setMessage(ex.getErrorCode().getErrorMessage());
-        simpMessagingTemplate.convertAndSendToUser(loginMember.getUsername(), "/room", message);
+        simpMessagingTemplate.convertAndSendToUser(loginMember.getUsername(), "/room", exceptionMessage);
         return message;
     }
 
@@ -83,10 +87,13 @@ public class ChatApiController {
     public Message exceptionHandler(Exception ex, @Payload Message message, @Header("simpSessionId") String sessionId) {
 
         Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
+        ExceptionMessage exceptionMessage = ExceptionMessage.builder()
+                .exceptionMessage(ex.getMessage())
+                .chatId(message.getChatId())
+                .chatRoomId(message.getChatRoomId())
+                .build();
 
-        message.setIsExceptionData(true);
-        message.setMessage(ex.getMessage());
-        simpMessagingTemplate.convertAndSendToUser(loginMember.getUsername(), "/room", message);
+        simpMessagingTemplate.convertAndSendToUser(loginMember.getUsername(), "/room", exceptionMessage);
         return Message.builder().build();
     }
 }
