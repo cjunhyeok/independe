@@ -73,17 +73,49 @@ public class ChatRoomServiceImpl implements ChatRoomService{
 
         for (ChatRoom findChatRoom : findChatRooms) {
             Chat findLastChat = chatRepository.findLastChatByChatRoomId(findChatRoom.getId());
+            List<Chat> findNonReadChat = chatRepository.findIsReadCountByChatRoomId(findChatRoom.getId(), memberId);
+            Integer isReadCount = getIsReadCount(findNonReadChat);
+            Long opponentId;
+            String opponentNickname;
+
+            if (findLastChat.getReceiver().getId() == memberId) {
+                opponentId = findLastChat.getSender().getId();
+                opponentNickname = findLastChat.getSender().getNickname();
+            } else {
+                opponentId = findLastChat.getReceiver().getId();
+                opponentNickname = findLastChat.getReceiver().getNickname();
+            }
+
             ChatRoomsResponse chatRoomsResponse = ChatRoomsResponse.builder()
                     .chatRoomId(findChatRoom.getId())
                     .receiverId(findLastChat.getReceiver().getId())
                     .senderNickname(findLastChat.getSender().getNickname())
                     .receiverNickname(findLastChat.getReceiver().getNickname())
-                    .isRead(findLastChat.getIsRead())
+                    .isReadCount(isReadCount)
                     .lastMessage(findLastChat.getMessage())
+                    .opponentId(opponentId)
+                    .opponentNickname(opponentNickname)
                     .build();
             chatRoomsResponses.add(chatRoomsResponse);
         }
 
         return chatRoomsResponses;
+    }
+
+    @Override
+    public Integer findIsReadCountByChatRoomId(Long chatRoomId, Long memberId) {
+        List<Chat> findChats = chatRepository.findIsReadCountByChatRoomId(chatRoomId, memberId);
+        return getIsReadCount(findChats);
+    }
+
+    private Integer getIsReadCount(List<Chat> chats) {
+        Integer isReadCount;
+        if (chats.isEmpty()) {
+            isReadCount = 0;
+        } else {
+            isReadCount = chats.size();
+        }
+
+        return isReadCount;
     }
 }
