@@ -12,17 +12,17 @@ public class Message {
 
     private String message;
     private Long chatId;
-    private Long receiverId;
+    private Long opponentId;
     private Long chatRoomId;
     private String senderNickname;
     private LocalDateTime createdDate;
     private Boolean isRead;
 
     @Builder
-    public Message(String message, Long chatId, Long receiverId, Long chatRoomId, String senderNickname, LocalDateTime createdDate) {
+    public Message(String message, Long chatId, Long opponentId, Long chatRoomId, String senderNickname, LocalDateTime createdDate) {
         this.message = message;
         this.chatId = chatId;
-        this.receiverId = receiverId;
+        this.opponentId = opponentId;
         this.chatRoomId = chatRoomId;
         this.senderNickname = senderNickname;
         this.createdDate = createdDate;

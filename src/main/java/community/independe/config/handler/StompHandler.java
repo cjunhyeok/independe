@@ -52,7 +52,7 @@ public class StompHandler implements ChannelInterceptor {
         } else if (command == StompCommand.UNSUBSCRIBE) {
             // 세션(redis)에 회원 정보를 삭제
             Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
-            Long chatRoomId = Long.parseLong(accessor.getFirstNativeHeader("Destination"));
+            Long chatRoomId = Long.parseLong(accessor.getFirstNativeHeader("ChatRoomId"));
             chatSessionService.leaveChatRoom(loginMember.getId(), chatRoomId);
         } else if (command == StompCommand.DISCONNECT) {
             chatSessionService.removeSocketSession(sessionId);
