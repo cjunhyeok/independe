@@ -74,7 +74,7 @@ public class ChatRoomServiceImpl implements ChatRoomService{
         for (ChatRoom findChatRoom : findChatRooms) {
             Chat findLastChat = chatRepository.findLastChatByChatRoomId(findChatRoom.getId());
             List<Chat> findNonReadChat = chatRepository.findIsReadCountByChatRoomId(findChatRoom.getId(), memberId);
-            Integer isReadCount = getIsReadCount(findNonReadChat);
+            Integer unReadCount = getIsReadCount(findNonReadChat);
             Long opponentId;
             String opponentNickname;
 
@@ -91,7 +91,7 @@ public class ChatRoomServiceImpl implements ChatRoomService{
                     .receiverId(findLastChat.getReceiver().getId())
                     .senderNickname(findLastChat.getSender().getNickname())
                     .receiverNickname(findLastChat.getReceiver().getNickname())
-                    .isReadCount(isReadCount)
+                    .unReadCount(unReadCount)
                     .lastMessage(findLastChat.getMessage())
                     .opponentId(opponentId)
                     .opponentNickname(opponentNickname)
