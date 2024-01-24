@@ -43,7 +43,7 @@ public class ChatApiController {
 
         Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
         Set<String> chatRoomMembers = chatSessionService.getChatRoomMembers(message.getChatRoomId().toString());
-        Member receiver = memberService.findById(message.getReceiverId());
+        Member receiver = memberService.findById(message.getOpponentId());
         message.setIsRead(false);
 
         for (String chatRoomMember : chatRoomMembers) {
@@ -57,15 +57,15 @@ public class ChatApiController {
         message.setSenderNickname(loginMember.getNickname());
         message.setCreatedDate(LocalDateTime.now());
 
-        Long savedChat = chatService.saveChat(message.getMessage(), loginMember.getId(), message.getReceiverId(), message.getChatRoomId(), message.getIsRead());
+        Long savedChat = chatService.saveChat(message.getMessage(), loginMember.getId(), message.getOpponentId(), message.getChatRoomId(), message.getIsRead());
         message.setChatId(savedChat);
         // /user/{chatRoomId}/private 로 보낸다
 //        simpMessagingTemplate.convertAndSend("/user/" + message.getChatRoomId().toString() + "/private", message);
         simpMessagingTemplate.convertAndSendToUser(message.getChatRoomId().toString(),"/private",message);
 
         // /user/{username}/room 로 보낸다 (채팅방 내용)
-        Member findReceiver = memberService.findById(message.getReceiverId());
-        Integer isReadCount = chatRoomService.findIsReadCountByChatRoomId(message.getChatRoomId(), loginMember.getId());
+        Member findReceiver = memberService.findById(message.getOpponentId());
+        Integer unReadCount = chatRoomService.findIsReadCountByChatRoomId(message.getChatRoomId(), loginMember.getId());
 
         ChatRoomsResponse chatRoomsResponse = ChatRoomsResponse.builder()
                 .lastMessage(message.getMessage())
@@ -73,15 +73,15 @@ public class ChatApiController {
                 .receiverId(findReceiver.getId())
                 .receiverNickname(findReceiver.getNickname())
                 .senderNickname(loginMember.getNickname())
-                .isReadCount(isReadCount)
+                .unReadCount(unReadCount)
                 .opponentId(loginMember.getId())
                 .opponentNickname(loginMember.getNickname())
                 .build();
-        simpMessagingTemplate.convertAndSendToUser(receiver.getUsername(), "/room", chatRoomsResponse);
+        simpMessagingTemplate.convertAndSendToUser(receiver.getNickname(), "/room", chatRoomsResponse);
 
         if (!message.getIsRead()) {
-            emitterService.notify(message.getReceiverId(), CHAT_MESSAGE);
-            alarmService.saveAlarm(CHAT_MESSAGE, message.getIsRead(), AlarmType.TALK, message.getReceiverId());
+            emitterService.notify(message.getOpponentId(), CHAT_MESSAGE);
+            alarmService.saveAlarm(CHAT_MESSAGE, message.getIsRead(), AlarmType.TALK, message.getOpponentId());
         }
 
         return message;
