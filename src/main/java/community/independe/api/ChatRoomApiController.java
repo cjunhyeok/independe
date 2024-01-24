@@ -31,13 +31,13 @@ public class ChatRoomApiController {
                            @AuthenticationPrincipal MemberContext memberContext) {
         Member loginMember = memberContext.getMember();
         Long senderId = loginMember.getId();
-        Long receiverId = chatRoomRequest.getReceiverId();
+        Long opponentId = chatRoomRequest.getOpponentId();
 
-        ChatRoom findChatRoom = chatRoomService.findBySenderAndReceiver(senderId, receiverId);
+        ChatRoom findChatRoom = chatRoomService.findBySenderAndReceiver(senderId, opponentId);
 
         if (findChatRoom == null) {
-            chatRoomService.saveChatRoom(senderId, receiverId);
-            findChatRoom = chatRoomService.findBySenderAndReceiver(senderId, receiverId);
+            chatRoomService.saveChatRoom(senderId, opponentId);
+            findChatRoom = chatRoomService.findBySenderAndReceiver(senderId, opponentId);
         }
 
         ChatRoomResponse chatRoomResponse = ChatRoomResponse.builder()
