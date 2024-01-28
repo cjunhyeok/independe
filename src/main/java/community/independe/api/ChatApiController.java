@@ -77,7 +77,7 @@ public class ChatApiController {
                 .opponentId(loginMember.getId())
                 .opponentNickname(loginMember.getNickname())
                 .build();
-        simpMessagingTemplate.convertAndSendToUser(receiver.getNickname(), "/room", chatRoomsResponse);
+        simpMessagingTemplate.convertAndSendToUser(receiver.getUsername(), "/room", chatRoomsResponse);
 
         if (!message.getIsRead()) {
             emitterService.notify(message.getOpponentId(), CHAT_MESSAGE);
