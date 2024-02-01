@@ -19,4 +19,5 @@ public class ChatRoomsResponse {
     private Integer unReadCount;
     private Long opponentId;
     private String opponentNickname;
+    private Long senderId;
 }

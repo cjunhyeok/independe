@@ -17,9 +17,10 @@ public class Message {
     private String senderNickname;
     private LocalDateTime createdDate;
     private Boolean isRead;
+    private Long senderId;
 
     @Builder
-    public Message(String message, Long chatId, Long opponentId, Long chatRoomId, String senderNickname, LocalDateTime createdDate) {
+    public Message(String message, Long chatId, Long opponentId, Long chatRoomId, String senderNickname, LocalDateTime createdDate, Long senderId) {
         this.message = message;
         this.chatId = chatId;
         this.opponentId = opponentId;
@@ -27,5 +28,6 @@ public class Message {
         this.senderNickname = senderNickname;
         this.createdDate = createdDate;
         this.isRead = false;
+        this.senderId = senderId;
     }
 }
