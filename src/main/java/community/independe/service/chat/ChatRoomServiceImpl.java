@@ -95,6 +95,7 @@ public class ChatRoomServiceImpl implements ChatRoomService{
                     .lastMessage(findLastChat.getMessage())
                     .opponentId(opponentId)
                     .opponentNickname(opponentNickname)
+                    .senderId(findLastChat.getSender().getId())
                     .build();
             chatRoomsResponses.add(chatRoomsResponse);
         }
