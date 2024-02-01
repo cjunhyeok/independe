@@ -56,6 +56,7 @@ public class ChatApiController {
 
         message.setSenderNickname(loginMember.getNickname());
         message.setCreatedDate(LocalDateTime.now());
+        message.setSenderId(loginMember.getId());
 
         Long savedChat = chatService.saveChat(message.getMessage(), loginMember.getId(), message.getOpponentId(), message.getChatRoomId(), message.getIsRead());
         message.setChatId(savedChat);

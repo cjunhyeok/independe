@@ -77,6 +77,7 @@ public class ChatServiceImpl implements ChatService {
             chatHistoryResponse.setMessage(chat.getMessage());
             chatHistoryResponse.setIsRead(chat.getIsRead());
             chatHistoryResponse.setCreatedDate(chat.getCreatedDate());
+            chatHistoryResponse.setSenderId(chat.getSender().getId());
             chatHistoryResponses.add(chatHistoryResponse);
         }
 
