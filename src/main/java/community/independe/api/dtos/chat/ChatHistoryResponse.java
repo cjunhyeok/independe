@@ -19,12 +19,13 @@ public class ChatHistoryResponse {
     private Long senderId;
 
     @Builder
-    public ChatHistoryResponse(Long chatId, String senderNickname, String receiverNickname, String message, LocalDateTime createdDate, Boolean isRead) {
+    public ChatHistoryResponse(Long chatId, String senderNickname, String receiverNickname, String message, LocalDateTime createdDate, Boolean isRead, Long senderId) {
         this.chatId = chatId;
         this.senderNickname = senderNickname;
         this.receiverNickname = receiverNickname;
         this.message = message;
         this.createdDate = createdDate;
         this.isRead = isRead;
+        this.senderId = senderId;
     }
 }
