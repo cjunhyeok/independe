@@ -16,6 +16,7 @@ public class ChatHistoryResponse {
     private String message;
     private LocalDateTime createdDate;
     private Boolean isRead;
+    private Long senderId;
 
     @Builder
     public ChatHistoryResponse(Long chatId, String senderNickname, String receiverNickname, String message, LocalDateTime createdDate, Boolean isRead) {
