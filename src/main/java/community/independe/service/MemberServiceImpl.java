@@ -8,6 +8,7 @@ import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
 import community.independe.security.signature.SecuritySigner;
+import community.independe.service.dtos.JoinServiceDto;
 import community.independe.service.dtos.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,26 +32,43 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public Long join(String username, String password, String nickname, String email, String number) {
+    public Long join(JoinServiceDto joinServiceDto) {
 
-        if (checkUsername(username) == false) {
-            throw new CustomException(ErrorCode.USERNAME_DUPLICATED);
-        }
+        String username = joinServiceDto.getUsername();
+        String nickname = joinServiceDto.getNickname();
 
-        if (checkNickname(nickname) == false) {
-            throw new CustomException(ErrorCode.NICKNAME_DUPLICATED);
-        }
+        checkUsername(username);
+        checkNickname(nickname);
 
         Member member = Member.builder()
                 .username(username)
-                .password(passwordEncoder.encode(password))
+                .password(passwordEncoder.encode(joinServiceDto.getPassword()))
                 .nickname(nickname)
                 .role("ROLE_USER")
-                .email(email)
-                .number(number)
+                .email(joinServiceDto.getEmail())
+                .number(joinServiceDto.getNumber())
+                .isPrivacyCheck(joinServiceDto.getIsPrivacyCheck())
+                .isTermOfUseCheck(joinServiceDto.getIsTermOfUseCheck())
                 .build();
+
         Member savedMember = memberRepository.save(member);
         return savedMember.getId();
+    }
+
+    private void checkUsername(String username) {
+        Member findUsername = memberRepository.findByUsername(username);
+
+        if (findUsername != null) {
+            throw new CustomException(ErrorCode.USERNAME_DUPLICATED);
+        }
+    }
+
+    private void checkNickname(String nickname) {
+        Member findNickname = memberRepository.findByNickname(nickname);
+
+        if (findNickname != null) {
+            throw new CustomException(ErrorCode.USERNAME_DUPLICATED);
+        }
     }
 
     @Override
@@ -81,24 +99,6 @@ public class MemberServiceImpl implements MemberService {
         } catch (JOSEException e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    private boolean checkUsername(String username) {
-        Member findUsername = memberRepository.findByUsername(username);
-
-        if (findUsername != null) {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean checkNickname(String nickname) {
-        Member findNickname = memberRepository.findByNickname(nickname);
-
-        if (findNickname != null) {
-            return false;
-        }
-        return true;
     }
 
     @Override
