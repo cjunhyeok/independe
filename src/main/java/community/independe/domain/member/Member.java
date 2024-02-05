@@ -23,6 +23,8 @@ public class Member extends BaseEntity {
     private String password; // 비밀번호
     private String nickname; // 닉네임, 중복금지
     private String role; // 사용자 권한
+    private Boolean isTermOfUseCheck; // 약관 동의
+    private Boolean isPrivacyCheck; // 개인정보 동의
 
     //== 선택 사항 == //
     private String number; // 전화번호
@@ -36,13 +38,15 @@ public class Member extends BaseEntity {
 
     //== 생성 메서드 ==//
     @Builder
-    public Member(String username, String password, String nickname, String role,
+    public Member(String username, String password, String nickname, String role, Boolean isTermOfUseCheck, Boolean isPrivacyCheck,
                                String email, String number, RegionType region,
                                String registrationId, String provider) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.role = role;
+        this.isTermOfUseCheck = isTermOfUseCheck;
+        this.isPrivacyCheck = isPrivacyCheck;
         this.email = email;
         this.number = number;
         this.region = region;
