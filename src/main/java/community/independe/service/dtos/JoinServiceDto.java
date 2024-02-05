@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class JoinServiceDto implements ServiceDto {
+public class JoinServiceDto {
 
     private String username;
     private String password;
