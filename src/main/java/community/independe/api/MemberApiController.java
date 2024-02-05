@@ -15,6 +15,7 @@ import community.independe.service.MemberService;
 import community.independe.service.RefreshTokenService;
 import community.independe.service.dtos.JoinServiceDto;
 import community.independe.service.dtos.LoginResponse;
+import community.independe.service.dtos.LoginServiceDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -80,16 +81,17 @@ public class MemberApiController {
 
     @Operation(summary = "로그인")
     @PostMapping("/api/member/login")
-    public ResponseEntity login(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity login(@RequestBody LoginRequest loginRequest,
+                                HttpServletRequest request, HttpServletResponse response) {
 
-        LoginResponse loginResponse = memberService.login(loginRequest.getUsername(), loginRequest.getPassword(), request.getRemoteAddr());
+        LoginServiceDto loginServiceDto = LoginRequest.loginRequestToLoginServiceDto(loginRequest, request.getRemoteAddr());
+        LoginResponse loginResponse = memberService.login(loginServiceDto);
 
+        // header, cookie 에 access, refresh 토큰 넣기
         response.addHeader("Authorization", "Bearer " + loginResponse.getAccessToken());
         Cookie refreshTokenCookie = new Cookie("refreshToken", loginResponse.getRefreshToken());
-
         refreshTokenCookie.setSecure(true);
         refreshTokenCookie.setHttpOnly(true);
-
         response.addCookie(refreshTokenCookie);
 
         return ResponseEntity.ok("Login Success");
