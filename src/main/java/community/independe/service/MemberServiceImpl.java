@@ -10,6 +10,7 @@ import community.independe.repository.MemberRepository;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.service.dtos.JoinServiceDto;
 import community.independe.service.dtos.LoginResponse;
+import community.independe.service.dtos.LoginServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,6 +38,7 @@ public class MemberServiceImpl implements MemberService {
         String username = joinServiceDto.getUsername();
         String nickname = joinServiceDto.getNickname();
 
+        // Transaction 안타는 문제 해결해야됨
         checkUsername(username);
         checkNickname(nickname);
 
@@ -72,25 +74,24 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public LoginResponse login(String username, String password, String ip) {
+    public LoginResponse login(LoginServiceDto loginServiceDto) {
 
-        Member findMember = memberRepository.findByUsername(username);
+        Member findMember = memberRepository.findByUsername(loginServiceDto.getUsername());
         if (findMember == null) {
             throw new CustomException(ErrorCode.INVALID_USERNAME);
         }
 
-        if (!passwordEncoder.matches(password, findMember.getPassword())) {
+        if (!passwordEncoder.matches(loginServiceDto.getPassword(), findMember.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
-        String jwtToken;
-        String refreshToken;
-        String role = findMember.getRole();
-        String findUsername = findMember.getUsername();
 
         try {
-            jwtToken = securitySigner.getJwtToken(findUsername, jwk);
-            refreshToken = securitySigner.getRefreshJwtToken(findUsername, jwk);
-            refreshTokenService.save(ip, role, refreshToken, findUsername);
+            String findUsername = findMember.getUsername();
+            String role = findMember.getRole();
+
+            String jwtToken = securitySigner.getJwtToken(findUsername, jwk);
+            String refreshToken = securitySigner.getRefreshJwtToken(findUsername, jwk);
+            refreshTokenService.save(loginServiceDto.getIp(), role, refreshToken, findUsername);
 
             return LoginResponse.builder()
                     .accessToken(jwtToken)
