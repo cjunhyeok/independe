@@ -38,9 +38,15 @@ public class MemberServiceImpl implements MemberService {
         String username = joinServiceDto.getUsername();
         String nickname = joinServiceDto.getNickname();
 
-        // Transaction 안타는 문제 해결해야됨
-        checkUsername(username);
-        checkNickname(nickname);
+        Member findUsername = memberRepository.findByUsername(username);
+        if (findUsername != null) {
+            throw new CustomException(ErrorCode.USERNAME_DUPLICATED);
+        }
+
+        Member findNickname = memberRepository.findByNickname(nickname);
+        if (findNickname != null) {
+            throw new CustomException(ErrorCode.USERNAME_DUPLICATED);
+        }
 
         Member member = Member.builder()
                 .username(username)
@@ -55,22 +61,6 @@ public class MemberServiceImpl implements MemberService {
 
         Member savedMember = memberRepository.save(member);
         return savedMember.getId();
-    }
-
-    private void checkUsername(String username) {
-        Member findUsername = memberRepository.findByUsername(username);
-
-        if (findUsername != null) {
-            throw new CustomException(ErrorCode.USERNAME_DUPLICATED);
-        }
-    }
-
-    private void checkNickname(String nickname) {
-        Member findNickname = memberRepository.findByNickname(nickname);
-
-        if (findNickname != null) {
-            throw new CustomException(ErrorCode.USERNAME_DUPLICATED);
-        }
     }
 
     @Override
