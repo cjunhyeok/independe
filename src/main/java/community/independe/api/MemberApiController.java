@@ -13,6 +13,7 @@ import community.independe.security.service.MemberContext;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.service.MemberService;
 import community.independe.service.RefreshTokenService;
+import community.independe.service.dtos.JoinServiceDto;
 import community.independe.service.dtos.LoginResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
@@ -45,11 +46,8 @@ public class MemberApiController {
     @PostMapping("/api/members/new")
     public ResponseEntity<Long> createMember(@RequestBody @Valid CreateMemberRequest request) {
 
-        Long joinMember = memberService.join(request.getUsername(),
-                request.getPassword(),
-                request.getNickname(),
-                request.getEmail(),
-                request.getNumber());
+        JoinServiceDto joinServiceDto = CreateMemberRequest.requestToServiceDto(request);
+        Long joinMember = memberService.join(joinServiceDto);
 
         return ResponseEntity.ok(joinMember);
     }
