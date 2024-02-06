@@ -8,10 +8,7 @@ import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
 import community.independe.security.signature.SecuritySigner;
-import community.independe.service.dtos.JoinServiceDto;
-import community.independe.service.dtos.LoginResponse;
-import community.independe.service.dtos.LoginServiceDto;
-import community.independe.service.dtos.ModifyOAuthMemberServiceDto;
+import community.independe.service.dtos.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -79,6 +76,7 @@ public class MemberServiceImpl implements MemberService {
             String findUsername = findMember.getUsername();
             String role = findMember.getRole();
 
+            // 해당 부분 리펙토링이 필요할듯
             String jwtToken = securitySigner.getJwtToken(findUsername, jwk);
             String refreshToken = securitySigner.getRefreshJwtToken(findUsername, jwk);
             refreshTokenService.save(loginServiceDto.getIp(), role, refreshToken, findUsername);
@@ -107,12 +105,17 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void modifyMember(Long memberId, String username, String password, String nickname, String email, String number) {
-        Member findMember = memberRepository.findById(memberId).orElseThrow(
+    public void modifyMember(ModifyMemberServiceDto modifyMemberServiceDto) {
+        Member findMember = memberRepository.findById(modifyMemberServiceDto.getMemberId()).orElseThrow(
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
-        findMember.modifyMember(username, password, nickname, email, number);
+        findMember.modifyMember(
+                modifyMemberServiceDto.getUsername(),
+                modifyMemberServiceDto.getPassword(),
+                modifyMemberServiceDto.getNickname(),
+                modifyMemberServiceDto.getEmail(),
+                modifyMemberServiceDto.getNumber());
     }
 
     @Override
