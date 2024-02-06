@@ -36,13 +36,12 @@ public class MemberServiceImpl implements MemberService {
     public Long join(JoinServiceDto joinServiceDto) {
 
         String username = joinServiceDto.getUsername();
-        String nickname = joinServiceDto.getNickname();
-
         Member findUsername = memberRepository.findByUsername(username);
         if (findUsername != null) {
             throw new CustomException(ErrorCode.USERNAME_DUPLICATED);
         }
 
+        String nickname = joinServiceDto.getNickname();
         Member findNickname = memberRepository.findByNickname(nickname);
         if (findNickname != null) {
             throw new CustomException(ErrorCode.USERNAME_DUPLICATED);
