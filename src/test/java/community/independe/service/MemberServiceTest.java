@@ -138,7 +138,7 @@ public class MemberServiceTest {
 
         // stub
         when(memberRepository.findByUsername(username)).thenReturn(member);
-        when(passwordEncoder.matches(password,password)).thenReturn(true);
+        when(passwordEncoder.matches(password, password)).thenReturn(true);
         when(securitySigner.getJwtToken(username, jwk)).thenReturn(jwtToken);
         when(securitySigner.getRefreshJwtToken(username, jwk)).thenReturn(refreshToken);
         when(refreshTokenService.save(ip, role, refreshToken, username)).thenReturn(refreshToken);
@@ -151,27 +151,19 @@ public class MemberServiceTest {
         assertThat(loginResponse.getRefreshToken()).isEqualTo(refreshToken);
     }
 
-    private LoginServiceDto createLoginServiceDto() {
-        return LoginServiceDto
-                .builder()
-                .username("username")
-                .password("password")
-                .ip("ip")
-                .build();
-    }
-
     @Test
     void loginUsernameFailTest() {
         // given
-        String username = "username";
-        String password = "password";
-        String ip = "ip";
+        LoginServiceDto loginServiceDto = createLoginServiceDto();
+        String username = loginServiceDto.getUsername();
+        String password = loginServiceDto.getPassword();
+        String ip = loginServiceDto.getIp();
 
         // stub
         when(memberRepository.findByUsername(username)).thenReturn(null);
 
         // when
-        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> memberService.login(username, password, ip))
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> memberService.login(loginServiceDto))
                 .isInstanceOf(CustomException.class)
                 .extracting(ex -> (CustomException) ex);
 
@@ -188,9 +180,9 @@ public class MemberServiceTest {
     @Test
     void loginPasswordFailTest() {
         // given
-        String username = "username";
-        String password = "password";
-        String ip = "ip";
+        LoginServiceDto loginServiceDto = createLoginServiceDto();
+        String username = loginServiceDto.getUsername();
+        String password = loginServiceDto.getPassword();
         Member member = Member.builder().username(username).role("ROLE_USER").password(password).build();
 
         // stub
@@ -198,7 +190,7 @@ public class MemberServiceTest {
         when(passwordEncoder.matches(password, password)).thenReturn(false);
 
         // when
-        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> memberService.login(username, password, ip))
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> memberService.login(loginServiceDto))
                 .isInstanceOf(CustomException.class)
                 .extracting(ex -> (CustomException) ex);
 
@@ -215,9 +207,10 @@ public class MemberServiceTest {
     @Test
     void loginTokenFailTest() throws JOSEException {
         // given
-        String username = "username";
-        String password = "password";
-        String ip = "ip";
+        LoginServiceDto loginServiceDto = createLoginServiceDto();
+        String username = loginServiceDto.getUsername();
+        String password = loginServiceDto.getPassword();
+        String ip = loginServiceDto.getIp();
         Member member = Member.builder().username(username).role("ROLE_USER").password(password).build();
         Set<String> authorities = new HashSet<>();
         authorities.add(member.getRole());
@@ -229,7 +222,7 @@ public class MemberServiceTest {
         when(passwordEncoder.matches(password, password)).thenReturn(true);
         when(securitySigner.getJwtToken(username, jwk)).thenThrow(JOSEException.class);
         // when
-        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> memberService.login(username, password, ip))
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> memberService.login(loginServiceDto))
                 .isInstanceOf(CustomException.class)
                 .extracting(ex -> (CustomException) ex);
 
@@ -241,6 +234,15 @@ public class MemberServiceTest {
         verify(passwordEncoder, times(1)).matches(password, password);
         verify(securitySigner, times(1)).getJwtToken(username, jwk);
         verifyNoInteractions(refreshTokenService);
+    }
+
+    private LoginServiceDto createLoginServiceDto() {
+        return LoginServiceDto
+                .builder()
+                .username("username")
+                .password("password")
+                .ip("ip")
+                .build();
     }
 
     @Test
