@@ -13,10 +13,7 @@ import community.independe.security.service.MemberContext;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.service.MemberService;
 import community.independe.service.RefreshTokenService;
-import community.independe.service.dtos.JoinServiceDto;
-import community.independe.service.dtos.LoginResponse;
-import community.independe.service.dtos.LoginServiceDto;
-import community.independe.service.dtos.ModifyOAuthMemberServiceDto;
+import community.independe.service.dtos.*;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -161,14 +158,10 @@ public class MemberApiController {
                                         @AuthenticationPrincipal MemberContext memberContext) {
 
         Member loginMember = memberContext.getMember();
+        ModifyMemberServiceDto modifyMemberServiceDto
+                = ModifyMemberRequest.requestToModifyMemberServiceDto(request, loginMember.getId());
 
-        memberService.modifyMember(
-                loginMember.getId(),
-                request.getUsername(),
-                request.getPassword(),
-                request.getNickname(),
-                request.getEmail(),
-                request.getNumber());
+        memberService.modifyMember(modifyMemberServiceDto);
 
         return ResponseEntity.ok("OK");
     }
