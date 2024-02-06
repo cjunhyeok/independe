@@ -47,13 +47,7 @@ public class MemberServiceTest {
     @Test
     public void joinTest() {
         // given
-        JoinServiceDto joinServiceDto = JoinServiceDto.builder()
-                .username("id")
-                .password("1234")
-                .nickname("nick")
-                .isPrivacyCheck(true)
-                .isPrivacyCheck(true)
-                .build();
+        JoinServiceDto joinServiceDto = createJoinServiceDto();
 
         // stub
         when(memberRepository.findByUsername(joinServiceDto.getUsername())).thenReturn(null);
@@ -82,16 +76,14 @@ public class MemberServiceTest {
     @Test
     void joinCheckUsernameFailTest() {
         // given
-        String username = "mockUsername";
-        String password = "mockPassword";
-        String nickname = "mockNickname";
+        JoinServiceDto joinServiceDto = createJoinServiceDto();
 
         // stub
-        when(memberRepository.findByUsername(username)).thenReturn(Member.builder().build());
+        when(memberRepository.findByUsername(joinServiceDto.getUsername())).thenReturn(Member.builder().build());
 
         // when
         AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert =
-                assertThatThrownBy(() -> memberService.join(username, password, nickname, null, null));
+                assertThatThrownBy(() -> memberService.join(joinServiceDto));
 
         // then
         abstractThrowableAssert
@@ -101,21 +93,29 @@ public class MemberServiceTest {
     @Test
     void joinCheckNicknameFailTest() {
         // given
-        String username = "mockUsername";
-        String password = "mockPassword";
-        String nickname = "mockNickname";
+        JoinServiceDto joinServiceDto = createJoinServiceDto();
 
         // stub
-        when(memberRepository.findByUsername(username)).thenReturn(null);
-        when(memberRepository.findByNickname(nickname)).thenReturn(Member.builder().build());
+        when(memberRepository.findByUsername(joinServiceDto.getUsername())).thenReturn(null);
+        when(memberRepository.findByNickname(joinServiceDto.getNickname())).thenReturn(Member.builder().build());
 
         // when
         AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert =
-                assertThatThrownBy(() -> memberService.join(username, password, nickname, null, null));
+                assertThatThrownBy(() -> memberService.join(joinServiceDto));
 
         // then
         abstractThrowableAssert
                 .isInstanceOf(CustomException.class);
+    }
+
+    private JoinServiceDto createJoinServiceDto() {
+        return JoinServiceDto.builder()
+                .username("id")
+                .password("1234")
+                .nickname("nick")
+                .isPrivacyCheck(true)
+                .isPrivacyCheck(true)
+                .build();
     }
 
     @Test
