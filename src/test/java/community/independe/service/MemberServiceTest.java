@@ -10,6 +10,7 @@ import community.independe.repository.MemberRepository;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.service.dtos.JoinServiceDto;
 import community.independe.service.dtos.LoginResponse;
+import community.independe.service.dtos.LoginServiceDto;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.Test;
@@ -121,28 +122,42 @@ public class MemberServiceTest {
     @Test
     void loginTest() throws JOSEException {
         // given
-        String username = "username";
-        String password = "password";
-        String ip = "ip";
+        LoginServiceDto loginServiceDto = createLoginServiceDto();
+        String username = loginServiceDto.getUsername();
+        String password = loginServiceDto.getPassword();
+        String ip = loginServiceDto.getIp();
         String role = "ROLE_USER";
-        Member member = Member.builder().username(username).role(role).password(password).build();
-
+        Member member = Member
+                .builder()
+                .username(username)
+                .password(password)
+                .role(role)
+                .build();
         String jwtToken = "jwtToken";
         String refreshToken = "refreshToken";
 
         // stub
         when(memberRepository.findByUsername(username)).thenReturn(member);
-        when(passwordEncoder.matches(password, password)).thenReturn(true);
+        when(passwordEncoder.matches(password,password)).thenReturn(true);
         when(securitySigner.getJwtToken(username, jwk)).thenReturn(jwtToken);
         when(securitySigner.getRefreshJwtToken(username, jwk)).thenReturn(refreshToken);
         when(refreshTokenService.save(ip, role, refreshToken, username)).thenReturn(refreshToken);
 
         // when
-        LoginResponse loginResponse = memberService.login(username, password, ip);
+        LoginResponse loginResponse = memberService.login(loginServiceDto);
 
         // then
         assertThat(loginResponse.getAccessToken()).isEqualTo(jwtToken);
         assertThat(loginResponse.getRefreshToken()).isEqualTo(refreshToken);
+    }
+
+    private LoginServiceDto createLoginServiceDto() {
+        return LoginServiceDto
+                .builder()
+                .username("username")
+                .password("password")
+                .ip("ip")
+                .build();
     }
 
     @Test
