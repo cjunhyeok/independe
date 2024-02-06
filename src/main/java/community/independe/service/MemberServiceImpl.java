@@ -11,6 +11,7 @@ import community.independe.security.signature.SecuritySigner;
 import community.independe.service.dtos.JoinServiceDto;
 import community.independe.service.dtos.LoginResponse;
 import community.independe.service.dtos.LoginServiceDto;
+import community.independe.service.dtos.ModifyOAuthMemberServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -93,12 +94,15 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void modifyOAuthMember(Long memberId, String nickname, String email, String number) {
-        Member findMember = memberRepository.findById(memberId).orElseThrow(
+    public void modifyOAuthMember(ModifyOAuthMemberServiceDto modifyOAuthMemberServiceDto) {
+        Member findMember = memberRepository.findById(modifyOAuthMemberServiceDto.getMemberId()).orElseThrow(
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
-        findMember.oauthMember(nickname, email, number);
+        findMember.oauthMember(
+                modifyOAuthMemberServiceDto.getNickname(),
+                modifyOAuthMemberServiceDto.getEmail(),
+                modifyOAuthMemberServiceDto.getNumber());
     }
 
     @Override
