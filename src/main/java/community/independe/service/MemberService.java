@@ -2,16 +2,16 @@ package community.independe.service;
 
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.RegionType;
-import community.independe.service.dtos.LoginResponse;
+import community.independe.service.dtos.*;
 
 import java.util.List;
 
 public interface MemberService {
 
-    Long join(String username, String password, String nickname, String email, String number);
-    LoginResponse login(String username, String password, String ip);
-    void modifyOAuthMember(Long memberId, String nickname, String email, String number);
-    void modifyMember(Long memberId, String username, String password, String nickname, String email, String number);
+    Long join(JoinServiceDto joinServiceDto);
+    LoginResponse login(LoginServiceDto loginServiceDto);
+    void modifyOAuthMember(ModifyOAuthMemberServiceDto modifyOAuthMemberServiceDto);
+    void modifyMember(ModifyMemberServiceDto modifyMemberServiceDto);
     void authenticateRegion(Long memberId ,RegionType regionType);
     Member findById(Long id);
     Member findByUsername(String username);

@@ -1,5 +1,6 @@
 package community.independe.api.dtos.member;
 
+import community.independe.service.dtos.JoinServiceDto;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,4 +29,17 @@ public class CreateMemberRequest {
     private String email;
     @Pattern(regexp = "^\\d{3}-\\d{3,4}-\\d{4}$")
     private String number;
+
+    public static JoinServiceDto requestToServiceDto(CreateMemberRequest request) {
+        return JoinServiceDto
+                .builder()
+                .username(request.getUsername())
+                .password(request.getPassword())
+                .nickname(request.getNickname())
+                .email(request.getEmail())
+                .number(request.getNumber())
+                .isPrivacyCheck(request.getIsPrivacyCheck())
+                .isTermOfUseCheck(request.getIsTermOfUseCheck())
+                .build();
+    }
 }

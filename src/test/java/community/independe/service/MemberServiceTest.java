@@ -8,7 +8,7 @@ import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
 import community.independe.security.signature.SecuritySigner;
-import community.independe.service.dtos.LoginResponse;
+import community.independe.service.dtos.*;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.Test;
@@ -46,14 +46,12 @@ public class MemberServiceTest {
     @Test
     public void joinTest() {
         // given
-        String username = "id";
-        String password = "1234";
-        String nickname = "nick";
+        JoinServiceDto joinServiceDto = createJoinServiceDto();
 
         // stub
-        when(memberRepository.findByUsername(username)).thenReturn(null);
-        when(memberRepository.findByNickname(nickname)).thenReturn(null);
-        when(passwordEncoder.encode(password)).thenReturn("hashedPassword");
+        when(memberRepository.findByUsername(joinServiceDto.getUsername())).thenReturn(null);
+        when(memberRepository.findByNickname(joinServiceDto.getNickname())).thenReturn(null);
+        when(passwordEncoder.encode(joinServiceDto.getPassword())).thenReturn("hashedPassword");
         when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> {
             Member member = invocation.getArgument(0);
             setPrivateField(member, "id", 1L);  // Reflection으로 ID 값을 설정
@@ -61,12 +59,10 @@ public class MemberServiceTest {
         });
 
         // when
-        Long joinMemberId = memberService.join(username, password, nickname, null, null);
+        Long joinMemberId = memberService.join(joinServiceDto);
 
-        System.out.println(joinMemberId);
-
-        verify(memberRepository).findByUsername(username);
-        verify(passwordEncoder).encode(password);
+        verify(memberRepository).findByUsername(joinServiceDto.getUsername());
+        verify(passwordEncoder).encode(joinServiceDto.getPassword());
         verify(memberRepository).save(any(Member.class));
     }
 
@@ -79,16 +75,14 @@ public class MemberServiceTest {
     @Test
     void joinCheckUsernameFailTest() {
         // given
-        String username = "mockUsername";
-        String password = "mockPassword";
-        String nickname = "mockNickname";
+        JoinServiceDto joinServiceDto = createJoinServiceDto();
 
         // stub
-        when(memberRepository.findByUsername(username)).thenReturn(Member.builder().build());
+        when(memberRepository.findByUsername(joinServiceDto.getUsername())).thenReturn(Member.builder().build());
 
         // when
         AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert =
-                assertThatThrownBy(() -> memberService.join(username, password, nickname, null, null));
+                assertThatThrownBy(() -> memberService.join(joinServiceDto));
 
         // then
         abstractThrowableAssert
@@ -98,32 +92,45 @@ public class MemberServiceTest {
     @Test
     void joinCheckNicknameFailTest() {
         // given
-        String username = "mockUsername";
-        String password = "mockPassword";
-        String nickname = "mockNickname";
+        JoinServiceDto joinServiceDto = createJoinServiceDto();
 
         // stub
-        when(memberRepository.findByUsername(username)).thenReturn(null);
-        when(memberRepository.findByNickname(nickname)).thenReturn(Member.builder().build());
+        when(memberRepository.findByUsername(joinServiceDto.getUsername())).thenReturn(null);
+        when(memberRepository.findByNickname(joinServiceDto.getNickname())).thenReturn(Member.builder().build());
 
         // when
         AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert =
-                assertThatThrownBy(() -> memberService.join(username, password, nickname, null, null));
+                assertThatThrownBy(() -> memberService.join(joinServiceDto));
 
         // then
         abstractThrowableAssert
                 .isInstanceOf(CustomException.class);
     }
 
+    private JoinServiceDto createJoinServiceDto() {
+        return JoinServiceDto.builder()
+                .username("id")
+                .password("1234")
+                .nickname("nick")
+                .isPrivacyCheck(true)
+                .isPrivacyCheck(true)
+                .build();
+    }
+
     @Test
     void loginTest() throws JOSEException {
         // given
-        String username = "username";
-        String password = "password";
-        String ip = "ip";
+        LoginServiceDto loginServiceDto = createLoginServiceDto();
+        String username = loginServiceDto.getUsername();
+        String password = loginServiceDto.getPassword();
+        String ip = loginServiceDto.getIp();
         String role = "ROLE_USER";
-        Member member = Member.builder().username(username).role(role).password(password).build();
-
+        Member member = Member
+                .builder()
+                .username(username)
+                .password(password)
+                .role(role)
+                .build();
         String jwtToken = "jwtToken";
         String refreshToken = "refreshToken";
 
@@ -135,7 +142,7 @@ public class MemberServiceTest {
         when(refreshTokenService.save(ip, role, refreshToken, username)).thenReturn(refreshToken);
 
         // when
-        LoginResponse loginResponse = memberService.login(username, password, ip);
+        LoginResponse loginResponse = memberService.login(loginServiceDto);
 
         // then
         assertThat(loginResponse.getAccessToken()).isEqualTo(jwtToken);
@@ -145,15 +152,16 @@ public class MemberServiceTest {
     @Test
     void loginUsernameFailTest() {
         // given
-        String username = "username";
-        String password = "password";
-        String ip = "ip";
+        LoginServiceDto loginServiceDto = createLoginServiceDto();
+        String username = loginServiceDto.getUsername();
+        String password = loginServiceDto.getPassword();
+        String ip = loginServiceDto.getIp();
 
         // stub
         when(memberRepository.findByUsername(username)).thenReturn(null);
 
         // when
-        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> memberService.login(username, password, ip))
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> memberService.login(loginServiceDto))
                 .isInstanceOf(CustomException.class)
                 .extracting(ex -> (CustomException) ex);
 
@@ -170,9 +178,9 @@ public class MemberServiceTest {
     @Test
     void loginPasswordFailTest() {
         // given
-        String username = "username";
-        String password = "password";
-        String ip = "ip";
+        LoginServiceDto loginServiceDto = createLoginServiceDto();
+        String username = loginServiceDto.getUsername();
+        String password = loginServiceDto.getPassword();
         Member member = Member.builder().username(username).role("ROLE_USER").password(password).build();
 
         // stub
@@ -180,7 +188,7 @@ public class MemberServiceTest {
         when(passwordEncoder.matches(password, password)).thenReturn(false);
 
         // when
-        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> memberService.login(username, password, ip))
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> memberService.login(loginServiceDto))
                 .isInstanceOf(CustomException.class)
                 .extracting(ex -> (CustomException) ex);
 
@@ -197,9 +205,10 @@ public class MemberServiceTest {
     @Test
     void loginTokenFailTest() throws JOSEException {
         // given
-        String username = "username";
-        String password = "password";
-        String ip = "ip";
+        LoginServiceDto loginServiceDto = createLoginServiceDto();
+        String username = loginServiceDto.getUsername();
+        String password = loginServiceDto.getPassword();
+        String ip = loginServiceDto.getIp();
         Member member = Member.builder().username(username).role("ROLE_USER").password(password).build();
         Set<String> authorities = new HashSet<>();
         authorities.add(member.getRole());
@@ -211,7 +220,7 @@ public class MemberServiceTest {
         when(passwordEncoder.matches(password, password)).thenReturn(true);
         when(securitySigner.getJwtToken(username, jwk)).thenThrow(JOSEException.class);
         // when
-        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> memberService.login(username, password, ip))
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> memberService.login(loginServiceDto))
                 .isInstanceOf(CustomException.class)
                 .extracting(ex -> (CustomException) ex);
 
@@ -225,13 +234,21 @@ public class MemberServiceTest {
         verifyNoInteractions(refreshTokenService);
     }
 
+    private LoginServiceDto createLoginServiceDto() {
+        return LoginServiceDto
+                .builder()
+                .username("username")
+                .password("password")
+                .ip("ip")
+                .build();
+    }
+
     @Test
     void modifyOAuthMemberTest() {
         // given
+        ModifyOAuthMemberServiceDto modifyOAuthMemberServiceDto = createModifyOAuthMemberServiceDto();
         Long memberId = 1L;
-        String nickname = "modifyNickname";
-        String email = "modifyEmail";
-        String number = "01064613134";
+        String nickname = modifyOAuthMemberServiceDto.getNickname();
 
         Member mockMember = Member.builder().build();
 
@@ -239,7 +256,7 @@ public class MemberServiceTest {
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
 
         // when
-        memberService.modifyOAuthMember(memberId, nickname, email, number);
+        memberService.modifyOAuthMember(modifyOAuthMemberServiceDto);
 
         // then
         verify(memberRepository).findById(memberId);
@@ -249,31 +266,38 @@ public class MemberServiceTest {
     @Test
     void modifyOAuthMemberFailTest() {
         // given
-        Long memberId = 1L;
-        String nickname = "modifyNickname";
-        String email = "modifyEmail";
-        String number = "01064613134";
+        ModifyOAuthMemberServiceDto modifyOAuthMemberServiceDto = createModifyOAuthMemberServiceDto();
+        Long memberId = createModifyOAuthMemberServiceDto().getMemberId();
 
         // stub
         when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
         // when
-        assertThatThrownBy(() -> memberService.modifyOAuthMember(memberId, nickname, email, number))
+        assertThatThrownBy(() -> memberService.modifyOAuthMember(createModifyOAuthMemberServiceDto()))
                 .isInstanceOf(CustomException.class);
 
         // then
         verify(memberRepository, times(1)).findById(memberId);
     }
 
+    private ModifyOAuthMemberServiceDto createModifyOAuthMemberServiceDto() {
+        return ModifyOAuthMemberServiceDto
+                .builder()
+                .memberId(1L)
+                .nickname("nickname")
+                .email("email")
+                .number("number")
+                .build();
+
+    }
+
     @Test
     void modifyMember() {
         // given
+        ModifyMemberServiceDto modifyMemberServiceDto = createModifyMemberServiceDto();
         Long memberId = 1L;
-        String username = "updateUsername";
-        String password = "updatePassword";
-        String nickname = "updateNickname";
-        String email = "updateEmail";
-        String number = "01012345678";
+        String username = modifyMemberServiceDto.getUsername();
+        String nickname = modifyMemberServiceDto.getNickname();
 
         Member mockMember = Member.builder().build();
 
@@ -281,7 +305,7 @@ public class MemberServiceTest {
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
 
         // when
-        memberService.modifyMember(memberId, username, password, nickname, email, number);
+        memberService.modifyMember(createModifyMemberServiceDto());
 
         // then
         verify(memberRepository).findById(memberId);
@@ -292,22 +316,31 @@ public class MemberServiceTest {
     @Test
     void modifyMemberFailTest() {
         // given
-        Long memberId = 1L;
-        String username = "updateUsername";
-        String password = "updatePassword";
-        String nickname = "updateNickname";
-        String email = "updateEmail";
-        String number = "01012345678";
+        ModifyOAuthMemberServiceDto modifyOAuthMemberServiceDto = createModifyOAuthMemberServiceDto();
+        Long memberId = createModifyOAuthMemberServiceDto().getMemberId();
 
         // stub
         when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
         // when
-        assertThatThrownBy(() -> memberService.modifyMember(memberId, username, password, nickname, email, number))
+        assertThatThrownBy(() -> memberService.modifyMember(createModifyMemberServiceDto()))
                 .isInstanceOf(CustomException.class);
 
         // then
         verify(memberRepository, times(1)).findById(memberId);
+    }
+
+    private ModifyMemberServiceDto createModifyMemberServiceDto() {
+        return ModifyMemberServiceDto
+                .builder()
+                .memberId(1L)
+                .username("username")
+                .password("password")
+                .nickname("nickname")
+                .email("email")
+                .number("number")
+                .build();
+
     }
 
     @Test

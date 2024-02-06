@@ -1,5 +1,6 @@
 package community.independe.api.dtos.member;
 
+import community.independe.service.dtos.ModifyMemberServiceDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
@@ -36,5 +37,17 @@ public class ModifyMemberRequest {
         this.nickname = nickname;
         this.email = email;
         this.number = number;
+    }
+
+    public static ModifyMemberServiceDto requestToModifyMemberServiceDto(ModifyMemberRequest request, Long memberId) {
+        return ModifyMemberServiceDto
+                .builder()
+                .memberId(memberId)
+                .username(request.getUsername())
+                .password(request.getPassword())
+                .nickname(request.getNickname())
+                .email(request.getEmail())
+                .number(request.getNumber())
+                .build();
     }
 }

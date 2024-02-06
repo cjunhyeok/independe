@@ -7,6 +7,7 @@ import community.independe.domain.member.Member;
 import community.independe.service.MemberService;
 import community.independe.service.chat.ChatRoomService;
 import community.independe.service.chat.ChatService;
+import community.independe.service.dtos.JoinServiceDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,8 +66,10 @@ public class ChatRoomApiControllerTest {
         // given
         Member sender = memberService.findByUsername("testUsername");
         Long senderId = sender.getId();
-        Long receiverId = memberService.join("receiver", "pass1", "receiver", null, null);
-        Long secondReceiverId = memberService.join("secondReceiver", "pass1", "secondReceiver", null, null);
+        JoinServiceDto receiverJoinServiceDto = createJoinServiceDto("receiver", "pass1", "receiver");
+        JoinServiceDto secondReceiverJoinServiceDto = createJoinServiceDto("secondReceiver", "pass1", "secondReceiver");
+        Long receiverId = memberService.join(receiverJoinServiceDto);
+        Long secondReceiverId = memberService.join(secondReceiverJoinServiceDto);
         Long chatRoomId = chatRoomService.saveChatRoom(senderId, receiverId);
         Long secondChatRoomId = chatRoomService.saveChatRoom(senderId, secondReceiverId);
         chatService.saveChat("message", senderId, receiverId, chatRoomId, false);
@@ -86,9 +89,10 @@ public class ChatRoomApiControllerTest {
     @Test
     void chatRoomTest() throws Exception {
         // given
-        Long receiverId = memberService.join("receiver", "pass1", "receiver", null, null);
+        JoinServiceDto receiverJoinServiceDto = createJoinServiceDto("receiver", "pass1", "receiver");
+        Long receiverId = memberService.join(receiverJoinServiceDto);
         ChatRoomRequest request = new ChatRoomRequest();
-        request.setReceiverId(receiverId);
+        request.setOpponentId(receiverId);
 
         // when
         ResultActions perform = mockMvc.perform(post("/api/chat/room")
@@ -104,9 +108,10 @@ public class ChatRoomApiControllerTest {
     void chatRoomExistTest() throws Exception {
         // given
         Member sender = memberService.findByUsername("testUsername");
-        Long receiverId = memberService.join("receiver", "pass1", "receiver", null, null);
+        JoinServiceDto receiverJoinServiceDto = createJoinServiceDto("receiver", "pass1", "receiver");
+        Long receiverId = memberService.join(receiverJoinServiceDto);
         ChatRoomRequest request = new ChatRoomRequest();
-        request.setReceiverId(receiverId);
+        request.setOpponentId(receiverId);
         Long savedChatRoomId = chatRoomService.saveChatRoom(sender.getId(), receiverId);
 
         // when
@@ -125,7 +130,8 @@ public class ChatRoomApiControllerTest {
         // given
         Member sender = memberService.findByUsername("testUsername");
         Long senderId = sender.getId();
-        Long receiverId = memberService.join("receiver", "pass1", "receiver", null, null);
+        JoinServiceDto receiverJoinServiceDto = createJoinServiceDto("receiver", "pass1", "receiver");
+        Long receiverId = memberService.join(receiverJoinServiceDto);
         Long chatRoomId = chatRoomService.saveChatRoom(senderId, receiverId);
         chatService.saveChat("message", senderId, receiverId, chatRoomId, false);
         chatService.saveChat("secondMessage", senderId, receiverId, chatRoomId, false);
@@ -139,5 +145,15 @@ public class ChatRoomApiControllerTest {
         // then
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray());
+    }
+
+    private JoinServiceDto createJoinServiceDto(String username, String password, String nickname) {
+        return JoinServiceDto.builder()
+                .username(username)
+                .password(password)
+                .nickname(nickname)
+                .isPrivacyCheck(true)
+                .isPrivacyCheck(true)
+                .build();
     }
 }

@@ -13,7 +13,7 @@ import community.independe.security.service.MemberContext;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.service.MemberService;
 import community.independe.service.RefreshTokenService;
-import community.independe.service.dtos.LoginResponse;
+import community.independe.service.dtos.*;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,11 +45,8 @@ public class MemberApiController {
     @PostMapping("/api/members/new")
     public ResponseEntity<Long> createMember(@RequestBody @Valid CreateMemberRequest request) {
 
-        Long joinMember = memberService.join(request.getUsername(),
-                request.getPassword(),
-                request.getNickname(),
-                request.getEmail(),
-                request.getNumber());
+        JoinServiceDto joinServiceDto = CreateMemberRequest.requestToServiceDto(request);
+        Long joinMember = memberService.join(joinServiceDto);
 
         return ResponseEntity.ok(joinMember);
     }
@@ -82,16 +79,17 @@ public class MemberApiController {
 
     @Operation(summary = "로그인")
     @PostMapping("/api/member/login")
-    public ResponseEntity login(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity login(@RequestBody LoginRequest loginRequest,
+                                HttpServletRequest request, HttpServletResponse response) {
 
-        LoginResponse loginResponse = memberService.login(loginRequest.getUsername(), loginRequest.getPassword(), request.getRemoteAddr());
+        LoginServiceDto loginServiceDto = LoginRequest.loginRequestToLoginServiceDto(loginRequest, request.getRemoteAddr());
+        LoginResponse loginResponse = memberService.login(loginServiceDto);
 
+        // header, cookie 에 access, refresh 토큰 넣기
         response.addHeader("Authorization", "Bearer " + loginResponse.getAccessToken());
         Cookie refreshTokenCookie = new Cookie("refreshToken", loginResponse.getRefreshToken());
-
         refreshTokenCookie.setSecure(true);
         refreshTokenCookie.setHttpOnly(true);
-
         response.addCookie(refreshTokenCookie);
 
         return ResponseEntity.ok("Login Success");
@@ -147,8 +145,9 @@ public class MemberApiController {
                                         @AuthenticationPrincipal MemberContext memberContext) {
 
         Member loginMember = memberContext.getMember();
+        ModifyOAuthMemberServiceDto modifyOAuthMemberServiceDto = OAuthMemberRequest.requestToModifyOAuthMemberServiceDto(request, loginMember.getId());
 
-        memberService.modifyOAuthMember(loginMember.getId(), request.getNickname(), request.getEmail(), request.getNumber());
+        memberService.modifyOAuthMember(modifyOAuthMemberServiceDto);
 
         return ResponseEntity.ok("OK");
     }
@@ -159,14 +158,10 @@ public class MemberApiController {
                                         @AuthenticationPrincipal MemberContext memberContext) {
 
         Member loginMember = memberContext.getMember();
+        ModifyMemberServiceDto modifyMemberServiceDto
+                = ModifyMemberRequest.requestToModifyMemberServiceDto(request, loginMember.getId());
 
-        memberService.modifyMember(
-                loginMember.getId(),
-                request.getUsername(),
-                request.getPassword(),
-                request.getNickname(),
-                request.getEmail(),
-                request.getNumber());
+        memberService.modifyMember(modifyMemberServiceDto);
 
         return ResponseEntity.ok("OK");
     }

@@ -8,7 +8,7 @@ import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
 import community.independe.security.signature.SecuritySigner;
-import community.independe.service.dtos.LoginResponse;
+import community.independe.service.dtos.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,48 +31,55 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public Long join(String username, String password, String nickname, String email, String number) {
+    public Long join(JoinServiceDto joinServiceDto) {
 
-        if (checkUsername(username) == false) {
+        String username = joinServiceDto.getUsername();
+        Member findUsername = memberRepository.findByUsername(username);
+        if (findUsername != null) {
             throw new CustomException(ErrorCode.USERNAME_DUPLICATED);
         }
 
-        if (checkNickname(nickname) == false) {
-            throw new CustomException(ErrorCode.NICKNAME_DUPLICATED);
+        String nickname = joinServiceDto.getNickname();
+        Member findNickname = memberRepository.findByNickname(nickname);
+        if (findNickname != null) {
+            throw new CustomException(ErrorCode.USERNAME_DUPLICATED);
         }
 
         Member member = Member.builder()
                 .username(username)
-                .password(passwordEncoder.encode(password))
+                .password(passwordEncoder.encode(joinServiceDto.getPassword()))
                 .nickname(nickname)
                 .role("ROLE_USER")
-                .email(email)
-                .number(number)
+                .email(joinServiceDto.getEmail())
+                .number(joinServiceDto.getNumber())
+                .isPrivacyCheck(joinServiceDto.getIsPrivacyCheck())
+                .isTermOfUseCheck(joinServiceDto.getIsTermOfUseCheck())
                 .build();
+
         Member savedMember = memberRepository.save(member);
         return savedMember.getId();
     }
 
     @Override
-    public LoginResponse login(String username, String password, String ip) {
+    public LoginResponse login(LoginServiceDto loginServiceDto) {
 
-        Member findMember = memberRepository.findByUsername(username);
+        Member findMember = memberRepository.findByUsername(loginServiceDto.getUsername());
         if (findMember == null) {
             throw new CustomException(ErrorCode.INVALID_USERNAME);
         }
 
-        if (!passwordEncoder.matches(password, findMember.getPassword())) {
+        if (!passwordEncoder.matches(loginServiceDto.getPassword(), findMember.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
-        String jwtToken;
-        String refreshToken;
-        String role = findMember.getRole();
-        String findUsername = findMember.getUsername();
 
         try {
-            jwtToken = securitySigner.getJwtToken(findUsername, jwk);
-            refreshToken = securitySigner.getRefreshJwtToken(findUsername, jwk);
-            refreshTokenService.save(ip, role, refreshToken, findUsername);
+            String findUsername = findMember.getUsername();
+            String role = findMember.getRole();
+
+            // 해당 부분 리펙토링이 필요할듯
+            String jwtToken = securitySigner.getJwtToken(findUsername, jwk);
+            String refreshToken = securitySigner.getRefreshJwtToken(findUsername, jwk);
+            refreshTokenService.save(loginServiceDto.getIp(), role, refreshToken, findUsername);
 
             return LoginResponse.builder()
                     .accessToken(jwtToken)
@@ -83,42 +90,32 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
-    private boolean checkUsername(String username) {
-        Member findUsername = memberRepository.findByUsername(username);
+    @Override
+    @Transactional
+    public void modifyOAuthMember(ModifyOAuthMemberServiceDto modifyOAuthMemberServiceDto) {
+        Member findMember = memberRepository.findById(modifyOAuthMemberServiceDto.getMemberId()).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+        );
 
-        if (findUsername != null) {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean checkNickname(String nickname) {
-        Member findNickname = memberRepository.findByNickname(nickname);
-
-        if (findNickname != null) {
-            return false;
-        }
-        return true;
+        findMember.oauthMember(
+                modifyOAuthMemberServiceDto.getNickname(),
+                modifyOAuthMemberServiceDto.getEmail(),
+                modifyOAuthMemberServiceDto.getNumber());
     }
 
     @Override
     @Transactional
-    public void modifyOAuthMember(Long memberId, String nickname, String email, String number) {
-        Member findMember = memberRepository.findById(memberId).orElseThrow(
+    public void modifyMember(ModifyMemberServiceDto modifyMemberServiceDto) {
+        Member findMember = memberRepository.findById(modifyMemberServiceDto.getMemberId()).orElseThrow(
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
-        findMember.oauthMember(nickname, email, number);
-    }
-
-    @Override
-    @Transactional
-    public void modifyMember(Long memberId, String username, String password, String nickname, String email, String number) {
-        Member findMember = memberRepository.findById(memberId).orElseThrow(
-                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
-        );
-
-        findMember.modifyMember(username, password, nickname, email, number);
+        findMember.modifyMember(
+                modifyMemberServiceDto.getUsername(),
+                modifyMemberServiceDto.getPassword(),
+                modifyMemberServiceDto.getNickname(),
+                modifyMemberServiceDto.getEmail(),
+                modifyMemberServiceDto.getNumber());
     }
 
     @Override
