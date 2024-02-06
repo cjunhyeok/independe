@@ -5,6 +5,7 @@ import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.service.FilesService;
 import community.independe.service.MemberService;
 import community.independe.service.PostService;
+import community.independe.service.dtos.JoinServiceDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,7 +60,8 @@ public class FilesApiControllerTest {
     @Test
     void postFilesTest() throws Exception {
         // given
-        Long joinMemberId = memberService.join("mockUsername", "password", "mockNickname", "email", "number");
+        JoinServiceDto joinServiceDto = createJoinServiceDto("mockUsername", "password", "mockNickname");
+        Long joinMemberId = memberService.join(joinServiceDto);
         Long savedPostId = postService.createIndependentPost(joinMemberId, "title", "content", IndependentPostType.CLEAN);
         List<MultipartFile> images = new ArrayList<>();
         MockMultipartFile eventImage1 = new MockMultipartFile("eventImages", "image1.jpg", "image/jpeg", new byte[0]);
@@ -72,5 +74,15 @@ public class FilesApiControllerTest {
 
         // then
         perform.andExpect(status().isOk());
+    }
+
+    private JoinServiceDto createJoinServiceDto(String username, String password, String nickname) {
+        return JoinServiceDto.builder()
+                .username(username)
+                .password(password)
+                .nickname(nickname)
+                .isPrivacyCheck(true)
+                .isPrivacyCheck(true)
+                .build();
     }
 }
