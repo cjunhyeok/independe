@@ -8,9 +8,7 @@ import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
 import community.independe.security.signature.SecuritySigner;
-import community.independe.service.dtos.JoinServiceDto;
-import community.independe.service.dtos.LoginResponse;
-import community.independe.service.dtos.LoginServiceDto;
+import community.independe.service.dtos.*;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.Test;
@@ -248,10 +246,9 @@ public class MemberServiceTest {
     @Test
     void modifyOAuthMemberTest() {
         // given
+        ModifyOAuthMemberServiceDto modifyOAuthMemberServiceDto = createModifyOAuthMemberServiceDto();
         Long memberId = 1L;
-        String nickname = "modifyNickname";
-        String email = "modifyEmail";
-        String number = "01064613134";
+        String nickname = modifyOAuthMemberServiceDto.getNickname();
 
         Member mockMember = Member.builder().build();
 
@@ -259,11 +256,22 @@ public class MemberServiceTest {
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(mockMember));
 
         // when
-        memberService.modifyOAuthMember(memberId, nickname, email, number);
+        memberService.modifyOAuthMember(modifyOAuthMemberServiceDto);
 
         // then
         verify(memberRepository).findById(memberId);
         assertThat(mockMember.getNickname()).isEqualTo(nickname);
+    }
+
+    private ModifyOAuthMemberServiceDto createModifyOAuthMemberServiceDto() {
+        return ModifyOAuthMemberServiceDto
+                .builder()
+                .memberId(1L)
+                .nickname("nickname")
+                .email("email")
+                .number("number")
+                .build();
+
     }
 
     @Test
