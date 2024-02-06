@@ -263,6 +263,23 @@ public class MemberServiceTest {
         assertThat(mockMember.getNickname()).isEqualTo(nickname);
     }
 
+    @Test
+    void modifyOAuthMemberFailTest() {
+        // given
+        ModifyOAuthMemberServiceDto modifyOAuthMemberServiceDto = createModifyOAuthMemberServiceDto();
+        Long memberId = createModifyOAuthMemberServiceDto().getMemberId();
+
+        // stub
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> memberService.modifyOAuthMember(createModifyOAuthMemberServiceDto()))
+                .isInstanceOf(CustomException.class);
+
+        // then
+        verify(memberRepository, times(1)).findById(memberId);
+    }
+
     private ModifyOAuthMemberServiceDto createModifyOAuthMemberServiceDto() {
         return ModifyOAuthMemberServiceDto
                 .builder()
@@ -272,25 +289,6 @@ public class MemberServiceTest {
                 .number("number")
                 .build();
 
-    }
-
-    @Test
-    void modifyOAuthMemberFailTest() {
-        // given
-        Long memberId = 1L;
-        String nickname = "modifyNickname";
-        String email = "modifyEmail";
-        String number = "01064613134";
-
-        // stub
-        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
-
-        // when
-        assertThatThrownBy(() -> memberService.modifyOAuthMember(memberId, nickname, email, number))
-                .isInstanceOf(CustomException.class);
-
-        // then
-        verify(memberRepository, times(1)).findById(memberId);
     }
 
     @Test
