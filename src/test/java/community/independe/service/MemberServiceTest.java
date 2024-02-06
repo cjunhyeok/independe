@@ -8,6 +8,7 @@ import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
 import community.independe.security.signature.SecuritySigner;
+import community.independe.service.dtos.JoinServiceDto;
 import community.independe.service.dtos.LoginResponse;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractThrowableAssert;
@@ -46,14 +47,18 @@ public class MemberServiceTest {
     @Test
     public void joinTest() {
         // given
-        String username = "id";
-        String password = "1234";
-        String nickname = "nick";
+        JoinServiceDto joinServiceDto = JoinServiceDto.builder()
+                .username("id")
+                .password("1234")
+                .nickname("nick")
+                .isPrivacyCheck(true)
+                .isPrivacyCheck(true)
+                .build();
 
         // stub
-        when(memberRepository.findByUsername(username)).thenReturn(null);
-        when(memberRepository.findByNickname(nickname)).thenReturn(null);
-        when(passwordEncoder.encode(password)).thenReturn("hashedPassword");
+        when(memberRepository.findByUsername(joinServiceDto.getUsername())).thenReturn(null);
+        when(memberRepository.findByNickname(joinServiceDto.getNickname())).thenReturn(null);
+        when(passwordEncoder.encode(joinServiceDto.getPassword())).thenReturn("hashedPassword");
         when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> {
             Member member = invocation.getArgument(0);
             setPrivateField(member, "id", 1L);  // Reflection으로 ID 값을 설정
@@ -61,12 +66,10 @@ public class MemberServiceTest {
         });
 
         // when
-        Long joinMemberId = memberService.join(username, password, nickname, null, null);
+        Long joinMemberId = memberService.join(joinServiceDto);
 
-        System.out.println(joinMemberId);
-
-        verify(memberRepository).findByUsername(username);
-        verify(passwordEncoder).encode(password);
+        verify(memberRepository).findByUsername(joinServiceDto.getUsername());
+        verify(passwordEncoder).encode(joinServiceDto.getPassword());
         verify(memberRepository).save(any(Member.class));
     }
 
