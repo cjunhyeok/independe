@@ -3,6 +3,7 @@ package community.independe.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import community.independe.api.dtos.member.*;
 import community.independe.service.MemberService;
+import community.independe.service.dtos.JoinServiceDto;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +47,15 @@ public class MemberApiControllerTest {
     public void setup() throws Exception {
         transactionStatus = transactionManager.getTransaction(new DefaultTransactionDefinition());
 
-        memberService.join("modifyMember", "testPasswrod1!", "modifyNickname", null, null);
+        JoinServiceDto joinServiceDto = JoinServiceDto
+                .builder()
+                .username("modifyMember")
+                .password("testPassword1!")
+                .nickname("modifyNickname")
+                .isTermOfUseCheck(true)
+                .isPrivacyCheck(true)
+                .build();
+        memberService.join(joinServiceDto);
 
         injector.makeAccessAndRefreshToken();
         accessToken = injector.getAccessToken();
@@ -259,7 +268,7 @@ public class MemberApiControllerTest {
     void loginTest() throws Exception {
         // given
         String username = "testUsername";
-        String password = "testPasswrod1!";
+        String password = "testPassword1!";
 
         // when
         ResultActions perform = mockMvc.perform(post("/api/member/login")

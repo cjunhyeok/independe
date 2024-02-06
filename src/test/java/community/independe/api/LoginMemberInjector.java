@@ -2,6 +2,7 @@ package community.independe.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import community.independe.service.MemberService;
+import community.independe.service.dtos.JoinServiceDto;
 import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,16 +27,21 @@ public class LoginMemberInjector {
     private String accessToken;
 
     public void makeAccessAndRefreshToken() throws Exception {
-        memberService.join("testUsername", "testPasswrod1!", "testNickname", null, null);
-
-        String username = "testUsername";
-        String password = "testPasswrod1!";
+        JoinServiceDto joinServiceDto = JoinServiceDto
+                .builder()
+                .username("testUsername")
+                .password("testPassword1!")
+                .nickname("testNickname")
+                .isPrivacyCheck(true)
+                .isTermOfUseCheck(true)
+                .build();
+        memberService.join(joinServiceDto);
 
         ResultActions perform = mockMvc.perform(post("/api/member/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(Map.of(
-                        "username", username,
-                        "password", password
+                        "username", joinServiceDto.getUsername(),
+                        "password", joinServiceDto.getPassword()
                 )))
                 .with(csrf()));
 
