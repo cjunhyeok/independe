@@ -4,6 +4,8 @@ import community.independe.api.dtos.Result;
 import community.independe.api.dtos.chat.*;
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.security.service.MemberContext;
 import community.independe.service.MemberService;
 import community.independe.service.chat.ChatRoomService;
@@ -32,6 +34,10 @@ public class ChatRoomApiController {
         Member loginMember = memberContext.getMember();
         Long senderId = loginMember.getId();
         Long opponentId = chatRoomRequest.getOpponentId();
+
+        if (senderId.equals(opponentId)) {
+            throw new CustomException(ErrorCode.Coincide_Sender_Receiver);
+        }
 
         ChatRoom findChatRoom = chatRoomService.findBySenderAndReceiver(senderId, opponentId);
 
