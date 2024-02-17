@@ -20,23 +20,24 @@ public class ChatSessionServiceImpl implements ChatSessionService{
     private final RedisTemplate<String, String> redisTemplate;
     private final MemberRepository memberRepository;
     private final String SOCKETSESSIONPREIX = "SOCKETSESSION : ";
+    private final String CHATROOMSESSIONPREIX = "CHATROOMSESSION : ";
 
     @Override
     @Transactional
     public void enterChatRoom(Long memberId, Long chatRoomId) {
-        redisTemplate.opsForSet().add(chatRoomId.toString(), memberId.toString()); // 채팅방 PK로 키 설정 후 세션 값 저장
+        redisTemplate.opsForSet().add(CHATROOMSESSIONPREIX + chatRoomId.toString(), memberId.toString()); // 채팅방 PK로 키 설정 후 세션 값 저장
     }
 
     @Override
     @Transactional
     public void leaveChatRoom(Long memberId, Long chatRoomId) {
-        redisTemplate.opsForSet().remove(chatRoomId.toString(), memberId.toString()); // 채팅방 PK와 username 으로 세션 값 삭제
+        redisTemplate.opsForSet().remove(CHATROOMSESSIONPREIX + chatRoomId.toString(), memberId.toString()); // 채팅방 PK와 username 으로 세션 값 삭제
     }
 
     @Override
     @Transactional
     public Set<String> getChatRoomMembers(String chatRoomId) {
-        return redisTemplate.opsForSet().members(chatRoomId);
+        return redisTemplate.opsForSet().members(CHATROOMSESSIONPREIX + chatRoomId);
     }
 
     @Override
