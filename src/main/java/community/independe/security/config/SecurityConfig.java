@@ -121,6 +121,7 @@ public class SecurityConfig {
         config.addAllowedOrigin("https://api.independe.co.kr");
         config.addAllowedOrigin("https://192.168.0.6:5000");
         config.addAllowedOrigin("https://192.168.0.6:8080");
+        config.addAllowedOrigin("http://52.79.249.47:8081");
 //        config.addAllowedOrigin("https://api.independe.co.kr");
 //        config.addAllowedOrigin("http://localhost:8081");
 //        config.addAllowedOrigin("*");
