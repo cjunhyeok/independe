@@ -18,7 +18,7 @@
 - [추천, 신고, 즐겨찾기 DB 설계에 대한 고민](https://jhdevelopment.tistory.com/45)
 - [채팅 DB 설계에 대한 고민](https://jhdevelopment.tistory.com/50)
 # 프로젝트 구조
-![Untitled](https://github.com/cjunhyeok/independe/assets/97434544/18b546d9-9086-4ace-87be-c23a60c9913e)
+![Untitled](https://github.com/independeProject/independe/assets/97434544/3f1c2641-5846-4859-974b-f37789f68f02)
 # Trouble Shooting
 - [Junit5 댓글 Repository 삭제 테스트 오류 해결](https://jhdevelopment.tistory.com/44)
 - [테스트 시 JWT 를 이용한 로그인 처리](https://jhdevelopment.tistory.com/49)
