@@ -228,10 +228,15 @@ public class ChatRoomServiceTest {
         Member receiver = Member.builder().build();
         setPrivateField(receiver, "id", 2L);
         Chat lastChat = Chat.builder().chatRoom(chatRoom).isRead(false).message("lastMessage").sender(sender).receiver(receiver).build();
+        List<Chat> chats = new ArrayList<>();
+        chats.add(Chat.builder().build());
+        chats.add(Chat.builder().build());
+        chats.add(Chat.builder().build());
 
         // stub
         when(chatRoomRepository.findChatRoomsByMemberId(memberId)).thenReturn(chatRooms);
         when(chatRepository.findLastChatByChatRoomId(null)).thenReturn(lastChat);
+        when(chatRepository.findIsReadCountByChatRoomId(null, memberId)).thenReturn(chats);
 
         // when
         List<ChatRoomsResponse> chatRoomsResponse = chatRoomService.findChatRooms(memberId);
@@ -240,5 +245,53 @@ public class ChatRoomServiceTest {
         assertThat(chatRoomsResponse.size()).isEqualTo(1);
         verify(chatRoomRepository, times(1)).findChatRoomsByMemberId(memberId);
         verify(chatRepository, times(1)).findLastChatByChatRoomId(null);
+        verify(chatRepository, times(1)).findIsReadCountByChatRoomId(null, memberId);
+    }
+
+    @Test
+    void findChatRoomsIsReadEmptyTest() throws Exception {
+        // given
+        Long memberId = 1L;
+        List<ChatRoom> chatRooms = new ArrayList<>();
+        ChatRoom chatRoom = ChatRoom.builder().build();
+        chatRooms.add(chatRoom);
+        Member sender = Member.builder().build();
+        setPrivateField(sender, "id", memberId);
+        Member receiver = Member.builder().build();
+        setPrivateField(receiver, "id", 2L);
+        Chat lastChat = Chat.builder().chatRoom(chatRoom).isRead(false).message("lastMessage").sender(sender).receiver(receiver).build();
+        List<Chat> chats = new ArrayList<>();
+
+        // stub
+        when(chatRoomRepository.findChatRoomsByMemberId(memberId)).thenReturn(chatRooms);
+        when(chatRepository.findLastChatByChatRoomId(null)).thenReturn(lastChat);
+        when(chatRepository.findIsReadCountByChatRoomId(null, memberId)).thenReturn(chats);
+
+        // when
+        List<ChatRoomsResponse> chatRoomsResponse = chatRoomService.findChatRooms(memberId);
+
+        // then
+        assertThat(chatRoomsResponse.size()).isEqualTo(1);
+        verify(chatRoomRepository, times(1)).findChatRoomsByMemberId(memberId);
+        verify(chatRepository, times(1)).findLastChatByChatRoomId(null);
+        verify(chatRepository, times(1)).findIsReadCountByChatRoomId(null, memberId);
+    }
+
+    @Test
+    void findIsReadCountByChatRoomIdTest() {
+        // given
+        Long chatRoomId = 1L;
+        Long memberId = 1L;
+        List<Chat> chats = new ArrayList<>();
+        chats.add(Chat.builder().build());
+
+        // stub
+        when(chatRepository.findIsReadCountByChatRoomId(chatRoomId, memberId)).thenReturn(chats);
+
+        // when
+        Integer isReadCount = chatRoomService.findIsReadCountByChatRoomId(chatRoomId, memberId);
+
+        // then
+        assertThat(isReadCount).isEqualTo(1);
     }
 }

@@ -46,14 +46,14 @@ public class ChatSessionServiceTest {
 
         // stub
         when(redisTemplate.opsForSet()).thenReturn(setOperations);
-        when(setOperations.add(chatRoomId.toString(), memberId.toString())).thenReturn(1L);
+        when(setOperations.add("CHATROOMSESSION : " + chatRoomId.toString(), memberId.toString())).thenReturn(1L);
 
         // when
         chatSessionService.enterChatRoom(memberId, chatRoomId);
 
         // then
         verify(redisTemplate, times(1)).opsForSet();
-        verify(setOperations, times(1)).add(chatRoomId.toString(), memberId.toString());
+        verify(setOperations, times(1)).add("CHATROOMSESSION : " + chatRoomId.toString(), memberId.toString());
     }
 
     @Test
@@ -64,14 +64,14 @@ public class ChatSessionServiceTest {
 
         // stub
         when(redisTemplate.opsForSet()).thenReturn(setOperations);
-        when(setOperations.remove(chatRoomId.toString(), memberId.toString())).thenReturn(1L);
+        when(setOperations.remove("CHATROOMSESSION : " + chatRoomId.toString(), memberId.toString())).thenReturn(1L);
 
         // when
         chatSessionService.leaveChatRoom(memberId, chatRoomId);
 
         // then
         verify(redisTemplate, times(1)).opsForSet();
-        verify(setOperations, times(1)).remove(chatRoomId.toString(), memberId.toString());
+        verify(setOperations, times(1)).remove("CHATROOMSESSION : " + chatRoomId.toString(), memberId.toString());
     }
 
     @Test
