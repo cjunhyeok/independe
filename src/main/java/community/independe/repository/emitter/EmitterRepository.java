@@ -10,4 +10,5 @@ public interface EmitterRepository {
     void deleteById(Long id);
     SseEmitter findById(Long id);
     List<SseEmitter> findAll();
+    void deleteAll();
 }

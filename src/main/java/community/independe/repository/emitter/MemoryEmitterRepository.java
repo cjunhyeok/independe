@@ -30,4 +30,9 @@ public class MemoryEmitterRepository implements EmitterRepository{
     public List<SseEmitter> findAll() {
         return emitters.values().stream().toList();
     }
+
+    @Override
+    public void deleteAll() {
+        emitters.clear();
+    }
 }
