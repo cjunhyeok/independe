@@ -108,7 +108,7 @@ public class StompHandlerTest {
         // given
         StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.UNSUBSCRIBE);
         accessor.setNativeHeader("Authorization", "mockToken");
-        accessor.setNativeHeader("Destination", "1");
+        accessor.setNativeHeader("ChatRoomId", "1");
         String sessionId = "sessionId";
         accessor.setSessionId(sessionId);
         Message<?> message = org.springframework.messaging.support.MessageBuilder.createMessage("payload", accessor.getMessageHeaders());
