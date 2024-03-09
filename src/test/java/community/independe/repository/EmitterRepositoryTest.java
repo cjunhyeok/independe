@@ -1,23 +1,25 @@
 package community.independe.repository;
 
+import community.independe.IntegrationTestSupporter;
 import community.independe.repository.emitter.EmitterRepository;
-import community.independe.repository.emitter.MemoryEmitterRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-@SpringJUnitConfig
-@ContextConfiguration(classes = MemoryEmitterRepository.class)
-public class EmitterRepositoryTest {
+public class EmitterRepositoryTest extends IntegrationTestSupporter {
 
     @Autowired
     private EmitterRepository emitterRepository;
+
+    @AfterEach
+    void tearDown() {
+        emitterRepository.deleteAll();
+    }
 
     @Test
     void saveTest() {
