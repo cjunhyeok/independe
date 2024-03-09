@@ -1,21 +1,18 @@
 package community.independe.api;
 
+import community.independe.IntegrationTestSupporter;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.video.Video;
 import community.independe.repository.video.VideoRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class VideoApiControllerTest {
+public class VideoApiControllerTest extends IntegrationTestSupporter {
 
     @Autowired
     private MockMvc mockMvc;

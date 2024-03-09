@@ -1,21 +1,18 @@
 package community.independe.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import community.independe.IntegrationTestSupporter;
 import community.independe.domain.token.RefreshTokenMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-public class RefreshTokenRepositoryTest {
+public class RefreshTokenRepositoryTest extends IntegrationTestSupporter {
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;

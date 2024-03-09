@@ -1,6 +1,7 @@
 package community.independe.api.manytomany;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import community.independe.IntegrationTestSupporter;
 import community.independe.api.LoginMemberInjector;
 import community.independe.domain.manytomany.FavoritePost;
 import community.independe.domain.member.Member;
@@ -13,8 +14,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -25,9 +24,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class FavoritePostApiControllerTest {
+public class FavoritePostApiControllerTest extends IntegrationTestSupporter {
 
     @Autowired
     private MockMvc mockMvc;

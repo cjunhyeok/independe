@@ -1,19 +1,16 @@
 package community.independe.repository;
 
+import community.independe.IntegrationTestSupporter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-public class RedisSessionTest {
+public class RedisSessionTest extends IntegrationTestSupporter {
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
