@@ -1,5 +1,6 @@
 package community.independe.repository;
 
+import community.independe.IntegrationTestSupporter;
 import community.independe.domain.keyword.Keyword;
 import community.independe.domain.keyword.KeywordDto;
 import community.independe.repository.keyword.KeywordRepository;
@@ -7,16 +8,14 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-@DataJpaTest
 @Transactional
-public class KeywordsRepositoryTest {
+public class KeywordsRepositoryTest extends IntegrationTestSupporter {
 
     @Autowired
     private KeywordRepository keywordRepository;

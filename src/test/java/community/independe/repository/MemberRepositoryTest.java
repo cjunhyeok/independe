@@ -1,17 +1,18 @@
 package community.independe.repository;
 
+import community.independe.IntegrationTestSupporter;
 import community.independe.domain.member.Member;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-class MemberRepositoryTest {
+@Transactional
+class MemberRepositoryTest extends IntegrationTestSupporter {
 
     @Autowired
     private MemberRepository memberRepository;

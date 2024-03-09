@@ -1,6 +1,7 @@
 package community.independe.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import community.independe.IntegrationTestSupporter;
 import community.independe.api.dtos.chat.ChatRoomRequest;
 import community.independe.api.dtos.chat.ChatRoomsResponse;
 import community.independe.domain.member.Member;
@@ -12,8 +13,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -28,9 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ChatRoomApiControllerTest {
+public class ChatRoomApiControllerTest extends IntegrationTestSupporter {
 
     @Autowired
     private MockMvc mockMvc;

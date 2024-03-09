@@ -1,5 +1,6 @@
 package community.independe.repository.manytomany;
 
+import community.independe.IntegrationTestSupporter;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.manytomany.RecommendComment;
 import community.independe.domain.member.Member;
@@ -12,14 +13,14 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-public class RecommendCommentRepositoryTest {
+@Transactional
+public class RecommendCommentRepositoryTest extends IntegrationTestSupporter {
 
     @Autowired
     private RecommendCommentRepository recommendCommentRepository;

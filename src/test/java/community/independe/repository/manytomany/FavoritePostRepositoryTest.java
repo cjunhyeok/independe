@@ -1,5 +1,6 @@
 package community.independe.repository.manytomany;
 
+import community.independe.IntegrationTestSupporter;
 import community.independe.domain.manytomany.FavoritePost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
@@ -8,14 +9,12 @@ import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
 @Transactional
-public class FavoritePostRepositoryTest {
+public class FavoritePostRepositoryTest extends IntegrationTestSupporter {
 
     @Autowired
     private FavoritePostRepository favoritePostRepository;
