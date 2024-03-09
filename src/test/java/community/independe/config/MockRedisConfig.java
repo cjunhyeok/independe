@@ -1,5 +1,7 @@
 package community.independe.config;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -8,23 +10,28 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import redis.embedded.RedisServer;
 
-@Profile("test")
 @Configuration
-@Testcontainers
+@Profile("test")
 public class MockRedisConfig {
 
-    @Container
-    public static GenericContainer<?> redis = new GenericContainer<>("redis:latest").withExposedPorts(6379);
+    private final RedisServer redisServer = new RedisServer(6379);
+
+    @PostConstruct
+    public void startRedis() {
+        this.redisServer.start();
+    }
+
+    @PreDestroy
+    public void stopRedis() {
+        this.redisServer.stop();
+    }
 
     @Bean
     @Primary
     public RedisConnectionFactory redisConnectionFactoryMock() {
-        redis.start();
-        return new LettuceConnectionFactory(redis.getHost(), redis.getFirstMappedPort());
+        return new LettuceConnectionFactory("localhost", 6379);
     }
 
     @Bean
