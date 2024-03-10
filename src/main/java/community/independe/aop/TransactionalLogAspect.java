@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class TransactionalLogAspect {
 
     @Around("execution(* community.independe..api..*.*(..))")
-    public Object logTransactionExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object logApiExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
 
         Object result = joinPoint.proceed();
@@ -21,7 +21,22 @@ public class TransactionalLogAspect {
         long elapsedTime = endTime - startTime;
 
         String methodName = joinPoint.getSignature().getName();
-        log.info("Execution time for method " + methodName + ": " + elapsedTime + " milliseconds");
+        log.info("Execution Api time for method " + methodName + ": " + elapsedTime + " milliseconds");
+
+        return result;
+    }
+
+    @Around("execution(* community.independe..repository..*.*(..))")
+    public Object logRepositoryExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+        long startTime = System.currentTimeMillis();
+
+        Object result = joinPoint.proceed();
+
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+
+        String methodName = joinPoint.getSignature().getName();
+        log.info("Execution Repository time for method " + methodName + ": " + elapsedTime + " milliseconds");
 
         return result;
     }
