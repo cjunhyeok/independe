@@ -1,6 +1,8 @@
 package community.independe.domain.post;
 
 import community.independe.domain.BaseEntity;
+import community.independe.domain.comment.Comment;
+import community.independe.domain.file.Files;
 import community.independe.domain.manytomany.RecommendPost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.IndependentPostType;
@@ -46,6 +48,12 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post") // 게시글, 게시글 추천
     private List<RecommendPost> recommendPosts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    private List<Files> files = new ArrayList<>();
 
     @Builder
     public Post(String title, String content, IndependentPostType independentPostType, RegionType regionType, RegionPostType regionPostType, Member member) {
