@@ -32,5 +32,6 @@ public class Files {
         this.storeFilename = storeFilename;
         this.s3Url = s3Url;
         this.post = post;
+        post.getFiles().add(this);
     }
 }
