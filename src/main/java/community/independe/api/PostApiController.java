@@ -358,9 +358,9 @@ public class PostApiController {
                         p.getRegionType(),
                         p.getRegionPostType(),
                         p.getViews(),
-                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
-                        commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
+                        Long.valueOf(p.getRecommendPosts().size()),
+                        Long.valueOf(p.getComments().size()),
+                        (p.getFiles().isEmpty()) ? false : true
                 )).collect(Collectors.toList());
 
         // 추천수 자취 게시글 10개
@@ -371,9 +371,9 @@ public class PostApiController {
                         p.getTitle(),
                         p.getIndependentPostType().getDescription(),
                         p.getIndependentPostType(),
-                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
-                        commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
+                        Long.valueOf(p.getRecommendPosts().size()),
+                        Long.valueOf(p.getComments().size()),
+                        (p.getFiles().isEmpty()) ? false : true
                 )).collect(Collectors.toList());
 
         // 전체 지역 게시글 5개
@@ -382,9 +382,9 @@ public class PostApiController {
                 .map(p -> new RegionAllPostDto(
                         p.getId(),
                         p.getTitle(),
-                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
-                        commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
+                        Long.valueOf(p.getRecommendPosts().size()),
+                        Long.valueOf(p.getComments().size()),
+                        (p.getFiles().isEmpty()) ? false : true
                 )).collect(Collectors.toList());
 
         // 전체 아닌 지역 게시글 5개
@@ -397,9 +397,9 @@ public class PostApiController {
                         p.getRegionPostType().getDescription(),
                         p.getRegionType(),
                         p.getRegionPostType(),
-                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
-                        commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
+                        Long.valueOf(p.getRecommendPosts().size()),
+                        Long.valueOf(p.getComments().size()),
+                        (p.getFiles().isEmpty()) ? false : true
                 )).collect(Collectors.toList());
 
         // 인기 검색어 10개
