@@ -11,7 +11,7 @@ import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.domain.video.Video;
-import community.independe.repository.query.PostApiRepository;
+import community.independe.repository.query.MainPostApiRepository;
 import community.independe.security.service.MemberContext;
 import community.independe.service.*;
 import community.independe.service.manytomany.FavoritePostService;
@@ -47,7 +47,7 @@ public class PostApiController {
     private final CommentService commentService;
     private final KeywordService keywordService;
     private final VideoService videoService;
-    private final PostApiRepository postApiRepository;
+    private final MainPostApiRepository mainPostApiRepository;
     private final FilesService filesService;
     private final RecommendPostService recommendPostService;
     private final FavoritePostService favoritePostService;
@@ -346,7 +346,7 @@ public class PostApiController {
         LocalDateTime lastWeek = LocalDateTime.now().minusDays(7);
 
         // 인기 게시글(10개)
-        List<Post> findAllPopularPosts = postApiRepository.findAllPopularPosts(yesterday, today, 0, 10);
+        List<Post> findAllPopularPosts = mainPostApiRepository.findAllPopularPosts(yesterday, today, 0, 10);
         List<PopularPostDto> popularPostDto = findAllPopularPosts.stream()
                 .map(p -> new PopularPostDto(
                         p.getId(),
@@ -364,7 +364,7 @@ public class PostApiController {
                 )).collect(Collectors.toList());
 
         // 추천수 자취 게시글 10개
-        List<Post> findAllIndependentPostByRecommendCount = postApiRepository.findAllIndependentPostByRecommendCount(yesterday, today, 0, 10);
+        List<Post> findAllIndependentPostByRecommendCount = mainPostApiRepository.findAllIndependentPostByRecommendCount(yesterday, today, 0, 10);
         List<PopularIndependentPostsDto> popularIndependentPostsDto = findAllIndependentPostByRecommendCount.stream()
                 .map(p -> new PopularIndependentPostsDto(
                         p.getId(),
@@ -377,7 +377,7 @@ public class PostApiController {
                 )).collect(Collectors.toList());
 
         // 전체 지역 게시글 5개
-        List<Post> findAllRegionPostByRecommendCount = postApiRepository.findAllRegionAllPostByRecommendCount(yesterday, today, 0, 5);
+        List<Post> findAllRegionPostByRecommendCount = mainPostApiRepository.findAllRegionAllPostByRecommendCount(yesterday, today, 0, 5);
         List<RegionAllPostDto> regionAllPostDto = findAllRegionPostByRecommendCount.stream()
                 .map(p -> new RegionAllPostDto(
                         p.getId(),
@@ -388,7 +388,7 @@ public class PostApiController {
                 )).collect(Collectors.toList());
 
         // 전체 아닌 지역 게시글 5개
-        List<Post> findRegionNotAllPostByRecommendCount = postApiRepository.findRegionNotAllPostByRecommendCount(yesterday, today, 0, 5);
+        List<Post> findRegionNotAllPostByRecommendCount = mainPostApiRepository.findRegionNotAllPostByRecommendCount(yesterday, today, 0, 5);
         List<RegionNotAllPostDto> regionNotAllPostDto = findRegionNotAllPostByRecommendCount.stream()
                 .map(p -> new RegionNotAllPostDto(
                         p.getId(),
