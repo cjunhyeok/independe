@@ -56,7 +56,6 @@ public class MainPostApiRepository {
     public List<Post> findRegionNotAllPostByRecommendCount(LocalDateTime yesterday, LocalDateTime today, int first, int max) {
         return em.createQuery("select p from Post p left join p.recommendPosts rp" +
                 " where p.createdDate BETWEEN :yesterday AND :today" +
-                " and p.independentPostType IS NULL" +
                 " and p.regionType <> :regionType" +
                 " group by p.id" +
                 " order by count(rp.post) desc, p.views desc", Post.class)
