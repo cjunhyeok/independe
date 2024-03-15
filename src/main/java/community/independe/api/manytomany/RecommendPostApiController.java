@@ -1,5 +1,7 @@
 package community.independe.api.manytomany;
 
+import community.independe.api.dtos.Result;
+import community.independe.api.dtos.manytomany.recommendpost.RecommendPostResponse;
 import community.independe.domain.manytomany.RecommendPost;
 import community.independe.domain.member.Member;
 import community.independe.security.service.MemberContext;
@@ -8,7 +10,6 @@ import community.independe.service.manytomany.RecommendPostService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +25,7 @@ public class RecommendPostApiController {
 
     @Operation(summary = "게시글 추천 *")
     @PostMapping("/api/recommendPost/{postId}")
-    public ResponseEntity addRecommendPost(@PathVariable(name = "postId") Long postId,
+    public Result addRecommendPost(@PathVariable(name = "postId") Long postId,
                                                  @AuthenticationPrincipal MemberContext memberContext) {
 
         Member loginMember = memberContext.getMember();
@@ -39,6 +40,10 @@ public class RecommendPostApiController {
             recommendPostService.updateIsRecommend(findRecommendPostByPost, false);
         }
 
-        return ResponseEntity.ok("OK");
+        Long countRecommendPost = recommendPostService.countAllByPostIdAndIsRecommend(postId);
+        RecommendPostResponse recommendPostResponse =
+                RecommendPostResponse.builder().recommendPostCount(countRecommendPost).build();
+
+        return new Result(recommendPostResponse);
     }
 }
