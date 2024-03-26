@@ -35,7 +35,8 @@ public abstract class UrlList {
             "/api/recommendPost/**",
             "/api/recommendComment/**",
             "/api/favoritePost/**",
-            "/api/chat/**"
+            "/api/chat/**",
+            "/api/member"
     };
 
     public static String[] getWhiteList() {
