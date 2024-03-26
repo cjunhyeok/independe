@@ -3,6 +3,7 @@ package community.independe.api;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jwt.JWT;
+import community.independe.api.dtos.Result;
 import community.independe.api.dtos.member.*;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.RegionType;
@@ -201,5 +202,20 @@ public class MemberApiController {
         JWT parsedJwt = jwtParser.parse(sampleToken);
 
         return jwtParser.getClaim(parsedJwt, "username");
+    }
+
+    @GetMapping("/api/member")
+    @Operation(summary = "마이페이지 회원 데이터 조회 *")
+    public Result<MyPageResponse> getMyPage(@AuthenticationPrincipal MemberContext memberContext) {
+        Member loginMember = memberContext.getMember();
+
+        MyPageResponse myPageResponse = MyPageResponse.builder()
+                .username(loginMember.getUsername())
+                .nickname(loginMember.getNickname())
+                .email(loginMember.getEmail())
+                .number(loginMember.getNumber())
+                .build();
+
+        return new Result(myPageResponse);
     }
 }
