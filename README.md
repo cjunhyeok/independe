@@ -13,7 +13,7 @@
 - Redis
 - Docker
 # 데이터베이스 구조
-![Copy of Independe](https://github.com/cjunhyeok/independe/assets/97434544/888c9394-50a2-4bd0-81a0-96ac1211cae7)
+![Copy of Independe](https://github.com/independeProject/independe/assets/97434544/60e2c7e9-8c24-4cd1-9f0e-47bbc99ffc44)
 - [대댓글 DB 설계에 대한 고민](https://jhdevelopment.tistory.com/43)
 - [추천, 신고, 즐겨찾기 DB 설계에 대한 고민](https://jhdevelopment.tistory.com/45)
 - [채팅 DB 설계에 대한 고민](https://jhdevelopment.tistory.com/50)
