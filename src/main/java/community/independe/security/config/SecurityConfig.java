@@ -116,6 +116,7 @@ public class SecurityConfig {
         config.addAllowedHeader("*");
         // frontend domain
         config.addAllowedOrigin("http://localhost:8081");
+        config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedOrigin("https://www.independe.co.kr");
         config.addAllowedOrigin("https://independe.co.kr");
         config.addAllowedOrigin("https://api.independe.co.kr");

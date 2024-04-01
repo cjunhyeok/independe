@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -73,6 +74,12 @@ public class JwtTokenVerifier {
         try {
             // token 파싱
             signedJWT = SignedJWT.parse(token);
+
+            // 만료일 검증
+            Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+            if (expirationTime.before(new Date())) {
+                throw new CustomException(ErrorCode.ACCESS_TOKEN_EXPIRED);
+            }
 
             // token 검증
             MACVerifier macVerifier = new MACVerifier(jwk.toSecretKey()); // 시크릿 키를 이용해 Verifier 생성
