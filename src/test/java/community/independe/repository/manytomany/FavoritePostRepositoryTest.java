@@ -147,7 +147,7 @@ public class FavoritePostRepositoryTest extends IntegrationTestSupporter {
     }
 
     @Test
-    @DisplayName("회원 PK로 즐겨찾기 게시글을 조회한다.")
+    @DisplayName("회원 PK로 즐겨찾기 목록을 조회한다.")
     void findPostByMemberIdTest() {
         // given
         Member member = Member.builder()
@@ -188,9 +188,9 @@ public class FavoritePostRepositoryTest extends IntegrationTestSupporter {
         FavoritePost savedFavoritePost2 = favoritePostRepository.save(favoritePost2);
 
         // when
-        List<Post> findPosts = favoritePostRepository.findPostByMemberId(member.getId());
+        List<FavoritePost> findFavoritePosts = favoritePostRepository.findByMemberId(member.getId());
 
         // then
-        assertThat(findPosts).hasSize(2);
+        assertThat(findFavoritePosts).hasSize(2);
     }
 }
