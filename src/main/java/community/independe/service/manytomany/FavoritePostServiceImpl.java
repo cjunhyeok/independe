@@ -8,10 +8,14 @@ import community.independe.exception.ErrorCode;
 import community.independe.repository.manytomany.FavoritePostRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
+import community.independe.service.manytomany.dtos.GetFavoritePostServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -61,5 +65,27 @@ public class FavoritePostServiceImpl implements FavoritePostService {
     @Override
     public FavoritePost findByPostIdAndMemberIdAndIsRecommend(Long postId, Long memberId) {
         return favoritePostRepository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId);
+    }
+
+    @Override
+    public List<GetFavoritePostServiceDto> findFavoritePostByMemberId(Long memberId) {
+        List<FavoritePost> findFavoritePosts = favoritePostRepository.findByMemberId(memberId);
+
+        List<GetFavoritePostServiceDto> serviceDto = findFavoritePosts.stream()
+                .map(fp -> {
+                    Post post = fp.getPost();
+                    Member member = fp.getMember();
+                    return GetFavoritePostServiceDto.builder()
+                            .title(post.getTitle())
+                            .independentPostType(post.getIndependentPostType())
+                            .regionType(post.getRegionType())
+                            .regionPostType(post.getRegionPostType())
+                            .nickname(member.getNickname())
+                            .createdDate(fp.getCreatedDate())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return serviceDto;
     }
 }
