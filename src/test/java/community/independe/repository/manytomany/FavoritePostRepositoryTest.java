@@ -7,9 +7,12 @@ import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -141,5 +144,53 @@ public class FavoritePostRepositoryTest extends IntegrationTestSupporter {
 
         // then
         assertThat(findByPostIdAndMemberId.getIsFavorite()).isTrue();
+    }
+
+    @Test
+    @DisplayName("회원 PK로 즐겨찾기 게시글을 조회한다.")
+    void findPostByMemberIdTest() {
+        // given
+        Member member = Member.builder()
+                .username("id")
+                .password("pass")
+                .nickname("nick")
+                .build();
+        Member savedMember = memberRepository.save(member);
+
+        Post post = Post.builder()
+                .title("title")
+                .content("content")
+                .independentPostType(IndependentPostType.ETC)
+                .member(savedMember)
+                .build();
+        Post savedPost = postRepository.save(post);
+
+        FavoritePost favoritePost = FavoritePost.builder()
+                .isFavorite(true)
+                .post(savedPost)
+                .member(savedMember)
+                .build();
+        FavoritePost savedFavoritePost = favoritePostRepository.save(favoritePost);
+
+        Post post2 = Post.builder()
+                .title("title2")
+                .content("content2")
+                .independentPostType(IndependentPostType.ETC)
+                .member(savedMember)
+                .build();
+        Post savedPost2 = postRepository.save(post2);
+
+        FavoritePost favoritePost2 = FavoritePost.builder()
+                .isFavorite(true)
+                .post(savedPost2)
+                .member(savedMember)
+                .build();
+        FavoritePost savedFavoritePost2 = favoritePostRepository.save(favoritePost2);
+
+        // when
+        List<Post> findPosts = favoritePostRepository.findPostByMemberId(member.getId());
+
+        // then
+        assertThat(findPosts).hasSize(2);
     }
 }
