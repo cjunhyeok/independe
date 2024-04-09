@@ -1,7 +1,6 @@
 package community.independe.repository.manytomany;
 
 import community.independe.domain.manytomany.FavoritePost;
-import community.independe.domain.post.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,8 +27,9 @@ public interface FavoritePostRepository extends JpaRepository<FavoritePost, Long
     FavoritePost findByPostIdAndMemberIdAndIsRecommend(@Param("postId") Long postId,
                                                         @Param("memberId") Long memberId);
 
-    @Query(value = "select p" +
-            " from Post p join FavoritePost fp on fp.post.id = p.id" +
+    @Query(value = "select fp" +
+            " from FavoritePost fp join fetch fp.member" +
+            " join fetch fp.post" +
             " where fp.member.id = :memberId")
-    List<Post> findPostByMemberId(@Param("memberId") Long memberId);
+    List<FavoritePost> findByMemberId(@Param("memberId") Long memberId);
 }
