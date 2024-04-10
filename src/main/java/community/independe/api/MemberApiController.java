@@ -13,6 +13,7 @@ import community.independe.security.provider.JwtParser;
 import community.independe.security.service.MemberContext;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.service.MemberService;
+import community.independe.service.PostService;
 import community.independe.service.RefreshTokenService;
 import community.independe.service.dtos.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 public class MemberApiController {
 
     private final MemberService memberService;
+    private final PostService postService;
     private final RefreshTokenService refreshTokenService;
     private final SecuritySigner securitySigner;
     private final JWK jwk;
@@ -217,5 +219,16 @@ public class MemberApiController {
                 .build();
 
         return new Result(myPageResponse);
+    }
+
+    // 작성한 글 목록 (활동내역)
+    @GetMapping("/api/member/post")
+    @Operation(summary = "작성한 글 목록 조회 * (마이페이지)")
+    public Result getMyPost(@AuthenticationPrincipal MemberContext memberContext) {
+        Member loginMember = memberContext.getMember();
+
+        List<MyPostServiceDto> myPostServiceDto = postService.findMyPost(loginMember.getId());
+
+        return new Result(myPostServiceDto);
     }
 }
