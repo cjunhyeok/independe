@@ -12,6 +12,7 @@ import community.independe.repository.post.PostRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -312,5 +313,62 @@ public class CommentRepositoryTest extends IntegrationTestSupporter {
         // then
         assertThatThrownBy(() -> commentRepository.findById(savedComment.getId()).get())
                 .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("회원 PK를 통해 댓글을 조회한다.")
+    void findAllByMemberIdTest() {
+        // given
+        Member member = Member.builder()
+                .username("id")
+                .password("1234")
+                .nickname("nick")
+                .role("ROLE_USER")
+                .build();
+        Member savedMember = memberRepository.save(member);
+
+        Post post = Post.builder()
+                .title("title")
+                .content("content")
+                .member(member)
+                .independentPostType(IndependentPostType.COOK)
+                .build();
+        postRepository.save(post);
+
+        Comment parentComment = Comment.builder()
+                .content("parent")
+                .member(member)
+                .post(post)
+                .build();
+        Comment savedComment = commentRepository.save(parentComment);
+
+        Comment childComment = Comment.builder()
+                .content("child")
+                .member(member)
+                .post(post)
+                .parent(savedComment)
+                .build();
+        Comment savedChildComment = commentRepository.save(childComment);
+
+        Post post2 = Post.builder()
+                .title("title")
+                .content("content")
+                .member(member)
+                .independentPostType(IndependentPostType.COOK)
+                .build();
+        postRepository.save(post2);
+
+        Comment comment2 = Comment.builder()
+                .content("comment")
+                .member(member)
+                .post(post2)
+                .build();
+        Comment savedComment2 = commentRepository.save(comment2);
+
+        // when
+        List<Comment> findComments = commentRepository.findAllByMemberId(savedMember.getId());
+
+        // then
+        assertThat(findComments).hasSize(3);
     }
 }
