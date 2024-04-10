@@ -9,12 +9,14 @@ import community.independe.exception.ErrorCode;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
+import community.independe.service.dtos.MyCommentServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -109,5 +111,20 @@ public class CommentServiceImpl implements CommentService{
         if (isRegionPost == true && (findMember.getRegion() == null || !findMember.getRegion().equals(findPost.getRegionType()))) {
             throw new CustomException(ErrorCode.REGION_NOT_AUTHENTICATE);
         }
+    }
+
+    @Override
+    public List<MyCommentServiceDto> getMyComment(Long memberId) {
+
+        List<Comment> findComment = commentRepository.findAllByMemberId(memberId);
+
+        return findComment.stream()
+                .map(fc -> MyCommentServiceDto.builder()
+                        .commentId(fc.getId())
+                        .postId(fc.getPost().getId())
+                        .content(fc.getContent())
+                        .createdDate(fc.getCreatedDate())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

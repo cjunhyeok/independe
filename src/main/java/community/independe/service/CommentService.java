@@ -1,6 +1,7 @@
 package community.independe.service;
 
 import community.independe.domain.comment.Comment;
+import community.independe.service.dtos.MyCommentServiceDto;
 
 import java.util.List;
 
@@ -15,4 +16,6 @@ public interface CommentService {
     Long countAllByPostId(Long postId);
 
     List<Comment> findAllByPostId(Long postId);
+
+    List<MyCommentServiceDto> getMyComment(Long memberId);
 }
