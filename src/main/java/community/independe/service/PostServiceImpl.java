@@ -12,6 +12,7 @@ import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.file.FilesRepository;
 import community.independe.repository.post.PostRepository;
+import community.independe.service.dtos.MyPostServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -133,5 +135,21 @@ public class PostServiceImpl implements PostService{
         );
 
         findPost.increaseViews(findPost.getViews() + 1);
+    }
+
+    @Override
+    public List<MyPostServiceDto> findMyPost(Long memberId) {
+
+        List<Post> findPosts = postRepository.findAllByMemberId(memberId);
+        return findPosts.stream()
+                .map(fp -> MyPostServiceDto.builder()
+                        .postId(fp.getId())
+                        .title(fp.getTitle())
+                        .independentPostType(fp.getIndependentPostType())
+                        .regionType(fp.getRegionType())
+                        .regionPostType(fp.getRegionPostType())
+                        .createdDate(fp.getCreatedDate())
+                        .build())
+                .collect(Collectors.toList());
     }
 }
