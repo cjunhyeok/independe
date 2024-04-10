@@ -10,6 +10,7 @@ import community.independe.repository.post.PostRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -287,5 +288,24 @@ class PostRepositoryTest extends IntegrationTestSupporter {
             // then
             assertThat(findPosts.size()).isEqualTo(5);
         }
+    }
+
+    @Test
+    @DisplayName("회원 PK를 통해 작성한 게시글을 조회한다.")
+    void findAllByMemberIdTest() {
+        // given
+        Member member = Member.builder().build();
+        Member savedMember = memberRepository.save(member);
+
+        Post post = Post.builder().member(savedMember).build();
+        Post savedPost = postRepository.save(post);
+        Post post2 = Post.builder().member(savedMember).build();
+        Post savedPost2 = postRepository.save(post2);
+
+        // when
+        List<Post> findPosts = postRepository.findAllByMemberId(savedMember.getId());
+
+        // then
+        assertThat(findPosts).hasSize(2);
     }
 }
