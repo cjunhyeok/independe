@@ -6,14 +6,15 @@ import community.independe.domain.manytomany.RecommendPost;
 import community.independe.domain.member.Member;
 import community.independe.security.service.MemberContext;
 import community.independe.service.PostService;
+import community.independe.service.dtos.MyRecommendPostServiceDto;
 import community.independe.service.manytomany.RecommendPostService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -45,5 +46,18 @@ public class RecommendPostApiController {
                 RecommendPostResponse.builder().recommendPostCount(countRecommendPost).build();
 
         return new Result(recommendPostResponse);
+    }
+
+    @GetMapping("/api/recommendPost")
+    @Operation(summary = "게시글 추천 목록 조회 * (마이페이지)")
+    public Result getRecommendPost(@RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                   @RequestParam(name = "size", required = false, defaultValue = "10") int size,
+                                   @AuthenticationPrincipal MemberContext memberContext) {
+        Member loginMember = memberContext.getMember();
+
+        List<MyRecommendPostServiceDto> response = postService.getMyRecommendPost(loginMember.getId(), page, size);
+        Long totalCount = response.get(0).getTotalCount();
+
+        return new Result(response, totalCount);
     }
 }
