@@ -72,9 +72,11 @@ public class FavoritePostServiceIntegrationTest extends IntegrationTestSupporter
         FavoritePost savedFavoritePost2 = favoritePostRepository.save(favoritePost2);
 
         // when
-        List<GetFavoritePostServiceDto> serviceDto = favoritePostService.findFavoritePostByMemberId(savedMember.getId());
+        List<GetFavoritePostServiceDto> serviceDto = favoritePostService.findFavoritePostByMemberId(savedMember.getId(), 0, 10);
 
         // then
         assertThat(serviceDto).hasSize(2);
+        assertThat(serviceDto.get(0).getTotalCount()).isEqualTo(2);
+        assertThat(serviceDto.get(0).getNickname()).isNotNull();
     }
 }
