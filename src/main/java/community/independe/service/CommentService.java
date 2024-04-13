@@ -2,6 +2,7 @@ package community.independe.service;
 
 import community.independe.domain.comment.Comment;
 import community.independe.service.dtos.MyCommentServiceDto;
+import community.independe.service.dtos.MyRecommendCommentServiceDto;
 
 import java.util.List;
 
@@ -18,4 +19,6 @@ public interface CommentService {
     List<Comment> findAllByPostId(Long postId);
 
     List<MyCommentServiceDto> getMyComment(Long memberId, int page, int size);
+
+    List<MyRecommendCommentServiceDto> getMyRecommendComment(Long memberId, int page, int size);
 }

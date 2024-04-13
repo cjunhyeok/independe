@@ -11,6 +11,7 @@ import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
 import community.independe.repository.util.PageRequestCreator;
 import community.independe.service.dtos.MyCommentServiceDto;
+import community.independe.service.dtos.MyRecommendCommentServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -132,6 +133,25 @@ public class CommentServiceImpl implements CommentService{
                         .build()).collect(Collectors.toList());
 
         myCommentServiceDtos.get(0).setTotalCount(findCommentsPage.getTotalElements());
+
+        return myCommentServiceDtos;
+    }
+
+    @Override
+    public List<MyRecommendCommentServiceDto> getMyRecommendComment(Long memberId, int page, int size) {
+        PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(page, size);
+        Page<Comment> findRecommendCommentsPage = commentRepository.findRecommendCommentByMemberId(memberId, request);
+        List<Comment> findRecommendComments = findRecommendCommentsPage.getContent();
+
+        List<MyRecommendCommentServiceDto> myCommentServiceDtos = findRecommendComments.stream()
+                .map(frc -> MyRecommendCommentServiceDto.builder()
+                        .commentId(frc.getId())
+                        .postId(frc.getPost().getId())
+                        .content(frc.getContent())
+                        .createdDate(frc.getCreatedDate())
+                        .build()).collect(Collectors.toList());
+
+        myCommentServiceDtos.get(0).setTotalCount(findRecommendCommentsPage.getTotalElements());
 
         return myCommentServiceDtos;
     }
