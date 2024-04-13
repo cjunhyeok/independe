@@ -5,6 +5,7 @@ import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.service.dtos.MyPostServiceDto;
+import community.independe.service.dtos.MyRecommendPostServiceDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -42,5 +43,8 @@ public interface PostService {
     Page<Post> findAllPostsBySearchWithMember(String condition, String keyword, Pageable pageable);
 
     void increaseViews(Long postId);
+
     List<MyPostServiceDto> findMyPost(Long memberId, int page, int size);
+
+    List<MyRecommendPostServiceDto> getMyRecommendPost(Long memberId, int page, int size);
 }

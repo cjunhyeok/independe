@@ -14,6 +14,7 @@ import community.independe.repository.file.FilesRepository;
 import community.independe.repository.post.PostRepository;
 import community.independe.repository.util.PageRequestCreator;
 import community.independe.service.dtos.MyPostServiceDto;
+import community.independe.service.dtos.MyRecommendPostServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -161,5 +162,28 @@ public class PostServiceImpl implements PostService{
         myPostServiceDtos.get(0).setTotalCount(findPostPage.getTotalElements());
 
         return myPostServiceDtos;
+    }
+
+    @Override
+    public List<MyRecommendPostServiceDto> getMyRecommendPost(Long memberId, int page, int size) {
+
+        PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(page, size);
+        Page<Post> recommendPostPage = postRepository.findRecommendPostByMemberId(memberId, request);
+        List<Post> recommendPosts = recommendPostPage.getContent();
+
+        List<MyRecommendPostServiceDto> myRecommendPostServiceDtos = recommendPosts.stream()
+                .map(rp -> MyRecommendPostServiceDto.builder()
+                        .postId(rp.getId())
+                        .memberId(rp.getMember().getId())
+                        .title(rp.getTitle())
+                        .independentPostType(rp.getIndependentPostType())
+                        .regionType(rp.getRegionType())
+                        .regionPostType(rp.getRegionPostType())
+                        .nickname(rp.getMember().getNickname())
+                        .createdDate(rp.getCreatedDate())
+                        .build()).collect(Collectors.toList());
+        myRecommendPostServiceDtos.get(0).setTotalCount(recommendPostPage.getTotalElements());
+
+        return myRecommendPostServiceDtos;
     }
 }
