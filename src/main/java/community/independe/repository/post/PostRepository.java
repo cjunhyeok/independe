@@ -34,4 +34,9 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
      * 연관관계는 default_batch_fetch_size 를 통해 in 쿼리로 해결
      * JPA -> JPA 활용 2 -> API 개발 고급 -> V3.1 페이징 한계 돌파
      */
+
+    /**
+     * count 쿼리가 필요하지 않으면 count 쿼리를 날리지 않는다 (내부 최적화)
+     * size 가 10인데 2건만 조호되면 count 필요없다 판단
+     */
 }
