@@ -33,7 +33,7 @@ public class PostServiceIntegrationTest extends IntegrationTestSupporter {
     @DisplayName("내가 작성한 게시글을 조회한다.")
     void findMyPostTest() {
         // given
-        Member member = Member.builder().build();
+        Member member = Member.builder().nickname("nickname").build();
         Member savedMember = memberRepository.save(member);
 
         Post independentPost = Post.builder()
@@ -54,9 +54,11 @@ public class PostServiceIntegrationTest extends IntegrationTestSupporter {
         Post savedRegionPost = postRepository.save(regionPost);
 
         // when
-        List<MyPostServiceDto> myPost = postService.findMyPost(savedMember.getId());
+        List<MyPostServiceDto> myPost = postService.findMyPost(savedMember.getId(), 0, 10);
 
         // then
         assertThat(myPost).hasSize(2);
+        assertThat(myPost.get(0).getTotalCount()).isEqualTo(2);
+        assertThat(myPost.get(0).getNickname()).isNotNull();
     }
 }
