@@ -12,10 +12,12 @@ import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.file.FilesRepository;
 import community.independe.repository.post.PostRepository;
+import community.independe.repository.util.PageRequestCreator;
 import community.independe.service.dtos.MyPostServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -138,18 +140,26 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public List<MyPostServiceDto> findMyPost(Long memberId) {
+    public List<MyPostServiceDto> findMyPost(Long memberId, int page, int size) {
 
-        List<Post> findPosts = postRepository.findAllByMemberId(memberId);
-        return findPosts.stream()
+        PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(page, size);
+        Page<Post> findPostPage = postRepository.findAllByMemberId(memberId, request);
+        List<Post> findPosts = findPostPage.getContent();
+
+        List<MyPostServiceDto> myPostServiceDtos = findPosts.stream()
                 .map(fp -> MyPostServiceDto.builder()
                         .postId(fp.getId())
+                        .memberId(fp.getMember().getId())
                         .title(fp.getTitle())
                         .independentPostType(fp.getIndependentPostType())
                         .regionType(fp.getRegionType())
                         .regionPostType(fp.getRegionPostType())
+                        .nickname(fp.getMember().getNickname())
                         .createdDate(fp.getCreatedDate())
-                        .build())
-                .collect(Collectors.toList());
+                        .build()).collect(Collectors.toList());
+
+        myPostServiceDtos.get(0).setTotalCount(findPostPage.getTotalElements());
+
+        return myPostServiceDtos;
     }
 }

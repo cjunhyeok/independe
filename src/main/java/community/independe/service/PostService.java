@@ -42,5 +42,5 @@ public interface PostService {
     Page<Post> findAllPostsBySearchWithMember(String condition, String keyword, Pageable pageable);
 
     void increaseViews(Long postId);
-    List<MyPostServiceDto> findMyPost(Long memberId);
+    List<MyPostServiceDto> findMyPost(Long memberId, int page, int size);
 }
