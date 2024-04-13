@@ -14,5 +14,5 @@ public interface FavoritePostService {
     void updateIsFavorite(FavoritePost favoritePost, Boolean isFavorite);
 
     FavoritePost findByPostIdAndMemberIdAndIsRecommend(Long postId, Long memberId);
-    List<GetFavoritePostServiceDto> findFavoritePostByMemberId(Long memberId);
+    List<GetFavoritePostServiceDto> findFavoritePostByMemberId(Long memberId, int page, int size);
 }
