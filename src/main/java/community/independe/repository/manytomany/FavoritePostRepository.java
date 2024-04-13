@@ -1,11 +1,11 @@
 package community.independe.repository.manytomany;
 
 import community.independe.domain.manytomany.FavoritePost;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
 
 public interface FavoritePostRepository extends JpaRepository<FavoritePost, Long> {
 
@@ -28,8 +28,9 @@ public interface FavoritePostRepository extends JpaRepository<FavoritePost, Long
                                                         @Param("memberId") Long memberId);
 
     @Query(value = "select fp" +
-            " from FavoritePost fp join fetch fp.member" +
-            " join fetch fp.post" +
+            " from FavoritePost fp" +
             " where fp.member.id = :memberId")
-    List<FavoritePost> findByMemberId(@Param("memberId") Long memberId);
+    // 즐겨찾기 조회
+    Page<FavoritePost> findByMemberId(@Param("memberId") Long memberId,
+                                      Pageable pageable);
 }
