@@ -2,19 +2,24 @@ package community.independe.repository;
 
 import community.independe.IntegrationTestSupporter;
 import community.independe.domain.comment.Comment;
+import community.independe.domain.manytomany.RecommendComment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.repository.comment.CommentRepository;
+import community.independe.repository.manytomany.RecommendCommentRepository;
 import community.independe.repository.post.PostRepository;
+import community.independe.repository.util.PageRequestCreator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -32,6 +37,8 @@ public class CommentRepositoryTest extends IntegrationTestSupporter {
     private PostRepository postRepository;
     @Autowired
     private CommentRepository commentRepository;
+    @Autowired
+    private RecommendCommentRepository recommendCommentRepository;
     @PersistenceContext
     private EntityManager em;
 
@@ -364,11 +371,69 @@ public class CommentRepositoryTest extends IntegrationTestSupporter {
                 .post(post2)
                 .build();
         Comment savedComment2 = commentRepository.save(comment2);
+        PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(0, 10);
 
         // when
-        List<Comment> findComments = commentRepository.findAllByMemberId(savedMember.getId());
+        Page<Comment> findCommentPage = commentRepository.findAllByMemberId(savedMember.getId(), request);
+        List<Comment> findComments = findCommentPage.getContent();
 
         // then
         assertThat(findComments).hasSize(3);
+    }
+
+    @Test
+    @DisplayName("회원 PK를 이용해 좋아요한 댓글을 조회한다.")
+    void findRecommendCommendByMemberIdTest() {
+        // given
+        Member member = Member.builder()
+                .username("id")
+                .password("pass")
+                .nickname("nick")
+                .build();
+        Member savedMember = memberRepository.save(member);
+
+        Post post = Post.builder()
+                .title("title")
+                .content("content")
+                .independentPostType(IndependentPostType.ETC)
+                .member(savedMember)
+                .build();
+        Post savedPost = postRepository.save(post);
+
+        Comment comment = Comment.builder()
+                .content("content")
+                .member(savedMember)
+                .post(savedPost)
+                .build();
+        Comment savedComment = commentRepository.save(comment);
+
+        Comment comment2 = Comment.builder()
+                .content("content")
+                .member(savedMember)
+                .post(savedPost)
+                .build();
+        Comment savedComment2 = commentRepository.save(comment2);
+
+        RecommendComment recommendComment = RecommendComment.builder()
+                .isRecommend(true)
+                .member(savedMember)
+                .comment(savedComment)
+                .build();
+        recommendCommentRepository.save(recommendComment);
+
+        RecommendComment recommendComment2 = RecommendComment.builder()
+                .isRecommend(true)
+                .member(savedMember)
+                .comment(savedComment2)
+                .build();
+        recommendCommentRepository.save(recommendComment2);
+        PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(0, 10);
+
+        // when
+        Page<Comment> findCommentsPage = commentRepository.findRecommendCommentByMemberId(savedMember.getId(), request);
+        List<Comment> findComments = findCommentsPage.getContent();
+
+        // then
+        assertThat(findComments).hasSize(2);
     }
 }
