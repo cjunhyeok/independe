@@ -7,9 +7,12 @@ import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
+import community.independe.repository.util.PageRequestCreator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -188,7 +191,9 @@ public class FavoritePostRepositoryTest extends IntegrationTestSupporter {
         FavoritePost savedFavoritePost2 = favoritePostRepository.save(favoritePost2);
 
         // when
-        List<FavoritePost> findFavoritePosts = favoritePostRepository.findByMemberId(member.getId());
+        PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(0, 10);
+        Page<FavoritePost> findFavoritePostPage = favoritePostRepository.findByMemberId(member.getId(), request);
+        List<FavoritePost> findFavoritePosts = findFavoritePostPage.getContent();
 
         // then
         assertThat(findFavoritePosts).hasSize(2);
