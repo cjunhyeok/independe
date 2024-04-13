@@ -9,12 +9,18 @@ import community.independe.exception.ErrorCode;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
+import community.independe.repository.util.PageRequestCreator;
+import community.independe.service.dtos.MyCommentServiceDto;
+import community.independe.service.dtos.MyRecommendCommentServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -109,5 +115,44 @@ public class CommentServiceImpl implements CommentService{
         if (isRegionPost == true && (findMember.getRegion() == null || !findMember.getRegion().equals(findPost.getRegionType()))) {
             throw new CustomException(ErrorCode.REGION_NOT_AUTHENTICATE);
         }
+    }
+
+    @Override
+    public List<MyCommentServiceDto> getMyComment(Long memberId, int page, int size) {
+
+        PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(page, size);
+        Page<Comment> findCommentsPage = commentRepository.findAllByMemberId(memberId, request);
+        List<Comment> findComments = findCommentsPage.getContent();
+
+        List<MyCommentServiceDto> myCommentServiceDtos = findComments.stream()
+                .map(fc -> MyCommentServiceDto.builder()
+                        .commentId(fc.getId())
+                        .postId(fc.getPost().getId())
+                        .content(fc.getContent())
+                        .createdDate(fc.getCreatedDate())
+                        .build()).collect(Collectors.toList());
+
+        myCommentServiceDtos.get(0).setTotalCount(findCommentsPage.getTotalElements());
+
+        return myCommentServiceDtos;
+    }
+
+    @Override
+    public List<MyRecommendCommentServiceDto> getMyRecommendComment(Long memberId, int page, int size) {
+        PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(page, size);
+        Page<Comment> findRecommendCommentsPage = commentRepository.findRecommendCommentByMemberId(memberId, request);
+        List<Comment> findRecommendComments = findRecommendCommentsPage.getContent();
+
+        List<MyRecommendCommentServiceDto> myCommentServiceDtos = findRecommendComments.stream()
+                .map(frc -> MyRecommendCommentServiceDto.builder()
+                        .commentId(frc.getId())
+                        .postId(frc.getPost().getId())
+                        .content(frc.getContent())
+                        .createdDate(frc.getCreatedDate())
+                        .build()).collect(Collectors.toList());
+
+        myCommentServiceDtos.get(0).setTotalCount(findRecommendCommentsPage.getTotalElements());
+
+        return myCommentServiceDtos;
     }
 }

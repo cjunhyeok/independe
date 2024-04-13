@@ -208,7 +208,284 @@ public class InitDB {
                     .build();
             commentRepository.save(comment4);
 
-//            Keyword keyword = new Keyword("자취");
+            saveDefaultData();
+        }
+
+
+        private void saveDefaultMemberPostData() {
+            for (int i = 0; i < 100; i++) {
+                Member member = Member
+                        .builder()
+                        .username("username" + i)
+                        .password(passwordEncoder.encode("pass"))
+                        .nickname("nickname" + i)
+                        .role("role")
+                        .number("number")
+                        .region(RegionType.SEOUL)
+                        .build();
+
+                Member savedMember = memberRepository.save(member);
+
+                for (int j = 0; j < 10; j++) {
+                    Post post = Post.builder()
+                            .title("title" + j)
+                            .content("content" + j)
+                            .independentPostType(IndependentPostType.COOK)
+                            .member(savedMember)
+                            .build();
+                    post.increaseViews(i);
+                    postRepository.save(post);
+
+                    Comment comment = Comment.builder()
+                            .content("comment")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment);
+
+                    Comment comment2 = Comment.builder()
+                            .content("comment2")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment2);
+                }
+
+                for (int j = 10; j < 20; j++) {
+                    Post post = Post.builder()
+                            .title("title" + j)
+                            .content("content" + j)
+                            .independentPostType(IndependentPostType.CLEAN)
+                            .member(savedMember)
+                            .build();
+                    post.increaseViews(i);
+                    postRepository.save(post);
+
+                    Comment comment = Comment.builder()
+                            .content("comment")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment);
+
+                    Comment comment2 = Comment.builder()
+                            .content("comment2")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment2);
+                }
+
+                for (int j = 20; j < 30; j++) {
+                    Post post = Post.builder()
+                            .title("title" + j)
+                            .content("content" + j)
+                            .independentPostType(IndependentPostType.HEALTH)
+                            .member(savedMember)
+                            .build();
+                    post.increaseViews(i);
+                    postRepository.save(post);
+
+//                    Comment comment = Comment.builder()
+//                            .content("comment")
+//                            .member(member)
+//                            .post(post)
+//                            .build();
+//                    commentRepository.save(comment);
+//
+//                    Comment comment2 = Comment.builder()
+//                            .content("comment2")
+//                            .member(member)
+//                            .post(post)
+//                            .build();
+//                    commentRepository.save(comment2);
+                }
+
+                for (int j = 30; j < 40; j++) {
+                    Post post = Post.builder()
+                            .title("title" + j)
+                            .content("content" + j)
+                            .regionType(RegionType.ALL)
+                            .regionPostType(RegionPostType.FREE)
+                            .member(savedMember)
+                            .build();
+                    post.increaseViews(i);
+                    postRepository.save(post);
+
+                    Comment comment = Comment.builder()
+                            .content("comment")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment);
+
+                    Comment comment2 = Comment.builder()
+                            .content("comment2")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment2);
+                }
+
+                for (int j = 40; j < 50; j++) {
+                    Post post = Post.builder()
+                            .title("title" + j)
+                            .content("content" + j)
+                            .regionType(RegionType.PUSAN)
+                            .regionPostType(RegionPostType.RESTAURANT)
+                            .member(savedMember)
+                            .build();
+                    post.increaseViews(i);
+                    postRepository.save(post);
+
+                    Comment comment = Comment.builder()
+                            .content("comment")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment);
+
+                    Comment comment2 = Comment.builder()
+                            .content("comment2")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment2);
+                }
+
+                for (int j = 50; j < 60; j++) {
+                    Post post = Post.builder()
+                            .title("title" + j)
+                            .content("content" + j)
+                            .regionType(RegionType.ULSAN)
+                            .regionPostType(RegionPostType.MARKET)
+                            .member(savedMember)
+                            .build();
+                    post.increaseViews(i);
+                    postRepository.save(post);
+
+                    Comment comment = Comment.builder()
+                            .content("comment")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment);
+
+                    Comment comment2 = Comment.builder()
+                            .content("comment2")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment2);
+                }
+
+                for (int j = 60; j < 70; j++) {
+                    Post post = Post.builder()
+                            .title("title" + j)
+                            .content("content" + j)
+                            .regionType(RegionType.SEOUL)
+                            .regionPostType(RegionPostType.MEET)
+                            .member(savedMember)
+                            .build();
+                    post.increaseViews(i);
+                    postRepository.save(post);
+
+                    Comment comment = Comment.builder()
+                            .content("comment")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment);
+
+                    Comment comment2 = Comment.builder()
+                            .content("comment2")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment2);
+                }
+
+                for (int j = 70; j < 80; j++) {
+                    Post post = Post.builder()
+                            .title("title" + j)
+                            .content("content" + j)
+                            .regionType(RegionType.KYEONGNAM)
+                            .regionPostType(RegionPostType.PLAY)
+                            .member(savedMember)
+                            .build();
+                    post.increaseViews(i);
+                    postRepository.save(post);
+
+                    Comment comment = Comment.builder()
+                            .content("comment")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment);
+
+                    Comment comment2 = Comment.builder()
+                            .content("comment2")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment2);
+                }
+
+                for (int j = 80; j < 90; j++) {
+                    Post post = Post.builder()
+                            .title("title" + j)
+                            .content("content" + j)
+                            .regionType(RegionType.ULSAN)
+                            .regionPostType(RegionPostType.TALK)
+                            .member(savedMember)
+                            .build();
+                    post.increaseViews(i);
+                    postRepository.save(post);
+
+                    Comment comment = Comment.builder()
+                            .content("comment")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment);
+
+                    Comment comment2 = Comment.builder()
+                            .content("comment2")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment2);
+                }
+
+                for (int j = 90; j < 100; j++) {
+                    Post post = Post.builder()
+                            .title("title" + j)
+                            .content("content" + j)
+                            .regionType(RegionType.PUSAN)
+                            .regionPostType(RegionPostType.FREE)
+                            .member(savedMember)
+                            .build();
+                    post.increaseViews(i);
+                    postRepository.save(post);
+
+                    Comment comment = Comment.builder()
+                            .content("comment")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment);
+
+                    Comment comment2 = Comment.builder()
+                            .content("comment2")
+                            .member(member)
+                            .post(post)
+                            .build();
+                    commentRepository.save(comment2);
+                }
+            }
+        }
+
+        private void saveDefaultData() {
             Keyword keyword = Keyword.builder()
                     .keyword("자취")
                     .build();

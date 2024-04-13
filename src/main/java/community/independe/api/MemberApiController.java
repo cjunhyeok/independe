@@ -12,7 +12,9 @@ import community.independe.exception.ErrorCode;
 import community.independe.security.provider.JwtParser;
 import community.independe.security.service.MemberContext;
 import community.independe.security.signature.SecuritySigner;
+import community.independe.service.CommentService;
 import community.independe.service.MemberService;
+import community.independe.service.PostService;
 import community.independe.service.RefreshTokenService;
 import community.independe.service.dtos.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,6 +39,8 @@ import java.util.stream.Collectors;
 public class MemberApiController {
 
     private final MemberService memberService;
+    private final PostService postService;
+    private final CommentService commentService;
     private final RefreshTokenService refreshTokenService;
     private final SecuritySigner securitySigner;
     private final JWK jwk;
@@ -217,5 +221,33 @@ public class MemberApiController {
                 .build();
 
         return new Result(myPageResponse);
+    }
+
+    // 작성한 글 목록 (활동내역)
+    @GetMapping("/api/member/post")
+    @Operation(summary = "작성한 글 목록 조회 * (마이페이지)")
+    public Result getMyPost(@RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                            @RequestParam(name = "size", required = false, defaultValue = "10") int size,
+                            @AuthenticationPrincipal MemberContext memberContext) {
+        Member loginMember = memberContext.getMember();
+
+        List<MyPostServiceDto> response = postService.findMyPost(loginMember.getId(), page, size);
+        Long totalCount = response.get(0).getTotalCount();
+
+        return new Result(response, totalCount);
+    }
+
+    // 작성한 댓글 목록 * (활동내역)
+    @GetMapping("/api/member/comment")
+    @Operation(summary = "작성한 댓글 목록 조회 * (마이페이지)")
+    public Result getMyComment(@RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                               @RequestParam(name = "size", required = false, defaultValue = "10") int size,
+                               @AuthenticationPrincipal MemberContext memberContext) {
+        Member loginMember = memberContext.getMember();
+
+        List<MyCommentServiceDto> response = commentService.getMyComment(loginMember.getId(), page, size);
+        Long totalCount = response.get(0).getTotalCount();
+
+        return new Result(response, totalCount);
     }
 }

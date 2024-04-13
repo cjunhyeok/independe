@@ -1,15 +1,19 @@
 package community.independe.repository;
 
 import community.independe.IntegrationTestSupporter;
+import community.independe.domain.manytomany.RecommendPost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
+import community.independe.repository.manytomany.RecommendPostRepository;
 import community.independe.repository.post.PostRepository;
+import community.independe.repository.util.PageRequestCreator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +31,8 @@ class PostRepositoryTest extends IntegrationTestSupporter {
     private PostRepository postRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private RecommendPostRepository recommendPostRepository;
     @PersistenceContext
     EntityManager em;
 
@@ -287,5 +293,63 @@ class PostRepositoryTest extends IntegrationTestSupporter {
             // then
             assertThat(findPosts.size()).isEqualTo(5);
         }
+    }
+
+    @Test
+    @DisplayName("회원 PK를 통해 작성한 게시글을 조회한다.")
+    void findAllByMemberIdTest() {
+        // given
+        Member member = Member.builder().build();
+        Member savedMember = memberRepository.save(member);
+
+        Post post = Post.builder().member(savedMember).build();
+        Post savedPost = postRepository.save(post);
+        Post post2 = Post.builder().member(savedMember).build();
+        Post savedPost2 = postRepository.save(post2);
+
+        PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(0, 10);
+
+        // when
+        Page<Post> findPostPage = postRepository.findAllByMemberId(savedMember.getId(), request);
+        List<Post> findPosts = findPostPage.getContent();
+
+        // then
+        assertThat(findPosts).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("회원 PK를 통해 추천한 게시글을 조회한다.")
+    void findRecommendPostByMemberIdTest() {
+        // given
+        Member member = Member.builder().nickname("nickname").build();
+        Member savedMember = memberRepository.save(member);
+
+        Post post = Post.builder().title("title").member(savedMember).build();
+        Post savedPost = postRepository.save(post);
+
+        Post post2 = Post.builder().title("title").member(savedMember).build();
+        Post savedPost2 = postRepository.save(post2);
+
+        RecommendPost recommendPost = RecommendPost.builder()
+                .isRecommend(true)
+                .member(savedMember)
+                .post(savedPost)
+                .build();
+        recommendPostRepository.save(recommendPost);
+
+        RecommendPost recommendPost2 = RecommendPost.builder()
+                .isRecommend(true)
+                .member(savedMember)
+                .post(savedPost2)
+                .build();
+        recommendPostRepository.save(recommendPost2);
+        PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(0, 10);
+
+        // when
+        Page<Post> recommendPostByMemberId = postRepository.findRecommendPostByMemberId(savedMember.getId(), request);
+        List<Post> findPosts = recommendPostByMemberId.getContent();
+
+        // then
+        assertThat(findPosts).hasSize(2);
     }
 }

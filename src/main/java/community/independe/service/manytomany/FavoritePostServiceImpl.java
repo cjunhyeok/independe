@@ -8,10 +8,17 @@ import community.independe.exception.ErrorCode;
 import community.independe.repository.manytomany.FavoritePostRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
+import community.independe.service.manytomany.dtos.GetFavoritePostServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -61,5 +68,35 @@ public class FavoritePostServiceImpl implements FavoritePostService {
     @Override
     public FavoritePost findByPostIdAndMemberIdAndIsRecommend(Long postId, Long memberId) {
         return favoritePostRepository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId);
+    }
+
+    @Override
+    public List<GetFavoritePostServiceDto> findFavoritePostByMemberId(Long memberId, int page, int size) {
+
+        PageRequest request = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+
+        Page<FavoritePost> findFavoritePostPage = favoritePostRepository.findByMemberId(memberId, request);
+        List<FavoritePost> findFavoritePosts = findFavoritePostPage.getContent();
+
+        List<GetFavoritePostServiceDto> serviceDto = findFavoritePosts.stream()
+                .map(fp -> {
+                    Post post = fp.getPost();
+                    Member member = fp.getMember();
+                    return GetFavoritePostServiceDto.builder()
+                            .postId(post.getId())
+                            .memberId(member.getId())
+                            .title(post.getTitle())
+                            .independentPostType(post.getIndependentPostType())
+                            .regionType(post.getRegionType())
+                            .regionPostType(post.getRegionPostType())
+                            .nickname(member.getNickname())
+                            .createdDate(fp.getCreatedDate())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        serviceDto.get(0).setTotalCount(findFavoritePostPage.getTotalElements());
+
+        return serviceDto;
     }
 }
