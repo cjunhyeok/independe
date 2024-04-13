@@ -226,22 +226,28 @@ public class MemberApiController {
     // 작성한 글 목록 (활동내역)
     @GetMapping("/api/member/post")
     @Operation(summary = "작성한 글 목록 조회 * (마이페이지)")
-    public Result getMyPost(@AuthenticationPrincipal MemberContext memberContext) {
+    public Result getMyPost(@RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                            @RequestParam(name = "size", required = false, defaultValue = "10") int size,
+                            @AuthenticationPrincipal MemberContext memberContext) {
         Member loginMember = memberContext.getMember();
 
-        List<MyPostServiceDto> myPostServiceDto = postService.findMyPost(loginMember.getId());
+        List<MyPostServiceDto> response = postService.findMyPost(loginMember.getId(), page, size);
+        Long totalCount = response.get(0).getTotalCount();
 
-        return new Result(myPostServiceDto);
+        return new Result(response, totalCount);
     }
 
     // 작성한 댓글 목록 * (활동내역)
     @GetMapping("/api/member/comment")
     @Operation(summary = "작성한 댓글 목록 조회 * (마이페이지)")
-    public Result getMyComment(@AuthenticationPrincipal MemberContext memberContext) {
+    public Result getMyComment(@RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                               @RequestParam(name = "size", required = false, defaultValue = "10") int size,
+                               @AuthenticationPrincipal MemberContext memberContext) {
         Member loginMember = memberContext.getMember();
 
-        List<MyCommentServiceDto> myCommentServiceDtos = commentService.getMyComment(loginMember.getId());
+        List<MyCommentServiceDto> response = commentService.getMyComment(loginMember.getId(), page, size);
+        Long totalCount = response.get(0).getTotalCount();
 
-        return new Result(myCommentServiceDtos);
+        return new Result(response, totalCount);
     }
 }
