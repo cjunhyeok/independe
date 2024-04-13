@@ -82,10 +82,11 @@ public class CommentServiceIntegrationTest extends IntegrationTestSupporter {
         Comment savedComment2 = commentRepository.save(comment2);
 
         // when
-        List<MyCommentServiceDto> findCommentDto = commentService.getMyComment(savedMember.getId());
+        List<MyCommentServiceDto> findCommentDto = commentService.getMyComment(savedMember.getId(), 0, 10);
 
         // then
         assertThat(findCommentDto).hasSize(3);
         assertThat(findCommentDto.get(0).getPostId()).isNotNull();
+        assertThat(findCommentDto.get(0).getTotalCount()).isEqualTo(3);
     }
 }
