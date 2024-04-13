@@ -29,7 +29,8 @@ public interface FavoritePostRepository extends JpaRepository<FavoritePost, Long
 
     @Query(value = "select fp" +
             " from FavoritePost fp" +
-            " where fp.member.id = :memberId")
+            " where fp.member.id = :memberId" +
+            " and fp.isFavorite = true")
     // 즐겨찾기 조회
     Page<FavoritePost> findByMemberId(@Param("memberId") Long memberId,
                                       Pageable pageable);
