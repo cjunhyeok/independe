@@ -17,5 +17,5 @@ public interface CommentService {
 
     List<Comment> findAllByPostId(Long postId);
 
-    List<MyCommentServiceDto> getMyComment(Long memberId);
+    List<MyCommentServiceDto> getMyComment(Long memberId, int page, int size);
 }

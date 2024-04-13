@@ -12,12 +12,18 @@ public class MyCommentServiceDto {
     private Long commentId;
     private String content;
     private LocalDateTime createdDate;
+    private Long totalCount;
 
     @Builder
-    public MyCommentServiceDto(Long postId, Long commentId, String content, LocalDateTime createdDate) {
+    public MyCommentServiceDto(Long postId, Long commentId, String content, LocalDateTime createdDate, Long totalCount) {
         this.postId = postId;
         this.commentId = commentId;
         this.content = content;
         this.createdDate = createdDate;
+        this.totalCount = totalCount;
+    }
+
+    public void setTotalCount(Long totalCount) {
+        this.totalCount = totalCount;
     }
 }

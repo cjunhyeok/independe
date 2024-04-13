@@ -9,9 +9,12 @@ import community.independe.exception.ErrorCode;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.post.PostRepository;
+import community.independe.repository.util.PageRequestCreator;
 import community.independe.service.dtos.MyCommentServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -114,17 +117,22 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
-    public List<MyCommentServiceDto> getMyComment(Long memberId) {
+    public List<MyCommentServiceDto> getMyComment(Long memberId, int page, int size) {
 
-        List<Comment> findComment = commentRepository.findAllByMemberId(memberId);
+        PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(page, size);
+        Page<Comment> findCommentsPage = commentRepository.findAllByMemberId(memberId, request);
+        List<Comment> findComments = findCommentsPage.getContent();
 
-        return findComment.stream()
+        List<MyCommentServiceDto> myCommentServiceDtos = findComments.stream()
                 .map(fc -> MyCommentServiceDto.builder()
                         .commentId(fc.getId())
                         .postId(fc.getPost().getId())
                         .content(fc.getContent())
                         .createdDate(fc.getCreatedDate())
-                        .build())
-                .collect(Collectors.toList());
+                        .build()).collect(Collectors.toList());
+
+        myCommentServiceDtos.get(0).setTotalCount(findCommentsPage.getTotalElements());
+
+        return myCommentServiceDtos;
     }
 }
