@@ -118,6 +118,16 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
+    public void modifyPassword(Long memberId, String password) {
+        Member findMember = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+        );
+
+        findMember.modifyPassword(passwordEncoder.encode(password));
+    }
+
+    @Override
+    @Transactional
     public void authenticateRegion(Long memberId, RegionType regionType) {
         Member findMember = memberRepository.findById(memberId).orElseThrow(
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
