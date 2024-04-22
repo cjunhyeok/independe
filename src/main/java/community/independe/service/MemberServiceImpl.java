@@ -111,8 +111,6 @@ public class MemberServiceImpl implements MemberService {
         );
 
         findMember.modifyMember(
-                modifyMemberServiceDto.getUsername(),
-                modifyMemberServiceDto.getPassword(),
                 modifyMemberServiceDto.getNickname(),
                 modifyMemberServiceDto.getEmail(),
                 modifyMemberServiceDto.getNumber());
