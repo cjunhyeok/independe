@@ -73,4 +73,9 @@ public class Member extends BaseEntity {
         this.email = email;
         this.number = number;
     }
+
+    // 비밀번호 수정
+    public void modifyPassword(String password) {
+        this.password = password;
+    }
 }
