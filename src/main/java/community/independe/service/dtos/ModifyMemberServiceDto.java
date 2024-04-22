@@ -10,8 +10,6 @@ import lombok.Data;
 public class ModifyMemberServiceDto {
 
     private Long memberId;
-    private String username;
-    private String password;
     private String nickname;
     private String email;
     private String number;
