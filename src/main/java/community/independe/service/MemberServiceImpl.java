@@ -111,11 +111,19 @@ public class MemberServiceImpl implements MemberService {
         );
 
         findMember.modifyMember(
-                modifyMemberServiceDto.getUsername(),
-                modifyMemberServiceDto.getPassword(),
                 modifyMemberServiceDto.getNickname(),
                 modifyMemberServiceDto.getEmail(),
                 modifyMemberServiceDto.getNumber());
+    }
+
+    @Override
+    @Transactional
+    public void modifyPassword(Long memberId, String password) {
+        Member findMember = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+        );
+
+        findMember.modifyPassword(passwordEncoder.encode(password));
     }
 
     @Override

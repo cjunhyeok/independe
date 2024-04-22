@@ -12,6 +12,7 @@ public interface MemberService {
     LoginResponse login(LoginServiceDto loginServiceDto);
     void modifyOAuthMember(ModifyOAuthMemberServiceDto modifyOAuthMemberServiceDto);
     void modifyMember(ModifyMemberServiceDto modifyMemberServiceDto);
+    void modifyPassword(Long memberId, String password);
     void authenticateRegion(Long memberId ,RegionType regionType);
     Member findById(Long id);
     Member findByUsername(String username);

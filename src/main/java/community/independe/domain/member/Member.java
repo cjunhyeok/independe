@@ -68,11 +68,14 @@ public class Member extends BaseEntity {
     }
 
     // 회원 정보 수정
-    public void modifyMember(String username, String password, String nickname, String email, String number) {
-        this.username = username;
-        this.password = password;
+    public void modifyMember(String nickname, String email, String number) {
         this.nickname = nickname;
         this.email = email;
         this.number = number;
+    }
+
+    // 비밀번호 수정
+    public void modifyPassword(String password) {
+        this.password = password;
     }
 }
