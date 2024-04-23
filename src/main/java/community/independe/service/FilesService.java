@@ -14,4 +14,6 @@ public interface FilesService {
     PostFileResponse findAllFilesByPostId(Long postId);
 
     Files findById(Long filesId);
+
+    void deleteFile(Long postId);
 }
