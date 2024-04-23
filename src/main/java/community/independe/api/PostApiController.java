@@ -213,9 +213,10 @@ public class PostApiController {
         Long updatedPost = postService.updatePost(postId, title, content);
 
         // 파일 수정 기능 추가해야함
-//        if(files != null) {
-//            filesService.saveFiles(files, updatedPost);
-//        }
+        if(files != null) {
+            filesService.deleteFile(postId);
+            filesService.saveFiles(files, updatedPost);
+        }
 
         return ResponseEntity.ok(updatedPost);
     }
