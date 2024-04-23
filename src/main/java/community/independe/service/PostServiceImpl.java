@@ -36,6 +36,7 @@ public class PostServiceImpl implements PostService{
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final FilesRepository filesRepository;
+    private final FilesService filesService;
 
     @Override
     public Post findById(Long postId) {
@@ -87,16 +88,15 @@ public class PostServiceImpl implements PostService{
     @Transactional
     public Long updatePost(Long postId, String title, String content) {
 
-        Post findPost = postRepository.findById(postId).orElseThrow(
-                () -> new CustomException(ErrorCode.POST_NOT_FOUND)
-        );
-
+        Post findPost = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
         findPost.updatePost(title, content);
 
         return findPost.getId();
     }
 
     @Override
+    @Transactional
     public void deletePost(Long postId) {
         Post findPost = postRepository.findById(postId).orElseThrow(
                 () -> new CustomException(ErrorCode.POST_NOT_FOUND)
@@ -104,12 +104,12 @@ public class PostServiceImpl implements PostService{
         findPost.deleteMember();
         findPost.deleteRecommendPosts();
 
-        List<Comment> allByPostId = commentRepository.findAllByPostId(findPost.getId());
+        filesService.deleteFile(postId);
 
+        List<Comment> allByPostId = commentRepository.findAllByPostId(findPost.getId());
         for (Comment comment : allByPostId) {
             commentRepository.deleteCommentByParentId(comment.getId());
         }
-        filesRepository.deleteFilesByPostId(findPost.getId());
 
         commentRepository.deleteCommentsByPostId(findPost.getId());
         postRepository.deletePostByPostId(findPost.getId());

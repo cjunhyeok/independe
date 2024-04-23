@@ -1,6 +1,7 @@
 package community.independe.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import community.independe.api.dtos.files.PostFileResponse;
@@ -40,6 +41,7 @@ public class S3FilesServiceImpl implements FilesService{
     }
 
     @Override
+    @Transactional
     public List<Files> saveFiles(List<MultipartFile> multipartFiles, Long postId) throws IOException {
 
         Post findPost = postRepository.findById(postId)
@@ -106,5 +108,21 @@ public class S3FilesServiceImpl implements FilesService{
     public Files findById(Long filesId) {
         return filesRepository.findById(filesId)
                 .orElseThrow(() -> new CustomException(ErrorCode.FILE_NOT_FOUND));
+    }
+
+    @Override
+    @Transactional
+    public void deleteFile(Long postId) {
+
+        List<Files> findFiles = filesRepository.findAllFilesByPostId(postId);
+
+        for (Files findFile : findFiles) {
+            String storeFilename = findFile.getStoreFilename();
+
+            DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, storeFilename);
+            amazonS3Client.deleteObject(deleteObjectRequest);
+        }
+
+        filesRepository.deleteFilesByPostId(postId);
     }
 }
