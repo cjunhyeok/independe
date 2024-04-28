@@ -171,7 +171,7 @@ public class MemberApiController {
         return ResponseEntity.ok("OK");
     }
 
-    @GetMapping("/api/members/password")
+    @PutMapping("/api/members/password")
     @Operation(summary = "회원 비밀번호 수정 *")
     public ResponseEntity modifyMember(@RequestBody ModifyPasswordRequest request,
                                        @AuthenticationPrincipal MemberContext memberContext) {
