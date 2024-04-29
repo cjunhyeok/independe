@@ -223,7 +223,7 @@ public class PostApiController {
 
     @Operation(summary = "게시글 삭제 *")
     @DeleteMapping("/api/posts/{postId}")
-    public ResponseEntity deletePost(@PathVariable Long postId,
+    public ResponseEntity deletePost(@PathVariable(name = "postId") Long postId,
                                      @AuthenticationPrincipal MemberContext memberContext) {
 
         postService.deletePost(postId);
