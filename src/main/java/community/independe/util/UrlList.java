@@ -38,6 +38,7 @@ public abstract class UrlList {
             "/api/chat/**",
             "/api/member",
             "/api/member/post",
+            "/api/members/password",
             "/api/member/comment"
     };
 
