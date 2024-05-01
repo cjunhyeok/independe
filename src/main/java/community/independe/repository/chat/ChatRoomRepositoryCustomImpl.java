@@ -21,14 +21,15 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom{
 
     @Override
     public List<ChatRoom> findChatRoomsByMemberId(Long memberId) {
-        return queryFactory
-                .select(chatRoom)
-                .from(chat)
-                .join(chat.chatRoom, chatRoom)
-                .where(
-                        chat.sender.id.eq(memberId)
-                                .or(chat.receiver.id.eq(memberId)))
-                .groupBy(chatRoom.id)
-                .fetch();
+//        return queryFactory
+//                .select(chatRoom)
+//                .from(chat)
+//                .join(chat.chatRoom, chatRoom)
+//                .where(
+//                        chat.sender.id.eq(memberId)
+//                                .or(chat.receiver.id.eq(memberId)))
+//                .groupBy(chatRoom.id)
+//                .fetch();
+        return null;
     }
 }

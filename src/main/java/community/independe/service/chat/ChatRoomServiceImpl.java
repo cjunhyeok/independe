@@ -32,75 +32,78 @@ public class ChatRoomServiceImpl implements ChatRoomService{
     @Override
     @Transactional
     public Long saveChatRoom(Long senderId, Long receiverId) {
-        Member findSender = memberRepository.findById(senderId).orElseThrow(
-                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
-        );
-
-        Member findReceiver = memberRepository.findById(receiverId).orElseThrow(
-                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
-        );
-
-        ChatRoom chatRoom = ChatRoom.builder()
-                .senderAndReceiver(SortedStringEditor.createSortedString(findSender.getId(), findReceiver.getId()))
-                .build();
-
-        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
-        return savedChatRoom.getId();
+//        Member findSender = memberRepository.findById(senderId).orElseThrow(
+//                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+//        );
+//
+//        Member findReceiver = memberRepository.findById(receiverId).orElseThrow(
+//                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+//        );
+//
+//        ChatRoom chatRoom = ChatRoom.builder()
+//                .senderAndReceiver(SortedStringEditor.createSortedString(findSender.getId(), findReceiver.getId()))
+//                .build();
+//
+//        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+//        return savedChatRoom.getId();
+        return null;
     }
 
     @Override
     public ChatRoom findBySenderAndReceiver(Long senderId, Long receiverId) {
-        Member findSender = memberRepository.findById(senderId).orElseThrow(
-                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
-        );
-
-        Member findReceiver = memberRepository.findById(receiverId).orElseThrow(
-                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
-        );
-
-        String senderAndReceiver = SortedStringEditor.createSortedString(findSender.getId(), findReceiver.getId());
-
-        ChatRoom findChatRoom = chatRoomRepository.findBySenderAndReceiver(senderAndReceiver);
-
-        return findChatRoom;
+//        Member findSender = memberRepository.findById(senderId).orElseThrow(
+//                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+//        );
+//
+//        Member findReceiver = memberRepository.findById(receiverId).orElseThrow(
+//                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+//        );
+//
+//        String senderAndReceiver = SortedStringEditor.createSortedString(findSender.getId(), findReceiver.getId());
+//
+//        ChatRoom findChatRoom = chatRoomRepository.findBySenderAndReceiver(senderAndReceiver);
+//
+//        return findChatRoom;
+        return null;
     }
 
     @Override
     public List<ChatRoomsResponse> findChatRooms(Long memberId) {
-        List<ChatRoom> findChatRooms = chatRoomRepository.findChatRoomsByMemberId(memberId);
-
-        List<ChatRoomsResponse> chatRoomsResponses = new ArrayList<>();
-
-        for (ChatRoom findChatRoom : findChatRooms) {
-            Chat findLastChat = chatRepository.findLastChatByChatRoomId(findChatRoom.getId());
-            List<Chat> findNonReadChat = chatRepository.findIsReadCountByChatRoomId(findChatRoom.getId(), memberId);
-            Integer unReadCount = getIsReadCount(findNonReadChat);
-            Long opponentId;
-            String opponentNickname;
-
-            if (findLastChat.getReceiver().getId() == memberId) {
-                opponentId = findLastChat.getSender().getId();
-                opponentNickname = findLastChat.getSender().getNickname();
-            } else {
-                opponentId = findLastChat.getReceiver().getId();
-                opponentNickname = findLastChat.getReceiver().getNickname();
-            }
-
-            ChatRoomsResponse chatRoomsResponse = ChatRoomsResponse.builder()
-                    .chatRoomId(findChatRoom.getId())
-                    .receiverId(findLastChat.getReceiver().getId())
-                    .senderNickname(findLastChat.getSender().getNickname())
-                    .receiverNickname(findLastChat.getReceiver().getNickname())
-                    .unReadCount(unReadCount)
-                    .lastMessage(findLastChat.getMessage())
-                    .opponentId(opponentId)
-                    .opponentNickname(opponentNickname)
-                    .senderId(findLastChat.getSender().getId())
-                    .build();
-            chatRoomsResponses.add(chatRoomsResponse);
-        }
-
-        return chatRoomsResponses;
+//        List<ChatRoom> findChatRooms = chatRoomRepository.findChatRoomsByMemberId(memberId);
+//
+//        List<ChatRoomsResponse> chatRoomsResponses = new ArrayList<>();
+//
+//        for (ChatRoom findChatRoom : findChatRooms) {
+//            Chat findLastChat = chatRepository.findLastChatByChatRoomId(findChatRoom.getId());
+//            List<Chat> findNonReadChat = chatRepository.findIsReadCountByChatRoomId(findChatRoom.getId(), memberId);
+//            Integer unReadCount = getIsReadCount(findNonReadChat);
+//            Long opponentId;
+//            String opponentNickname;
+//
+//            if (findLastChat.getReceiver().getId() == memberId) {
+//                opponentId = findLastChat.getSender().getId();
+//                opponentNickname = findLastChat.getSender().getNickname();
+//            } else {
+//                opponentId = findLastChat.getReceiver().getId();
+//                opponentNickname = findLastChat.getReceiver().getNickname();
+//            }
+//
+//            ChatRoomsResponse chatRoomsResponse = ChatRoomsResponse.builder()
+//                    .chatRoomId(findChatRoom.getId())
+//                    .receiverId(findLastChat.getReceiver().getId())
+//                    .senderNickname(findLastChat.getSender().getNickname())
+//                    .receiverNickname(findLastChat.getReceiver().getNickname())
+//                    .unReadCount(unReadCount)
+//                    .lastMessage(findLastChat.getMessage())
+//                    .opponentId(opponentId)
+//                    .opponentNickname(opponentNickname)
+//                    .senderId(findLastChat.getSender().getId())
+//                    .build();
+//            chatRoomsResponses.add(chatRoomsResponse);
+//        }
+//
+//        return chatRoomsResponses;
+        return null;
     }
 
     @Override

@@ -7,7 +7,4 @@ import org.springframework.data.repository.query.Param;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long>, ChatRoomRepositoryCustom {
 
-    @Query(value = "select cr from ChatRoom cr" +
-            " where cr.senderAndReceiver = :senderAndReceiver")
-    ChatRoom findBySenderAndReceiver(@Param("senderAndReceiver") String senderAndReceiver);
 }

@@ -30,81 +30,82 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional
     public Long saveChat(String message, Long senderId, Long receiverId, Long chatRoomId, Boolean isRead) {
-        Member findSender = memberRepository.findById(senderId).orElseThrow(
-                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
-        );
-
-        Member findReceiver = memberRepository.findById(receiverId).orElseThrow(
-                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
-        );
-
-        ChatRoom findChatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(
-                () -> new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND)
-        );
-
-        Chat chat = Chat.builder()
-                .message(message)
-                .sender(findSender)
-                .receiver(findReceiver)
-                .isRead(isRead)
-                .chatRoom(findChatRoom)
-                .build();
-        Chat savedChat = chatRepository.save(chat);
-
-        return savedChat.getId();
+//        Member findSender = memberRepository.findById(senderId).orElseThrow(
+//                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+//        );
+//
+//        Member findReceiver = memberRepository.findById(receiverId).orElseThrow(
+//                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+//        );
+//
+//        ChatRoom findChatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(
+//                () -> new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND)
+//        );
+//
+//        Chat chat = Chat.builder()
+//                .message(message)
+//                .sender(findSender)
+//                .receiver(findReceiver)
+//                .isRead(isRead)
+//                .chatRoom(findChatRoom)
+//                .build();
+//        Chat savedChat = chatRepository.save(chat);
+//
+//        return savedChat.getId();
+        return null;
     }
 
     @Override
     @Transactional
     public List<ChatHistoryResponse> findChatHistory(Long chatRoomId, Long memberId) {
-        List<Chat> chatHistory = chatRepository.findChatHistory(chatRoomId);
-        Member findMember = memberRepository.findById(memberId).orElseThrow(
-                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
-        );
+//        List<Chat> chatHistory = chatRepository.findChatHistory(chatRoomId);
+//        Member findMember = memberRepository.findById(memberId).orElseThrow(
+//                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+//        );
+//
+//        List<ChatHistoryResponse> chatHistoryResponses = new ArrayList<>();
+//
+//        for (Chat chat : chatHistory) {
+//
+//            if (chat.getReceiver() == findMember) {
+//                chat.updateIsReadTrue();
+//            }
+//
+//            ChatHistoryResponse chatHistoryResponse = new ChatHistoryResponse();
+//            chatHistoryResponse.setChatId(chat.getId());
+//            chatHistoryResponse.setSenderNickname(chat.getSender().getNickname());
+//            chatHistoryResponse.setReceiverNickname(chat.getReceiver().getNickname());
+//            chatHistoryResponse.setMessage(chat.getMessage());
+//            chatHistoryResponse.setIsRead(chat.getIsRead());
+//            chatHistoryResponse.setCreatedDate(chat.getCreatedDate());
+//            chatHistoryResponse.setSenderId(chat.getSender().getId());
+//            chatHistoryResponses.add(chatHistoryResponse);
+//        }
 
-        List<ChatHistoryResponse> chatHistoryResponses = new ArrayList<>();
-
-        for (Chat chat : chatHistory) {
-
-            if (chat.getReceiver() == findMember) {
-                chat.updateIsReadTrue();
-            }
-
-            ChatHistoryResponse chatHistoryResponse = new ChatHistoryResponse();
-            chatHistoryResponse.setChatId(chat.getId());
-            chatHistoryResponse.setSenderNickname(chat.getSender().getNickname());
-            chatHistoryResponse.setReceiverNickname(chat.getReceiver().getNickname());
-            chatHistoryResponse.setMessage(chat.getMessage());
-            chatHistoryResponse.setIsRead(chat.getIsRead());
-            chatHistoryResponse.setCreatedDate(chat.getCreatedDate());
-            chatHistoryResponse.setSenderId(chat.getSender().getId());
-            chatHistoryResponses.add(chatHistoryResponse);
-        }
-
-        return chatHistoryResponses;
+        return null;
     }
 
     @Override
     @Transactional
     public void updateChatIsRead(Long chatId, Long chatRoomId, Long memberId) {
-        Chat findChat = chatRepository.findById(chatId).orElseThrow(
-                () -> new CustomException(ErrorCode.CHAT_NOT_FOUND)
-        );
-
-        ChatRoom findChatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(
-                () -> new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND)
-        );
-
-        if (!findChat.getChatRoom().equals(findChatRoom)) {
-            throw new CustomException(ErrorCode.CHAT_ROOM_CHAT_NOT_MATCH);
-        }
-
-        Member findMember = memberRepository.findById(memberId).orElseThrow(
-                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
-        );
-
-        if (findChat.getReceiver().equals(findMember)) {
-            findChat.updateIsReadTrue();
-        }
+//        Chat findChat = chatRepository.findById(chatId).orElseThrow(
+//                () -> new CustomException(ErrorCode.CHAT_NOT_FOUND)
+//        );
+//
+//        ChatRoom findChatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(
+//                () -> new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND)
+//        );
+//
+//        if (!findChat.getChatRoom().equals(findChatRoom)) {
+//            throw new CustomException(ErrorCode.CHAT_ROOM_CHAT_NOT_MATCH);
+//        }
+//
+//        Member findMember = memberRepository.findById(memberId).orElseThrow(
+//                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+//        );
+//
+//        if (findChat.getReceiver().equals(findMember)) {
+//            findChat.updateIsReadTrue();
+//        }
     }
 }

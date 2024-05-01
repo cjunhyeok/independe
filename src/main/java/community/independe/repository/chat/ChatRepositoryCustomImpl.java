@@ -20,38 +20,41 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom{
 
     @Override
     public Chat findLastChatByChatRoomId(Long chatRoomId) {
-        return queryFactory
-                .select(chat)
-                .from(chat)
-                .join(chat.sender).fetchJoin()
-                .join(chat.receiver).fetchJoin()
-                .where(chat.chatRoom.id.eq(chatRoomId))
-                .orderBy(chat.createdDate.desc())
-                .limit(1)
-                .fetchOne();
+//        return queryFactory
+//                .select(chat)
+//                .from(chat)
+//                .join(chat.sender).fetchJoin()
+//                .join(chat.receiver).fetchJoin()
+//                .where(chat.chatRoom.id.eq(chatRoomId))
+//                .orderBy(chat.createdDate.desc())
+//                .limit(1)
+//                .fetchOne();
+        return null;
     }
 
     @Override
     public List<Chat> findChatHistory(Long chatRoomId) {
-        return queryFactory
-                .select(chat)
-                .from(chat)
-                .join(chat.sender).fetchJoin()
-                .join(chat.receiver).fetchJoin()
-                .where(chat.chatRoom.id.eq(chatRoomId))
-                .orderBy(chat.createdDate.asc())
-                .fetch();
+//        return queryFactory
+//                .select(chat)
+//                .from(chat)
+//                .join(chat.sender).fetchJoin()
+//                .join(chat.receiver).fetchJoin()
+//                .where(chat.chatRoom.id.eq(chatRoomId))
+//                .orderBy(chat.createdDate.asc())
+//                .fetch();
+        return null;
     }
 
     @Override
     public List<Chat> findIsReadCountByChatRoomId(Long chatRoomId, Long memberId) {
-        return queryFactory
-                .select(chat)
-                .from(chat)
-                .join(chat.receiver).fetchJoin()
-                .where(chat.chatRoom.id.eq(chatRoomId)
-                        .and(chat.receiver.id.eq(memberId)
-                                .and(chat.isRead.isFalse())))
-                .fetch();
+//        return queryFactory
+//                .select(chat)
+//                .from(chat)
+//                .join(chat.receiver).fetchJoin()
+//                .where(chat.chatRoom.id.eq(chatRoomId)
+//                        .and(chat.receiver.id.eq(memberId)
+//                                .and(chat.isRead.isFalse())))
+//                .fetch();
+        return null;
     }
 }
