@@ -19,7 +19,7 @@ public class ChatRead extends BaseManyToManyEntity {
     @Column(name = "chat_read_id")
     private Long id;
 
-    private boolean isRead;
+    private Boolean isRead;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
@@ -30,7 +30,7 @@ public class ChatRead extends BaseManyToManyEntity {
     private Chat chat;
 
     @Builder
-    public ChatRead(boolean isRead, Member member, Chat chat) {
+    public ChatRead(Boolean isRead, Member member, Chat chat) {
         this.isRead = isRead;
         this.member = member;
         this.chat = chat;
