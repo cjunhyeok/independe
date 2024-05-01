@@ -18,29 +18,19 @@ public class Chat extends BaseEntity {
     @Column(name = "chat_id")
     private Long id;
     private String message; // 메시지
-    private Boolean isRead;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id")
-    private Member sender; // 발신자
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_id")
-    private Member receiver; // 수신자
+    @JoinColumn(name = "member_id")
+    private Member member; // 발신자
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
 
     @Builder
-    public Chat(String message, Boolean isRead, Member sender, Member receiver, ChatRoom chatRoom) {
+    public Chat(String message, Member member, ChatRoom chatRoom) {
         this.message = message;
-        this.isRead = isRead;
-        this.sender = sender;
-        this.receiver = receiver;
+        this.member = member;
         this.chatRoom = chatRoom;
-    }
-
-    public void updateIsReadTrue() {
-        this.isRead = true;
     }
 }
