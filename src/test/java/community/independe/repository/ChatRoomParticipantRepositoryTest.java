@@ -42,4 +42,40 @@ public class ChatRoomParticipantRepositoryTest extends IntegrationTestSupporter 
         assertThat(savedChatRoomParticipant.getMember()).isEqualTo(savedSender);
         assertThat(savedChatRoomParticipant.getChatRoom()).isEqualTo(savedChatRoom);
     }
+
+    @Test
+    @DisplayName("보낸사람, 받는사람 PK 로 채팅방 참여 정보를 조회한다.")
+    void findChatRoomParticipantsBySenderAndReceiverIdTest() {
+        // given
+        Member sender = Member.builder().username("sender").password("pass").nickname("sender").build();
+        Member savedSender = memberRepository.save(sender);
+        Member receiver = Member.builder().username("receiver").password("pass").nickname("receiver").build();
+        Member savedReceiver = memberRepository.save(receiver);
+
+        Member third = Member.builder().username("third").password("pass").nickname("third").build();
+        Member savedThird = memberRepository.save(third);
+
+        ChatRoom chatRoom = ChatRoom.builder().title("title").build();
+        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+        ChatRoom extra = ChatRoom.builder().title("Extra").build();
+        ChatRoom savedExtra = chatRoomRepository.save(extra);
+
+        ChatRoomParticipant senderParticipate = ChatRoomParticipant.builder().chatRoom(savedChatRoom).member(savedSender).build();
+        ChatRoomParticipant savedSenderParticipant = chatRoomParticipantRepository.save(senderParticipate);
+        ChatRoomParticipant receiverParticipate = ChatRoomParticipant.builder().chatRoom(savedChatRoom).member(savedReceiver).build();
+        ChatRoomParticipant savedReceiverParticipant = chatRoomParticipantRepository.save(receiverParticipate);
+
+        ChatRoomParticipant firstExtraParticipate = ChatRoomParticipant.builder().chatRoom(savedExtra).member(savedReceiver).build();
+        ChatRoomParticipant savedFirstExtraParticipate = chatRoomParticipantRepository.save(firstExtraParticipate);
+        ChatRoomParticipant secondExtraParticipate = ChatRoomParticipant.builder().chatRoom(savedExtra).member(savedThird).build();
+        ChatRoomParticipant savedSecondExtraParticipate = chatRoomParticipantRepository.save(secondExtraParticipate);
+
+        // when
+        ChatRoomParticipant findChatRoomParticipant
+                = chatRoomParticipantRepository
+                .findChatRoomParticipantsBySenderAndReceiverId(savedSender.getId(), savedReceiver.getId());
+
+        // then
+        assertThat(findChatRoomParticipant.getChatRoom()).isEqualTo(savedChatRoom);
+    }
 }
