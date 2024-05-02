@@ -73,7 +73,7 @@ public class ChatRoomParticipantRepositoryTest extends IntegrationTestSupporter 
         // when
         ChatRoomParticipant findChatRoomParticipant
                 = chatRoomParticipantRepository
-                .findChatRoomParticipantsBySenderAndReceiverId(savedSender.getId(), savedReceiver.getId());
+                .findChatRoomParticipantsBySenderAndReceiverId(savedSender.getId(), savedReceiver.getId()).get();
 
         // then
         assertThat(findChatRoomParticipant.getChatRoom()).isEqualTo(savedChatRoom);
@@ -109,7 +109,7 @@ public class ChatRoomParticipantRepositoryTest extends IntegrationTestSupporter 
         // when
         ChatRoomParticipant findChatRoomParticipant
                 = chatRoomParticipantRepository
-                .findChatRoomParticipantsBySenderAndReceiverId(savedReceiver.getId(), savedSender.getId());
+                .findChatRoomParticipantsBySenderAndReceiverId(savedReceiver.getId(), savedSender.getId()).get();
 
         // then
         assertThat(findChatRoomParticipant.getChatRoom()).isEqualTo(savedChatRoom);
