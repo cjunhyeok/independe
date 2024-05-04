@@ -39,12 +39,12 @@ public class ChatRoomApiController {
             throw new CustomException(ErrorCode.Coincide_Sender_Receiver);
         }
 
-        ChatRoom findChatRoom = chatRoomService.findBySenderAndReceiver(senderId, opponentId);
+        ChatRoom findChatRoom = chatRoomService.findBySenderAndReceiver(senderId, opponentId).orElseGet(() -> {
 
-        if (findChatRoom == null) {
             chatRoomService.saveChatRoom(senderId, opponentId);
-            findChatRoom = chatRoomService.findBySenderAndReceiver(senderId, opponentId);
-        }
+            return chatRoomService.findBySenderAndReceiver(senderId, opponentId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND));
+        });
 
         ChatRoomResponse chatRoomResponse = ChatRoomResponse.builder()
                 .chatRoomId(findChatRoom.getId())
