@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.*;
 
 @Transactional
@@ -113,5 +115,40 @@ public class ChatRoomParticipantRepositoryTest extends IntegrationTestSupporter 
 
         // then
         assertThat(findChatRoomParticipant.getChatRoom()).isEqualTo(savedChatRoom);
+    }
+
+    @Test
+    @DisplayName("회원 PK를 이용해 채팅방 참여 정보들을 조회한다.")
+    void findChatRoomParticipantsByMemberIdTest() {
+        // given
+        Member sender = Member.builder().username("sender").password("pass").nickname("sender").build();
+        Member savedSender = memberRepository.save(sender);
+        Member receiver = Member.builder().username("receiver").password("pass").nickname("receiver").build();
+        Member savedReceiver = memberRepository.save(receiver);
+
+        Member third = Member.builder().username("third").password("pass").nickname("third").build();
+        Member savedThird = memberRepository.save(third);
+
+        ChatRoom chatRoom = ChatRoom.builder().title("title").build();
+        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+        ChatRoom extra = ChatRoom.builder().title("Extra").build();
+        ChatRoom savedExtra = chatRoomRepository.save(extra);
+
+        ChatRoomParticipant senderParticipate = ChatRoomParticipant.builder().chatRoom(savedChatRoom).member(savedSender).build();
+        ChatRoomParticipant savedSenderParticipant = chatRoomParticipantRepository.save(senderParticipate);
+        ChatRoomParticipant receiverParticipate = ChatRoomParticipant.builder().chatRoom(savedChatRoom).member(savedReceiver).build();
+        ChatRoomParticipant savedReceiverParticipant = chatRoomParticipantRepository.save(receiverParticipate);
+
+        ChatRoomParticipant firstExtraParticipate = ChatRoomParticipant.builder().chatRoom(savedExtra).member(savedReceiver).build();
+        ChatRoomParticipant savedFirstExtraParticipate = chatRoomParticipantRepository.save(firstExtraParticipate);
+        ChatRoomParticipant secondExtraParticipate = ChatRoomParticipant.builder().chatRoom(savedExtra).member(savedThird).build();
+        ChatRoomParticipant savedSecondExtraParticipate = chatRoomParticipantRepository.save(secondExtraParticipate);
+
+        // when
+        List<ChatRoomParticipant> findChatRoomParticipants
+                = chatRoomParticipantRepository.findChatRoomParticipantsByMemberId(savedReceiver.getId());
+
+        // then
+        assertThat(findChatRoomParticipants).hasSize(2);
     }
 }
