@@ -1,11 +1,17 @@
 package community.independe.api.dtos.chat;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
+@Getter
 @NoArgsConstructor
 public class ChatRoomRequest {
 
     private Long opponentId;
+
+    @Builder
+    public ChatRoomRequest(Long opponentId) {
+        this.opponentId = opponentId;
+    }
 }

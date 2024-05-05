@@ -1,31 +1,29 @@
 package community.independe.api.dtos.chat;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
 @NoArgsConstructor
 public class ChatHistoryResponse {
 
     private Long chatId;
-    private String senderNickname;
-    private String receiverNickname;
-    private String message;
-    private LocalDateTime createdDate;
-    private Boolean isRead;
     private Long senderId;
+    private String senderNickname;
+    private String message;
+    private Boolean isRead;
+    private LocalDateTime createdDate;
 
     @Builder
-    public ChatHistoryResponse(Long chatId, String senderNickname, String receiverNickname, String message, LocalDateTime createdDate, Boolean isRead, Long senderId) {
+    public ChatHistoryResponse(Long chatId, Long senderId, String senderNickname, String message, Boolean isRead, LocalDateTime createdDate) {
         this.chatId = chatId;
-        this.senderNickname = senderNickname;
-        this.receiverNickname = receiverNickname;
-        this.message = message;
-        this.createdDate = createdDate;
-        this.isRead = isRead;
         this.senderId = senderId;
+        this.senderNickname = senderNickname;
+        this.message = message;
+        this.isRead = isRead;
+        this.createdDate = createdDate;
     }
 }
