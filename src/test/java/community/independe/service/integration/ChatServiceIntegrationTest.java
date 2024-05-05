@@ -1,10 +1,13 @@
 package community.independe.service.integration;
 
 import community.independe.IntegrationTestSupporter;
+import community.independe.api.dtos.chat.ChatHistoryResponse;
 import community.independe.domain.chat.Chat;
+import community.independe.domain.chat.ChatRead;
 import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
 import community.independe.repository.MemberRepository;
+import community.independe.repository.chat.ChatReadRepository;
 import community.independe.repository.chat.ChatRepository;
 import community.independe.repository.chat.ChatRoomRepository;
 import community.independe.service.chat.ChatService;
@@ -13,6 +16,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -27,6 +32,8 @@ public class ChatServiceIntegrationTest extends IntegrationTestSupporter {
     private ChatRoomRepository chatRoomRepository;
     @Autowired
     private ChatRepository chatRepository;
+    @Autowired
+    private ChatReadRepository chatReadRepository;
 
     @Test
     @DisplayName("회원, 채팅방 정보를 이용해 채팅을 저장한다.")
@@ -34,6 +41,8 @@ public class ChatServiceIntegrationTest extends IntegrationTestSupporter {
         // given
         Member sender = Member.builder().username("sender").password("pass").nickname("sender").build();
         Member savedSender = memberRepository.save(sender);
+        Member receiver = Member.builder().username("receiver").password("pass").nickname("receiver").build();
+        Member savedReceiver = memberRepository.save(receiver);
         ChatRoom chatRoom = ChatRoom.builder().title("title").build();
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
 
@@ -41,6 +50,8 @@ public class ChatServiceIntegrationTest extends IntegrationTestSupporter {
                 .message("message")
                 .senderId(savedSender.getId())
                 .chatRoomId(savedChatRoom.getId())
+                .isRead(false)
+                .receiverId(savedReceiver.getId())
                 .build();
 
         // when
@@ -48,7 +59,53 @@ public class ChatServiceIntegrationTest extends IntegrationTestSupporter {
 
         // then
         Chat findChat = chatRepository.findById(savedChatId).get();
+        ChatRead findChatRead = chatReadRepository.findByChatId(findChat.getId());
         assertThat(findChat.getId()).isEqualTo(savedChatId);
         assertThat(findChat.getMessage()).isEqualTo(dto.getMessage());
+        assertThat(findChatRead.getIsRead()).isFalse();
+        assertThat(findChatRead.getMember()).isEqualTo(savedReceiver);
+    }
+
+    @Test
+    @DisplayName("채팅 내역을 조회한다.")
+    void findChatHistoryTest() {
+        // given
+        Member sender = Member.builder().username("sender").password("pass").nickname("sender").build();
+        Member savedSender = memberRepository.save(sender);
+        Member receiver = Member.builder().username("receiver").password("pass").nickname("receiver").build();
+        Member savedReceiver = memberRepository.save(receiver);
+        ChatRoom chatRoom = ChatRoom.builder().title("title").build();
+        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+        SaveChatDto dto = SaveChatDto.builder()
+                .message("message")
+                .senderId(savedSender.getId())
+                .chatRoomId(savedChatRoom.getId())
+                .isRead(false)
+                .receiverId(savedReceiver.getId())
+                .build();
+        Long savedChatId = chatService.saveChat(dto);
+        SaveChatDto dto2 = SaveChatDto.builder()
+                .message("message2")
+                .senderId(savedSender.getId())
+                .chatRoomId(savedChatRoom.getId())
+                .isRead(false)
+                .receiverId(savedReceiver.getId())
+                .build();
+        chatService.saveChat(dto);
+        SaveChatDto dto3 = SaveChatDto.builder()
+                .message("message3")
+                .senderId(savedSender.getId())
+                .chatRoomId(savedChatRoom.getId())
+                .isRead(false)
+                .receiverId(savedReceiver.getId())
+                .build();
+        chatService.saveChat(dto);
+
+        // when
+        List<ChatHistoryResponse> findChatHistory
+                = chatService.findChatHistory(savedChatRoom.getId(), savedSender.getId());
+
+        // then
+        assertThat(findChatHistory).hasSize(3);
     }
 }
