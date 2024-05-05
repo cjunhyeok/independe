@@ -40,4 +40,26 @@ public class ChatRepositoryTest extends IntegrationTestSupporter {
         assertThat(savedChat.getMember()).isEqualTo(savedMember);
         assertThat(savedChat.getChatRoom()).isEqualTo(savedChatRoom);
     }
+
+    @Test
+    @DisplayName("마지막 채팅 정보를 조회한다.")
+    void findLastChatByChatRoomIdTest() {
+        // given
+        Member member = Member.builder().build();
+        Member savedMember = memberRepository.save(member);
+        ChatRoom chatRoom = ChatRoom.builder().title("title").build();
+        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+        Chat chat = Chat.builder().message("message").chatRoom(savedChatRoom).member(savedMember).build();
+        Chat savedChat = chatRepository.save(chat);
+        Chat secondChat = Chat.builder().message("secondMessage").chatRoom(savedChatRoom).member(savedMember).build();
+        Chat savedSecondChat = chatRepository.save(secondChat);
+        Chat lastChat = Chat.builder().message("lastMessage").chatRoom(savedChatRoom).member(savedMember).build();
+        Chat savedLastChat = chatRepository.save(lastChat);
+
+        // when
+        Chat findLastChat = chatRepository.findLastChatByChatRoomId(savedChatRoom.getId());
+
+        // then
+        assertThat(findLastChat.getMessage()).isEqualTo(lastChat.getMessage());
+    }
 }
