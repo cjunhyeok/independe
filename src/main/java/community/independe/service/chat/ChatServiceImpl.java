@@ -38,6 +38,10 @@ public class ChatServiceImpl implements ChatService {
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
+        Member findReceiver = memberRepository.findById(dto.getReceiverId()).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+        );
+
         ChatRoom findChatRoom = chatRoomRepository.findById(dto.getChatRoomId()).orElseThrow(
                 () -> new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND)
         );
@@ -48,6 +52,14 @@ public class ChatServiceImpl implements ChatService {
                 .chatRoom(findChatRoom)
                 .build();
         Chat savedChat = chatRepository.save(chat);
+
+        // 읽음 정보도 추가해야된다.
+        ChatRead chatRead = ChatRead.builder()
+                .isRead(dto.getIsRead())
+                .chat(savedChat)
+                .member(findReceiver)
+                .build();
+        chatReadRepository.save(chatRead);
 
         return savedChat.getId();
     }

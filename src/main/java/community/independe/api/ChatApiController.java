@@ -50,7 +50,7 @@ public class ChatApiController {
         Boolean isRead = checkChatRoomParticipate(chatRoomMembers, loginMember);
 
         // 채팅을 저장하고 저장된 채팅 정보를 조회한다.
-        Chat findChat = saveChat(sendMessage, findSender);
+        Chat findChat = saveChat(sendMessage, findSender, isRead);
 
         // /user/{chatRoomId}/private 로 보낸다
         sendMessageToChatSocket(findChat, isRead, findSender, sendMessage.getChatRoomId());
@@ -77,12 +77,14 @@ public class ChatApiController {
         return isRead;
     }
 
-    private Chat saveChat(SendMessage sendMessage, Member sender) {
+    private Chat saveChat(SendMessage sendMessage, Member sender, Boolean isRead) {
         SaveChatDto saveChatDto = SaveChatDto
                 .builder()
                 .message(sendMessage.getMessage())
                 .chatRoomId(sendMessage.getChatRoomId())
                 .senderId(sender.getId())
+                .receiverId(sendMessage.getReceiverId())
+                .isRead(isRead)
                 .build();
         Long savedChat = chatService.saveChat(saveChatDto);
 

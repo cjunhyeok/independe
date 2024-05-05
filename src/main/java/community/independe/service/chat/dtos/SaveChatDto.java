@@ -11,11 +11,15 @@ public class SaveChatDto {
     private String message;
     private Long chatRoomId;
     private Long senderId;
+    private Long receiverId;
+    private Boolean isRead;
 
     @Builder
-    public SaveChatDto(String message, Long chatRoomId, Long senderId) {
+    public SaveChatDto(String message, Long chatRoomId, Long senderId, Long receiverId, Boolean isRead) {
         this.message = message;
         this.chatRoomId = chatRoomId;
         this.senderId = senderId;
+        this.receiverId = receiverId;
+        this.isRead = isRead;
     }
 }
