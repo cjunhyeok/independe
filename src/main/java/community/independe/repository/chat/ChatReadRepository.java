@@ -16,4 +16,9 @@ public interface ChatReadRepository extends JpaRepository<ChatRead, Long> {
             " AND cre.isRead = false")
     Long findUnReadCountByChatRoomIdAndMemberId(@Param("chatRoomId") Long chatRoomId,
                                             @Param("memberId") Long memberId);
+
+    @Query("SELECT cr" +
+            " FROM ChatRead cr" +
+            " WHERE cr.chat.id = :chatId")
+    ChatRead findByChatId(@Param("chatId") Long chatId);
 }
