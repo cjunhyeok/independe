@@ -35,4 +35,8 @@ public class ChatRead extends BaseManyToManyEntity {
         this.member = member;
         this.chat = chat;
     }
+
+    public void updateIsReadTrue() {
+        this.isRead = true;
+    }
 }
