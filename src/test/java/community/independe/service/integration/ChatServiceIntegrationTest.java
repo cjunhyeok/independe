@@ -83,7 +83,7 @@ public class ChatServiceIntegrationTest extends IntegrationTestSupporter {
                 .isRead(false)
                 .receiverId(savedReceiver.getId())
                 .build();
-        Long savedChatId = chatService.saveChat(dto);
+        chatService.saveChat(dto);
         SaveChatDto dto2 = SaveChatDto.builder()
                 .message("message2")
                 .senderId(savedSender.getId())
@@ -91,7 +91,7 @@ public class ChatServiceIntegrationTest extends IntegrationTestSupporter {
                 .isRead(false)
                 .receiverId(savedReceiver.getId())
                 .build();
-        chatService.saveChat(dto);
+        chatService.saveChat(dto2);
         SaveChatDto dto3 = SaveChatDto.builder()
                 .message("message3")
                 .senderId(savedSender.getId())
@@ -99,14 +99,24 @@ public class ChatServiceIntegrationTest extends IntegrationTestSupporter {
                 .isRead(false)
                 .receiverId(savedReceiver.getId())
                 .build();
-        chatService.saveChat(dto);
+        chatService.saveChat(dto3);
+
+        SaveChatDto receiverChat = SaveChatDto.builder()
+                .message("receiverChat")
+                .senderId(savedReceiver.getId())
+                .chatRoomId(savedChatRoom.getId())
+                .isRead(false)
+                .receiverId(savedSender.getId())
+                .build();
+        chatService.saveChat(receiverChat);
 
         // when
         List<ChatHistoryResponse> findChatHistory
                 = chatService.findChatHistory(savedChatRoom.getId(), savedSender.getId());
 
         // then
-        assertThat(findChatHistory).hasSize(3);
+        assertThat(findChatHistory).hasSize(4);
+        assertThat(findChatHistory.get(3).getIsRead()).isTrue();
     }
 
     // todo 채팅 내역 조회 시 상대방이 보낸 데이터 로직 테스트
