@@ -46,16 +46,27 @@ public class ChatRoomServiceImpl implements ChatRoomService{
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
-        ChatRoom chatRoom = ChatRoom.builder()
-                .title(SortedStringEditor.createSortedString(findSender.getId(), findReceiver.getId()))
-                .build();
+        Optional<ChatRoomParticipant> findChatRoomParticipantOptional =
+                chatRoomParticipantRepository
+                .findChatRoomParticipantsBySenderAndReceiverId(findSender.getId(), findReceiver.getId());
 
-        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
-        return savedChatRoom.getId();
+        if (findChatRoomParticipantOptional.isPresent()) {
+
+            ChatRoom findChatRoom = findChatRoomParticipantOptional.get().getChatRoom();
+            // N + 1 발생
+            return findChatRoom.getId();
+        } else {
+            ChatRoom chatRoom = ChatRoom.builder()
+                    .title(SortedStringEditor.createSortedString(findSender.getId(), findReceiver.getId()))
+                    .build();
+            ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+
+            return savedChatRoom.getId();
+        }
     }
 
     @Override
-    public Optional<ChatRoom> findBySenderAndReceiver(Long senderId, Long receiverId) {
+    public ChatRoom findBySenderAndReceiver(Long senderId, Long receiverId) {
         Member findSender = memberRepository.findById(senderId).orElseThrow(
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
@@ -68,8 +79,9 @@ public class ChatRoomServiceImpl implements ChatRoomService{
                 = chatRoomParticipantRepository.findChatRoomParticipantsBySenderAndReceiverId(findSender.getId(), findReceiver.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND));
 
-        // chatRoom().getId() --> N + 1 쿼리 발생
-        return chatRoomRepository.findById(chatRoomParticipant.getChatRoom().getId());
+        // chatRoom() --> N + 1 쿼리 발생
+        // DTO 로 변경해야됨
+        return chatRoomParticipant.getChatRoom();
     }
 
     @Override
