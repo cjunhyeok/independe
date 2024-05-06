@@ -2,7 +2,6 @@ package community.independe.api;
 
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.chat.*;
-import community.independe.domain.chat.ChatRoom;
 import community.independe.domain.member.Member;
 import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
@@ -33,21 +32,16 @@ public class ChatRoomApiController {
                            @AuthenticationPrincipal MemberContext memberContext) {
         Member loginMember = memberContext.getMember();
         Long senderId = loginMember.getId();
-        Long opponentId = chatRoomRequest.getOpponentId();
+        Long receiverId = chatRoomRequest.getReceiverId();
 
-        if (senderId.equals(opponentId)) {
+        if (senderId.equals(receiverId)) {
             throw new CustomException(ErrorCode.Coincide_Sender_Receiver);
         }
 
-        ChatRoom findChatRoom = chatRoomService.findBySenderAndReceiver(senderId, opponentId).orElseGet(() -> {
-
-            chatRoomService.saveChatRoom(senderId, opponentId);
-            return chatRoomService.findBySenderAndReceiver(senderId, opponentId)
-                    .orElseThrow(() -> new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND));
-        });
+        Long savedChatRoomId = chatRoomService.saveChatRoom(senderId, receiverId);
 
         ChatRoomResponse chatRoomResponse = ChatRoomResponse.builder()
-                .chatRoomId(findChatRoom.getId())
+                .chatRoomId(savedChatRoomId)
                 .build();
 
         return new Result(chatRoomResponse);
