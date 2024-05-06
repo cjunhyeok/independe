@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChatRoomRequest {
 
-    private Long opponentId;
+    private Long receiverId;
 
     @Builder
-    public ChatRoomRequest(Long opponentId) {
-        this.opponentId = opponentId;
+    public ChatRoomRequest(Long receiverId) {
+        this.receiverId = receiverId;
     }
 }
