@@ -108,4 +108,34 @@ public class ChatServiceIntegrationTest extends IntegrationTestSupporter {
         // then
         assertThat(findChatHistory).hasSize(3);
     }
+
+    // todo 채팅 내역 조회 시 상대방이 보낸 데이터 로직 테스트
+
+    @Test
+    @DisplayName("채팅 PK 로 채팅 데이터를 조회한다.")
+    void findByIdTest() {
+        // given
+        Member sender = Member.builder().username("sender").password("pass").nickname("sender").build();
+        Member savedSender = memberRepository.save(sender);
+        Member receiver = Member.builder().username("receiver").password("pass").nickname("receiver").build();
+        Member savedReceiver = memberRepository.save(receiver);
+        ChatRoom chatRoom = ChatRoom.builder().title("title").build();
+        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+
+        SaveChatDto dto = SaveChatDto.builder()
+                .message("message")
+                .senderId(savedSender.getId())
+                .chatRoomId(savedChatRoom.getId())
+                .isRead(false)
+                .receiverId(savedReceiver.getId())
+                .build();
+        Long savedChatId = chatService.saveChat(dto);
+
+        // when
+        Chat findChat = chatService.findById(savedChatId);
+
+        // then
+        assertThat(findChat.getId()).isEqualTo(savedChatId);
+        assertThat(findChat.getMessage()).isEqualTo("message");
+    }
 }
