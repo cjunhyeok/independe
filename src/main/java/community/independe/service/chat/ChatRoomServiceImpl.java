@@ -66,25 +66,6 @@ public class ChatRoomServiceImpl implements ChatRoomService{
     }
 
     @Override
-    public ChatRoom findBySenderAndReceiver(Long senderId, Long receiverId) {
-        Member findSender = memberRepository.findById(senderId).orElseThrow(
-                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
-        );
-
-        Member findReceiver = memberRepository.findById(receiverId).orElseThrow(
-                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
-        );
-
-        ChatRoomParticipant chatRoomParticipant
-                = chatRoomParticipantRepository.findChatRoomParticipantsBySenderAndReceiverId(findSender.getId(), findReceiver.getId())
-                .orElseThrow(() -> new CustomException(ErrorCode.CHAT_ROOM_NOT_FOUND));
-
-        // chatRoom() --> N + 1 쿼리 발생
-        // DTO 로 변경해야됨
-        return chatRoomParticipant.getChatRoom();
-    }
-
-    @Override
     public List<ChatRoomsResponse> findChatRooms(Long memberId) {
 
         List<ChatRoomsResponse> chatRoomsResponses = new ArrayList<>();
