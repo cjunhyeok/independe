@@ -8,22 +8,22 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-public class ChatHistoryResponse {
+public class ReceiveMessage {
 
     private Long chatId;
-    private Long senderId;
-    private String senderNickname;
     private String message;
     private Boolean isRead;
+    private Long senderId;
+    private String senderNickname;
     private LocalDateTime createdDate;
 
     @Builder
-    public ChatHistoryResponse(Long chatId, Long senderId, String senderNickname, String message, Boolean isRead, LocalDateTime createdDate) {
+    public ReceiveMessage(Long chatId, String message, Boolean isRead, Long senderId, String senderNickname, LocalDateTime createdDate) {
         this.chatId = chatId;
-        this.senderId = senderId;
-        this.senderNickname = senderNickname;
         this.message = message;
         this.isRead = isRead;
+        this.senderId = senderId;
+        this.senderNickname = senderNickname;
         this.createdDate = createdDate;
     }
 }

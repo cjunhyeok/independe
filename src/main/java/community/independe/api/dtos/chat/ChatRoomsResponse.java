@@ -1,23 +1,23 @@
 package community.independe.api.dtos.chat;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
-@Builder
+@Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class ChatRoomsResponse {
 
     private Long chatRoomId;
-    private Long receiverId;
-    private String senderNickname;
-    private String receiverNickname;
-    private String lastMessage;
-    private Integer unReadCount;
-    private Long opponentId;
-    private String opponentNickname;
     private Long senderId;
+    private String senderNickname;
+    private String lastMessage;
+    private Long unReadCount;
+
+    @Builder
+    public ChatRoomsResponse(Long chatRoomId, Long senderId, String senderNickname, String lastMessage, Long unReadCount) {
+        this.chatRoomId = chatRoomId;
+        this.senderId = senderId;
+        this.senderNickname = senderNickname;
+        this.lastMessage = lastMessage;
+        this.unReadCount = unReadCount;
+    }
 }

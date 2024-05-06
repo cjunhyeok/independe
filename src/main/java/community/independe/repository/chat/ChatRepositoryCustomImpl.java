@@ -23,8 +23,7 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom{
         return queryFactory
                 .select(chat)
                 .from(chat)
-                .join(chat.sender).fetchJoin()
-                .join(chat.receiver).fetchJoin()
+                .join(chat.member).fetchJoin()
                 .where(chat.chatRoom.id.eq(chatRoomId))
                 .orderBy(chat.createdDate.desc())
                 .limit(1)
@@ -36,22 +35,9 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom{
         return queryFactory
                 .select(chat)
                 .from(chat)
-                .join(chat.sender).fetchJoin()
-                .join(chat.receiver).fetchJoin()
+                .join(chat.member).fetchJoin()
                 .where(chat.chatRoom.id.eq(chatRoomId))
                 .orderBy(chat.createdDate.asc())
-                .fetch();
-    }
-
-    @Override
-    public List<Chat> findIsReadCountByChatRoomId(Long chatRoomId, Long memberId) {
-        return queryFactory
-                .select(chat)
-                .from(chat)
-                .join(chat.receiver).fetchJoin()
-                .where(chat.chatRoom.id.eq(chatRoomId)
-                        .and(chat.receiver.id.eq(memberId)
-                                .and(chat.isRead.isFalse())))
                 .fetch();
     }
 }

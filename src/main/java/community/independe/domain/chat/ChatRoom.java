@@ -15,10 +15,11 @@ public class ChatRoom extends BaseEntity {
     @Id @GeneratedValue
     @Column(name = "chat_room_id")
     private Long id;
-    private String senderAndReceiver;
+
+    private String title;
 
     @Builder
-    public ChatRoom(String senderAndReceiver) {
-        this.senderAndReceiver = senderAndReceiver;
+    public ChatRoom(String title) {
+        this.title = title;
     }
 }

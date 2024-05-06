@@ -37,7 +37,7 @@ public abstract class SecuritySigner {
                 .claim("authority", findMember.getRole()) // 사용자 권한
                 .claim("nickname", findMember.getNickname()) // 사용자 닉네임
                 .claim("region", findMember.getRegion()) // 사용자 지
-                .expirationTime(new Date(new Date().getTime() + 60 * 1000 * 10)) // 10분
+                .expirationTime(new Date(new Date().getTime() + 60 * 1000 * 60)) // 60분
                 .build();
         SignedJWT signedJWT = new SignedJWT(header, jwtClaimsSet);
         signedJWT.sign(jwsSigner); // mac signer를 이용해 서명
@@ -60,7 +60,7 @@ public abstract class SecuritySigner {
                 .claim("username", member.getUsername()) // 사용자 Id
                 .claim("authority", member.getRole()) // 사용자 권한
                 .claim("nickname", member.getNickname()) // 사용자 nickname
-                .expirationTime(new Date(new Date().getTime() + 60 * 1000 * 10)) // 10분
+                .expirationTime(new Date(new Date().getTime() + 60 * 1000 * 60)) // 60분
                 .build();
         SignedJWT signedJWT = new SignedJWT(header, jwtClaimsSet);
         signedJWT.sign(jwsSigner); // mac signer를 이용해 서명
