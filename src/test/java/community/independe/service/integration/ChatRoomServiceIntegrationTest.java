@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -53,9 +54,14 @@ public class ChatRoomServiceIntegrationTest extends IntegrationTestSupporter {
 
         // then
         ChatRoom findChatRoom = chatRoomRepository.findById(savedChatRoomId).get();
+
         assertThat(findChatRoom.getId()).isEqualTo(savedChatRoomId);
         assertThat(findChatRoom.getTitle())
                 .isEqualTo(SortedStringEditor.createSortedString(savedSender.getId(), savedReceiver.getId()));
+
+        Optional<ChatRoomParticipant> findChatRoomOptional
+                = chatRoomParticipantRepository.findChatRoomParticipantsBySenderAndReceiverId(savedSender.getId(), savedReceiver.getId());
+        assertThat(findChatRoomOptional.isPresent()).isTrue();
     }
 
     // todo 채팅방 저장 throw 테스트 작성
@@ -68,18 +74,22 @@ public class ChatRoomServiceIntegrationTest extends IntegrationTestSupporter {
         Member savedSender = memberRepository.save(sender);
         Member receiver = Member.builder().username("receiver").password("pass").nickname("receiver").build();
         Member savedReceiver = memberRepository.save(receiver);
+
         ChatRoom chatRoom = ChatRoom.builder().title("title").build();
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+
         ChatRoomParticipant senderParticipant = ChatRoomParticipant.builder().member(savedSender).chatRoom(savedChatRoom).build();
         chatRoomParticipantRepository.save(senderParticipant);
         ChatRoomParticipant receiverParticipant = ChatRoomParticipant.builder().member(savedReceiver).chatRoom(savedChatRoom).build();
         chatRoomParticipantRepository.save(receiverParticipant);
+
         Chat chat = Chat.builder().message("chat").chatRoom(savedChatRoom).member(savedSender).build();
         Chat savedChat = chatRepository.save(chat);
         Chat secondChat = Chat.builder().message("secondChat").chatRoom(savedChatRoom).member(savedSender).build();
         Chat savedSecondChat = chatRepository.save(secondChat);
         Chat thirdChat = Chat.builder().message("thirdChat").chatRoom(savedChatRoom).member(savedSender).build();
         Chat savedThirdChat = chatRepository.save(thirdChat);
+
         ChatRead chatRead = ChatRead.builder().isRead(true).chat(savedChat).member(savedReceiver).build();
         chatReadRepository.save(chatRead);
         ChatRead chatSenderRead = ChatRead.builder().isRead(true).chat(savedChat).member(savedSender).build();
