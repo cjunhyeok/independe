@@ -7,16 +7,16 @@ import lombok.*;
 public class ChatRoomsResponse {
 
     private Long chatRoomId;
-    private Long senderId;
-    private String senderNickname;
+    private Long opponentId; // 상대방 정보
+    private String opponentNickname; // 상대방 닉네임
     private String lastMessage;
     private Long unReadCount;
 
     @Builder
-    public ChatRoomsResponse(Long chatRoomId, Long senderId, String senderNickname, String lastMessage, Long unReadCount) {
+    public ChatRoomsResponse(Long chatRoomId, Long opponentId, String opponentNickname, String lastMessage, Long unReadCount) {
         this.chatRoomId = chatRoomId;
-        this.senderId = senderId;
-        this.senderNickname = senderNickname;
+        this.opponentId = opponentId;
+        this.opponentNickname = opponentNickname;
         this.lastMessage = lastMessage;
         this.unReadCount = unReadCount;
     }

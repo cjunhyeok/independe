@@ -111,7 +111,8 @@ public class ChatApiController {
         ChatRoomsResponse chatRoomsResponse = ChatRoomsResponse.builder()
                 .lastMessage(sendMessage.getMessage())
                 .chatRoomId(sendMessage.getChatRoomId())
-                .senderNickname(loginMember.getNickname())
+                .opponentId(loginMember.getId())
+                .opponentNickname(loginMember.getNickname())
                 .unReadCount(unReadCount)
                 .build();
         simpMessagingTemplate.convertAndSendToUser(findReceiver.getUsername(), "/room", chatRoomsResponse);
