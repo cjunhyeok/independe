@@ -151,4 +151,32 @@ public class ChatRoomParticipantRepositoryTest extends IntegrationTestSupporter 
         // then
         assertThat(findChatRoomParticipants).hasSize(2);
     }
+
+    @Test
+    @DisplayName("채팅방 PK 로 채팅방 참여 정보를 조회한다.")
+    void findChatRoomParticipantsByChatRoomIdFetchMemberTest() {
+        // given
+        Member sender = Member.builder().username("sender").password("pass").nickname("sender").build();
+        Member savedSender = memberRepository.save(sender);
+        Member receiver = Member.builder().username("receiver").password("pass").nickname("receiver").build();
+        Member savedReceiver = memberRepository.save(receiver);
+
+        ChatRoom chatRoom = ChatRoom.builder().title("title").build();
+        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+
+        ChatRoomParticipant senderParticipate = ChatRoomParticipant.builder().chatRoom(savedChatRoom).member(savedSender).build();
+        ChatRoomParticipant savedSenderParticipant = chatRoomParticipantRepository.save(senderParticipate);
+        ChatRoomParticipant receiverParticipate = ChatRoomParticipant.builder().chatRoom(savedChatRoom).member(savedReceiver).build();
+        ChatRoomParticipant savedReceiverParticipant = chatRoomParticipantRepository.save(receiverParticipate);
+
+        // when
+        List<ChatRoomParticipant> findChatRoomParticipants =
+                chatRoomParticipantRepository
+                .findChatRoomParticipantsByChatRoomIdFetchMember(savedChatRoom.getId());
+
+        // then
+        assertThat(findChatRoomParticipants).hasSize(2);
+        assertThat(findChatRoomParticipants.get(0)).isEqualTo(savedSenderParticipant);
+        assertThat(findChatRoomParticipants.get(1)).isEqualTo(savedReceiverParticipant);
+    }
 }
