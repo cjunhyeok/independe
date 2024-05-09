@@ -56,10 +56,20 @@ public class ChatRoomServiceImpl implements ChatRoomService{
             // N + 1 발생
             return findChatRoom.getId();
         } else {
+            // 채팅방 저장
             ChatRoom chatRoom = ChatRoom.builder()
                     .title(SortedStringEditor.createSortedString(findSender.getId(), findReceiver.getId()))
                     .build();
             ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+
+            // 채팅방 참여 저장
+            ChatRoomParticipant senderChatRoomParticipant
+                    = ChatRoomParticipant.builder().chatRoom(savedChatRoom).member(findSender).build();
+            ChatRoomParticipant savedSenderChatRoomParticipant = chatRoomParticipantRepository.save(senderChatRoomParticipant);
+
+            ChatRoomParticipant receiverChatRoomParticipant
+                    = ChatRoomParticipant.builder().chatRoom(savedChatRoom).member(findReceiver).build();
+            ChatRoomParticipant savedReceiverChatRoomParticipant = chatRoomParticipantRepository.save(receiverChatRoomParticipant);
 
             return savedChatRoom.getId();
         }
