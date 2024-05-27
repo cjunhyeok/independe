@@ -18,12 +18,14 @@ import java.util.Map;
 public abstract class SecuritySigner {
 
     private final MemberRepository memberRepository;
+    protected final JWK jwk;
 
-    public SecuritySigner(MemberRepository memberRepository) {
+    public SecuritySigner(MemberRepository memberRepository, JWK jwk) {
         this.memberRepository = memberRepository;
+        this.jwk = jwk;
     }
 
-    protected String getJwtTokenInternal(MACSigner jwsSigner, String username, JWK jwk) throws JOSEException {
+    protected String getJwtTokenInternal(MACSigner jwsSigner, String username) throws JOSEException {
 
         Member findMember = memberRepository.findByUsername(username);
 
@@ -46,7 +48,7 @@ public abstract class SecuritySigner {
         return jwtToken;
     }
 
-    protected String getTokenOAuth2(MACSigner jwsSigner, OAuth2User oAuth2User, JWK jwk) throws JOSEException {
+    protected String getTokenOAuth2(MACSigner jwsSigner, OAuth2User oAuth2User) throws JOSEException {
 
         Map<String, Object> attributes = (Map<String, Object>) oAuth2User.getAttributes().get("response");
         Member member = ((MemberContext) oAuth2User).getMember();
@@ -69,7 +71,7 @@ public abstract class SecuritySigner {
         return jwtToken;
     }
 
-    protected String getRefreshToken(MACSigner jwsSigner, String username, JWK jwk) throws JOSEException {
+    protected String getRefreshToken(MACSigner jwsSigner, String username) throws JOSEException {
 
         Member findMember = memberRepository.findByUsername(username);
 
@@ -92,9 +94,9 @@ public abstract class SecuritySigner {
         return jwtToken;
     }
 
-    public abstract String getJwtToken(String username, JWK jwk) throws JOSEException;
+    public abstract String getJwtToken(String username) throws JOSEException;
 
-    public abstract String getOAuth2JwtToken(OAuth2User oAuth2User, JWK jwk) throws JOSEException;
+    public abstract String getOAuth2JwtToken(OAuth2User oAuth2User) throws JOSEException;
 
-    public abstract String getRefreshJwtToken(String username, JWK jwk) throws JOSEException;
+    public abstract String getRefreshJwtToken(String username) throws JOSEException;
 }

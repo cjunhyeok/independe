@@ -3,7 +3,6 @@ package community.independe.security.config;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import community.independe.repository.MemberRepository;
-import community.independe.security.signature.MacSecuritySigner;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -21,11 +20,6 @@ public class SignatureConfig {
         this.memberRepository = memberRepository;
         this.secretKey = secretKey;
         this.secretKeyBytes = secretKey.getBytes();
-    }
-
-    @Bean
-    public MacSecuritySigner macSecuritySigner() {
-        return new MacSecuritySigner(memberRepository);
     }
 
 //    @Bean
