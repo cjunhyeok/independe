@@ -1,7 +1,6 @@
 package community.independe.service;
 
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.jwk.JWK;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.exception.CustomException;
@@ -27,7 +26,6 @@ public class MemberServiceImpl implements MemberService {
     private final PasswordEncoder passwordEncoder;
     private final SecuritySigner securitySigner;
     private final RefreshTokenService refreshTokenService;
-    private final JWK jwk;
 
     @Override
     @Transactional
@@ -77,8 +75,8 @@ public class MemberServiceImpl implements MemberService {
             String role = findMember.getRole();
 
             // 해당 부분 리펙토링이 필요할듯
-            String jwtToken = securitySigner.getJwtToken(findUsername, jwk);
-            String refreshToken = securitySigner.getRefreshJwtToken(findUsername, jwk);
+            String jwtToken = securitySigner.getJwtToken(findUsername);
+            String refreshToken = securitySigner.getRefreshJwtToken(findUsername);
             refreshTokenService.save(loginServiceDto.getIp(), role, refreshToken, findUsername);
 
             return LoginResponse.builder()

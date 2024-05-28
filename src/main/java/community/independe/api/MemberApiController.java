@@ -1,7 +1,6 @@
 package community.independe.api;
 
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jwt.JWT;
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.member.*;
@@ -43,7 +42,6 @@ public class MemberApiController {
     private final CommentService commentService;
     private final RefreshTokenService refreshTokenService;
     private final SecuritySigner securitySigner;
-    private final JWK jwk;
     private final JwtParser jwtParser;
 
     @Operation(summary = "회원 등록 요청")
@@ -194,7 +192,7 @@ public class MemberApiController {
 
         String username = getUsernameFromToken(refreshToken);
         String newRefreshToken = refreshTokenService.reProvideRefreshToken(username, request.getRemoteAddr(), refreshToken);
-        String jwtToken = securitySigner.getJwtToken(username, jwk);
+        String jwtToken = securitySigner.getJwtToken(username);
         makeRefreshTokenToCookieAndJwtInHeader(response, newRefreshToken, jwtToken);
 
         return new ResponseEntity(HttpStatus.OK);
