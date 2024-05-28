@@ -13,4 +13,5 @@ public interface MemberService {
     void authenticateRegion(Long memberId ,RegionType regionType);
     boolean checkDuplicateUsername(String username);
     boolean checkDuplicateNickname(String nickname);
+    FindMemberDto findMemberById(Long memberId);
 }

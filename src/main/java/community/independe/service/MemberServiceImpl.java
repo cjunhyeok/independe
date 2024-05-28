@@ -154,4 +154,18 @@ public class MemberServiceImpl implements MemberService {
             return false;
         }
     }
+
+    @Override
+    public FindMemberDto findMemberById(Long memberId) {
+        Member findMember = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+        );
+
+        return FindMemberDto.builder()
+                .username(findMember.getUsername())
+                .nickname(findMember.getNickname())
+                .email(findMember.getEmail())
+                .number(findMember.getNumber())
+                .build();
+    }
 }
