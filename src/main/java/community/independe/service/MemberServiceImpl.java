@@ -133,11 +133,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member findByUsername(String username) {
-        return memberRepository.findByUsername(username);
-    }
-
-    @Override
     public Member findByNickname(String nickname) {
         return memberRepository.findByNickname(nickname);
     }

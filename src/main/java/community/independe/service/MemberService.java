@@ -12,6 +12,5 @@ public interface MemberService {
     void modifyMember(ModifyMemberServiceDto modifyMemberServiceDto);
     void modifyPassword(Long memberId, String password);
     void authenticateRegion(Long memberId ,RegionType regionType);
-    Member findByUsername(String username);
     Member findByNickname(String nickname);
 }
