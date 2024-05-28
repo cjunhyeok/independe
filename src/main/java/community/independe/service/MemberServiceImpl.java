@@ -133,7 +133,25 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member findByNickname(String nickname) {
-        return memberRepository.findByNickname(nickname);
+    public boolean checkDuplicateUsername(String username) {
+        Member findMember = memberRepository.findByUsername(username);
+
+        if (findMember == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    @Override
+    public boolean checkDuplicateNickname(String nickname) {
+        Member findMember = memberRepository.findByNickname(nickname);
+
+        if (findMember == null) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
