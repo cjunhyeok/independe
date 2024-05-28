@@ -4,7 +4,6 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.JWT;
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.member.*;
-import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController // json
@@ -95,10 +93,10 @@ public class MemberApiController {
     public ResponseEntity authenticateRegion(@RequestBody AuthenticationRegionRequest request,
                                  @AuthenticationPrincipal MemberContext memberContext) {
 
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext.getMemberId();
         RegionType regionType = regionProvider(request.getRegion());
 
-        memberService.authenticateRegion(loginMember.getId(), regionType);
+        memberService.authenticateRegion(loginMemberId, regionType);
 
         return ResponseEntity.ok("Success Region Authentication");
     }
@@ -125,8 +123,8 @@ public class MemberApiController {
     public ResponseEntity modifyOAuthMembers(@RequestBody OAuthMemberRequest request,
                                         @AuthenticationPrincipal MemberContext memberContext) {
 
-        Member loginMember = memberContext.getMember();
-        ModifyOAuthMemberServiceDto modifyOAuthMemberServiceDto = OAuthMemberRequest.requestToModifyOAuthMemberServiceDto(request, loginMember.getId());
+        Long loginMemberId = memberContext.getMemberId();
+        ModifyOAuthMemberServiceDto modifyOAuthMemberServiceDto = OAuthMemberRequest.requestToModifyOAuthMemberServiceDto(request, loginMemberId);
 
         memberService.modifyOAuthMember(modifyOAuthMemberServiceDto);
 
@@ -138,9 +136,9 @@ public class MemberApiController {
     public ResponseEntity modifyMembers(@RequestBody ModifyMemberRequest request,
                                         @AuthenticationPrincipal MemberContext memberContext) {
 
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext.getMemberId();
         ModifyMemberServiceDto modifyMemberServiceDto
-                = ModifyMemberRequest.requestToModifyMemberServiceDto(request, loginMember.getId());
+                = ModifyMemberRequest.requestToModifyMemberServiceDto(request, loginMemberId);
 
         memberService.modifyMember(modifyMemberServiceDto);
 
@@ -151,9 +149,9 @@ public class MemberApiController {
     @Operation(summary = "회원 비밀번호 수정 *")
     public ResponseEntity modifyMember(@RequestBody ModifyPasswordRequest request,
                                        @AuthenticationPrincipal MemberContext memberContext) {
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext.getMemberId();
 
-        memberService.modifyPassword(loginMember.getId(), request.getPassword());
+        memberService.modifyPassword(loginMemberId, request.getPassword());
 
         return ResponseEntity.ok("비밀번호 수정 완료");
     }
@@ -198,13 +196,16 @@ public class MemberApiController {
     @GetMapping("/api/member")
     @Operation(summary = "마이페이지 회원 데이터 조회 *")
     public Result<MyPageResponse> getMyPage(@AuthenticationPrincipal MemberContext memberContext) {
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext.getMemberId();
+
+        // 회원 정보 조회
+        FindMemberDto findMemberDto = memberService.findMemberById(loginMemberId);
 
         MyPageResponse myPageResponse = MyPageResponse.builder()
-                .username(loginMember.getUsername())
-                .nickname(loginMember.getNickname())
-                .email(loginMember.getEmail())
-                .number(loginMember.getNumber())
+                .username(findMemberDto.getUsername())
+                .nickname(findMemberDto.getNickname())
+                .email(findMemberDto.getEmail())
+                .number(findMemberDto.getNumber())
                 .build();
 
         return new Result(myPageResponse);
@@ -216,9 +217,9 @@ public class MemberApiController {
     public Result getMyPost(@RequestParam(name = "page", required = false, defaultValue = "0") int page,
                             @RequestParam(name = "size", required = false, defaultValue = "10") int size,
                             @AuthenticationPrincipal MemberContext memberContext) {
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext.getMemberId();
 
-        List<MyPostServiceDto> response = postService.findMyPost(loginMember.getId(), page, size);
+        List<MyPostServiceDto> response = postService.findMyPost(loginMemberId, page, size);
         Long totalCount = response.get(0).getTotalCount();
 
         return new Result(response, totalCount);
@@ -230,9 +231,9 @@ public class MemberApiController {
     public Result getMyComment(@RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                @RequestParam(name = "size", required = false, defaultValue = "10") int size,
                                @AuthenticationPrincipal MemberContext memberContext) {
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext.getMemberId();
 
-        List<MyCommentServiceDto> response = commentService.getMyComment(loginMember.getId(), page, size);
+        List<MyCommentServiceDto> response = commentService.getMyComment(loginMemberId, page, size);
         Long totalCount = response.get(0).getTotalCount();
 
         return new Result(response, totalCount);
