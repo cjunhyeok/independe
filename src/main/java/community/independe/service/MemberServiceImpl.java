@@ -14,8 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -135,13 +133,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member findById(Long id) {
-        return memberRepository.findById(id).orElseThrow(
-                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
-        );
-    }
-
-    @Override
     public Member findByUsername(String username) {
         return memberRepository.findByUsername(username);
     }
@@ -149,10 +140,5 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Member findByNickname(String nickname) {
         return memberRepository.findByNickname(nickname);
-    }
-
-    @Override
-    public List<Member> findAll() {
-        return memberRepository.findAll();
     }
 }
