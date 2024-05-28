@@ -58,26 +58,18 @@ public class MemberApiController {
     @PostMapping("/api/members/username")
     public DuplicateResponse duplicateUsername(@RequestBody DuplicateUsernameRequest request) {
 
-        Member findMember = memberService.findByUsername(request.getUsername());
+        boolean isDuplicateNot = memberService.checkDuplicateUsername(request.getUsername());
 
-        if (findMember == null) {
-            return new DuplicateResponse(true);
-        } else {
-            return new DuplicateResponse(false);
-        }
+        return new DuplicateResponse(isDuplicateNot);
     }
 
     @Operation(summary = "닉네임 중복 확인")
     @PostMapping("/api/members/nickname")
     public DuplicateResponse duplicateNickname(@RequestBody DuplicateNicknameRequest request) {
 
-        Member findMember = memberService.findByNickname(request.getNickname());
+        boolean isDuplicateNot = memberService.checkDuplicateNickname(request.getNickname());
 
-        if (findMember == null) {
-            return new DuplicateResponse(true);
-        } else {
-            return new DuplicateResponse(false);
-        }
+        return new DuplicateResponse(isDuplicateNot);
     }
 
     @Operation(summary = "로그인")
