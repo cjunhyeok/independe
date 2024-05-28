@@ -120,20 +120,6 @@ public class MemberApiController {
         }
     }
 
-    @GetMapping("/api/members")
-    @Operation(summary = "모든 회원 정보 반환")
-    public List<MembersDto> members(@AuthenticationPrincipal MemberContext memberContext) {
-
-        List<Member> members = memberService.findAll();
-
-        return members.stream().map(
-                        m -> new MembersDto(
-                                m.getId(),
-                                m.getNickname()
-                        ))
-                .collect(Collectors.toList());
-    }
-
     @PutMapping("/api/oauth/members")
     @Operation(summary = "소셜 로그인 후 추가 정보 입력 api *")
     public ResponseEntity modifyOAuthMembers(@RequestBody OAuthMemberRequest request,
