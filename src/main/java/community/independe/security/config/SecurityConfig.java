@@ -1,7 +1,5 @@
 package community.independe.security.config;
 
-import com.nimbusds.jose.jwk.OctetSequenceKey;
-import community.independe.repository.MemberRepository;
 import community.independe.security.exception.JwtAccessDeniedHandler;
 import community.independe.security.exception.JwtAuthenticationEntryPoint;
 import community.independe.security.filter.CorsFilter;
@@ -10,8 +8,6 @@ import community.independe.security.handler.OAuth2AuthenticationFailureHandler;
 import community.independe.security.handler.OAuth2AuthenticationSuccessHandler;
 import community.independe.security.repository.HttpCookieOAuth2AuthorizationRequestRepository;
 import community.independe.security.service.oauth2.CustomOAuth2UserService;
-import community.independe.security.signature.MacSecuritySigner;
-import community.independe.service.RefreshTokenService;
 import community.independe.util.JwtTokenVerifier;
 import community.independe.util.UrlList;
 import lombok.RequiredArgsConstructor;
@@ -35,13 +31,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
-    private final MacSecuritySigner macSecuritySigner;
-    private final OctetSequenceKey octetSequenceKey;
-    private final MemberRepository memberRepository;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final JwtTokenVerifier jwtTokenVerifier;
-    private final RefreshTokenService refreshTokenService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -78,7 +71,7 @@ public class SecurityConfig {
                                         .authorizationEndpoint()
                                             .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
                                                 .and()
-                                                    .successHandler(oAuth2AuthenticationSuccessHandler());
+                                                    .successHandler(oAuth2AuthenticationSuccessHandler);
 
         http.addFilterBefore(jwtAuthorizationMacFilter(), UsernamePasswordAuthenticationFilter.class);
 
@@ -136,12 +129,6 @@ public class SecurityConfig {
     @Bean
     public CorsFilter corsFilter() {
         return new CorsFilter();
-    }
-
-    @Bean
-    public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
-//        return new OAuth2AuthenticationSuccessHandler(macSecuritySigner, octetSequenceKey);
-        return new OAuth2AuthenticationSuccessHandler(macSecuritySigner, octetSequenceKey, httpCookieOAuth2AuthorizationRequestRepository);
     }
 
     @Bean

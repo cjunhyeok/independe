@@ -1,19 +1,19 @@
 package community.independe.security.handler;
 
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.jwk.JWK;
 import community.independe.security.repository.HttpCookieOAuth2AuthorizationRequestRepository;
 import community.independe.security.signature.SecuritySigner;
 import community.independe.util.CookieUtils;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
@@ -22,23 +22,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Component
+@RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final SecuritySigner securitySigner;
-    private final JWK jwk;
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
-//    private List<String> authorizedRedirectUris = new ArrayList<>();
-
-    public OAuth2AuthenticationSuccessHandler(SecuritySigner securitySigner, JWK jwk, HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
-//        super(new AntPathRequestMatcher("/api/login"));
-        this.securitySigner = securitySigner;
-        this.jwk = jwk;
-        this.httpCookieOAuth2AuthorizationRequestRepository = httpCookieOAuth2AuthorizationRequestRepository;
-//        this.authorizedRedirectUris.add("http://vue:8081/");
-    }
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
 
         String targetUrl = determineTargetUrl(request, response, authentication);
 
@@ -85,7 +77,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 //            targetUrl = "https://www.independe.co.kr";
             String token;
             try {
-                token = securitySigner.getOAuth2JwtToken(oAuth2User, jwk);
+                token = securitySigner.getOAuth2JwtToken(oAuth2User);
 
 //            response.addHeader("Authorization", "Bearer " + token);
 //            log.info(token);
@@ -100,7 +92,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             targetUrl = redirectUri.orElse(getDefaultTargetUrl());
             String token;
             try {
-                token = securitySigner.getOAuth2JwtToken(oAuth2User, jwk);
+                token = securitySigner.getOAuth2JwtToken(oAuth2User);
 
 //            response.addHeader("Authorization", "Bearer " + token);
 //            log.info(token);
