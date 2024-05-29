@@ -118,11 +118,10 @@ public class PostApiController {
                                                       @Parameter(description = "이미지") @RequestParam(required = false) List<MultipartFile> files,
                                                       @AuthenticationPrincipal MemberContext memberContext) throws IOException {
 
-        Member loginMember = memberContext.getMember();
-        Long memberId = loginMember.getId();
+        Long loginMemberId = memberContext.getMemberId();
 
         Long independentPost = postService.createIndependentPost(
-                memberId,
+                loginMemberId,
                 title,
                 content,
                 independentPostType);
@@ -184,11 +183,10 @@ public class PostApiController {
                                                  @Parameter(description = "이미지") @RequestParam(required = false) List<MultipartFile> files,
                                                  @AuthenticationPrincipal MemberContext memberContext) throws IOException {
 
-        Member loginMember = memberContext.getMember();
-        Long memberId = loginMember.getId();
+        Long loginMemberId = memberContext.getMemberId();
 
         Long regionPost = postService.createRegionPost(
-                memberId,
+                loginMemberId,
                 title,
                 content,
                 regionType,
