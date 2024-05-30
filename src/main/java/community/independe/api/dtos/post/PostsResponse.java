@@ -19,4 +19,5 @@ public class PostsResponse {
     private Long recommendCount; // 추천수
     private Long commentCount; // 댓글수
     private boolean isPicture;
+    private Long totalCount;
 }

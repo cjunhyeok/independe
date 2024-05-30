@@ -1,5 +1,6 @@
 package community.independe.service;
 
+import community.independe.api.dtos.post.PostsResponse;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
@@ -11,15 +12,19 @@ import community.independe.exception.ErrorCode;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.file.FilesRepository;
+import community.independe.repository.manytomany.RecommendPostRepository;
 import community.independe.repository.post.PostRepository;
 import community.independe.repository.util.PageRequestCreator;
 import community.independe.service.dtos.MyPostServiceDto;
 import community.independe.service.dtos.MyRecommendPostServiceDto;
+import community.independe.service.dtos.post.FindIndependentPostsDto;
+import community.independe.service.dtos.post.FindRegionPostsDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +42,8 @@ public class PostServiceImpl implements PostService{
     private final CommentRepository commentRepository;
     private final FilesRepository filesRepository;
     private final FilesService filesService;
+    private final RecommendPostRepository recommendPostRepository;
+    private static final String SORT = "createdDate";
 
     @Override
     public Post findById(Long postId) {
@@ -116,13 +123,72 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public Page<Post> findAllIndependentPostsByTypeWithMember(IndependentPostType independentPostType, String condition, String keyword, Pageable pageable) {
-        return postRepository.findAllIndependentPostsByTypeWithMemberDynamic(independentPostType, condition, keyword, pageable);
+    public List<PostsResponse> findIndependentPosts(FindIndependentPostsDto findIndependentPostsDto) {
+
+        PageRequest pageRequest = PageRequest.of(
+                findIndependentPostsDto.getPage(),
+                findIndependentPostsDto.getSize(),
+                Sort.by(SORT));
+
+        Page<Post> findPostsPage = postRepository.findAllIndependentPostsByTypeWithMemberDynamic(
+                        findIndependentPostsDto.getIndependentPostType(),
+                        findIndependentPostsDto.getCondition(),
+                        findIndependentPostsDto.getKeyword(),
+                        pageRequest);
+
+        List<Post> findPosts = findPostsPage.getContent();
+        long totalCount = findPostsPage.getTotalElements();
+
+        List<PostsResponse> postsCollect = findPosts.stream()
+                .map(p -> new PostsResponse(
+                        p.getId(),
+                        p.getMember().getNickname(),
+                        p.getTitle(),
+                        p.getCreatedDate(),
+                        p.getViews(),
+                        recommendPostRepository.countAllByPostIdAndIsRecommend(p.getId()),
+                        commentRepository.countAllByPostId(p.getId()),
+                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty(),
+                        totalCount
+                ))
+                .collect(Collectors.toList());
+
+        return postsCollect;
     }
 
     @Override
-    public Page<Post> findAllRegionPostsByTypesWithMember(RegionType regionType, RegionPostType regionPostType, String condition, String keyword, Pageable pageable) {
-        return postRepository.findAllRegionPostsByTypesWithMemberDynamic(regionType, regionPostType, condition, keyword, pageable);
+    public List<PostsResponse> findRegionPosts(FindRegionPostsDto findRegionPostsDto) {
+
+        PageRequest pageRequest = PageRequest.of(
+                findRegionPostsDto.getPage(),
+                findRegionPostsDto.getSize(),
+                Sort.by(SORT));
+
+        Page<Post> findPostsPage = postRepository.findAllRegionPostsByTypesWithMemberDynamic(
+                findRegionPostsDto.getRegionType(),
+                findRegionPostsDto.getRegionPostType(),
+                findRegionPostsDto.getCondition(),
+                findRegionPostsDto.getKeyword(),
+                pageRequest);
+
+        List<Post> findPosts = findPostsPage.getContent();
+        long totalCount = findPostsPage.getTotalElements();
+
+        List<PostsResponse> postsCollect = findPosts.stream()
+                .map(p -> new PostsResponse(
+                        p.getId(),
+                        p.getMember().getNickname(),
+                        p.getTitle(),
+                        p.getCreatedDate(),
+                        p.getViews(),
+                        recommendPostRepository.countAllByPostIdAndIsRecommend(p.getId()),
+                        commentRepository.countAllByPostId(p.getId()),
+                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty(),
+                        totalCount
+                ))
+                .collect(Collectors.toList());
+
+        return postsCollect;
     }
 
     @Override

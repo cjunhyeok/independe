@@ -13,6 +13,8 @@ import community.independe.domain.video.Video;
 import community.independe.repository.query.MainPostApiRepository;
 import community.independe.security.service.MemberContext;
 import community.independe.service.*;
+import community.independe.service.dtos.post.FindIndependentPostRequest;
+import community.independe.service.dtos.post.FindRegionPostRequest;
 import community.independe.service.manytomany.FavoritePostService;
 import community.independe.service.manytomany.RecommendCommentService;
 import community.independe.service.manytomany.RecommendPostService;
@@ -56,41 +58,27 @@ public class PostApiController {
     // 자취 게시글 카테고리로 불러오기
     @Operation(summary = "자취 게시글 타입별 조회")
     @GetMapping("/api/posts/independent/{independentPostType}")
-    public Result independentPosts(@PathVariable(name = "independentPostType") IndependentPostType independentPostType,
-                                   @RequestParam(name = "condition", defaultValue = "no") String condition,
-                                   @RequestParam(name = "keyword", required = false) String keyword,
-                                   @PageableDefault(
-                                           size = 10,
-                                           sort = "createdDate",
-                                           direction = Sort.Direction.DESC) Pageable pageable) {
+    public Result independentPosts(
+            @RequestBody FindIndependentPostRequest request) {
 
+        String keyword = request.getKeyword();
+        String condition = request.getCondition();
         if (keyword != null && !keyword.isEmpty()) {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
 
         // 게시글 불러오기
-//        Page<Post> allIndependentPosts =
-//                postService.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
-        Page<Post> allIndependentPosts =
-                postService.findAllIndependentPostsByTypeWithMember(independentPostType, condition, keyword, pageable);
-        List<Post> independentPosts = allIndependentPosts.getContent();
-        long totalCount = allIndependentPosts.getTotalElements();
+        List<PostsResponse> findPostsResponse
+                = postService.findIndependentPosts(FindIndependentPostRequest.requestToFindDto(request));
 
-        List<PostsResponse> postsCollect = independentPosts.stream()
-                .map(p -> new PostsResponse(
-                        p.getId(),
-                        p.getMember().getNickname(),
-                        p.getTitle(),
-                        p.getCreatedDate(),
-                        p.getViews(),
-                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
-                        commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
-                ))
-                .collect(Collectors.toList());
+        // 총 게시글 수
+        Long totalCount = 0L;
+        if (!findPostsResponse.isEmpty()) {
+            totalCount = findPostsResponse.get(0).getTotalCount();
+        }
 
         // 영상 불러오기
-        List<Video> findAllByIndependentPostType = videoService.findAllByIndependentPostType(independentPostType);
+        List<Video> findAllByIndependentPostType = videoService.findAllByIndependentPostType(request.getIndependentPostType());
         List<IndependentPostVideoDto> videoCollect = findAllByIndependentPostType.stream()
                 .map(v -> new IndependentPostVideoDto(
                         v.getVideoTitle(),
@@ -99,7 +87,7 @@ public class PostApiController {
                 .collect(Collectors.toList());
 
         PostsResponseDto postsResponseDto = new PostsResponseDto(
-                postsCollect,
+                findPostsResponse,
                 videoCollect
         );
 
@@ -133,39 +121,25 @@ public class PostApiController {
     // 지역 게시글 카테고리 별로 가져오기
     @Operation(summary = "지역 게시글 타입별 조회")
     @GetMapping("/api/posts/region/{regionType}/{regionPostType}")
-    public Result regionPosts(@PathVariable(name = "regionType") RegionType regionType,
-                              @PathVariable(name = "regionPostType") RegionPostType regionPostType,
-                              @RequestParam(name = "condition", defaultValue = "no") String condition,
-                              @RequestParam(name = "keyword", required = false) String keyword,
-                              @PageableDefault(size = 10,
-                                      sort = "createdDate",
-                                      direction = Sort.Direction.DESC)Pageable pageable) {
+    public Result regionPosts(@RequestBody FindRegionPostRequest request) {
 
         // 검색어 저장
+        String keyword = request.getKeyword();
+        String condition = request.getCondition();
         if (keyword != null && !keyword.isEmpty()) {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
 
         // 게시글 가져오기
-//        Page<Post> allRegionPosts = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
-        Page<Post> allRegionPosts = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, condition, keyword, pageable);
-        List<Post> regionPosts = allRegionPosts.getContent();
-        long totalCount = allRegionPosts.getTotalElements();
+        List<PostsResponse> findPostsResponse = postService.findRegionPosts(FindRegionPostRequest.requestToFindDto(request));
 
-        List<PostsResponse> collect = regionPosts.stream()
-                .map(p -> new PostsResponse(
-                        p.getId(),
-                        p.getMember().getNickname(),
-                        p.getTitle(),
-                        p.getCreatedDate(),
-                        p.getViews(),
-                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
-                        commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
-                ))
-                .collect(Collectors.toList());
+        // 총 게시글 수
+        Long totalCount = 0L;
+        if (!findPostsResponse.isEmpty()) {
+            totalCount = findPostsResponse.get(0).getTotalCount();
+        }
 
-        return new Result(collect, totalCount);
+        return new Result(findPostsResponse, totalCount);
     }
 
     // 지역 게시글 생성
@@ -230,13 +204,7 @@ public class PostApiController {
     public Result post(@Parameter(description = "게시글 ID(PK)")@PathVariable(name = "postId") Long postId,
                        @AuthenticationPrincipal MemberContext memberContext) {
 
-        Long loginMemberId;
-
-        if (memberContext == null) {
-            loginMemberId = null;
-        } else {
-            loginMemberId = memberContext.getMemberId();
-        }
+        Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
 
         postService.increaseViews(postId); // 조회수 증가
 

@@ -1,11 +1,14 @@
 package community.independe.service;
 
+import community.independe.api.dtos.post.PostsResponse;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.service.dtos.MyPostServiceDto;
 import community.independe.service.dtos.MyRecommendPostServiceDto;
+import community.independe.service.dtos.post.FindIndependentPostsDto;
+import community.independe.service.dtos.post.FindRegionPostsDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -29,16 +32,9 @@ public interface PostService {
     // 게시글 삭제
     void deletePost(Long postId);
 
-    Page<Post> findAllIndependentPostsByTypeWithMember(IndependentPostType independentPostType,
-                                                       String condition,
-                                                       String keyword,
-                                                       Pageable pageable);
+    List<PostsResponse> findIndependentPosts(FindIndependentPostsDto findIndependentPostsDto);
 
-    Page<Post> findAllRegionPostsByTypesWithMember(RegionType regionType,
-                                                   RegionPostType regionPostType,
-                                                   String condition,
-                                                   String keyword,
-                                                   Pageable pageable);
+    List<PostsResponse> findRegionPosts(FindRegionPostsDto findRegionPostsDto);
 
     Page<Post> findAllPostsBySearchWithMember(String condition, String keyword, Pageable pageable);
 
