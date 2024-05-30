@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -126,10 +125,7 @@ public class PostServiceImpl implements PostService{
     @Override
     public List<PostsResponse> findIndependentPosts(FindIndependentPostsDto findIndependentPostsDto) {
 
-        PageRequest pageRequest = PageRequest.of(
-                findIndependentPostsDto.getPage(),
-                findIndependentPostsDto.getSize(),
-                Sort.by(SORT));
+        PageRequest pageRequest = PageRequestCreator.createPageRequestSortCreatedDateDesc(findIndependentPostsDto.getPage(), findIndependentPostsDto.getSize());
 
         Page<Post> findPostsPage = postRepository.findAllIndependentPostsByTypeWithMemberDynamic(
                         findIndependentPostsDto.getIndependentPostType(),
@@ -159,10 +155,7 @@ public class PostServiceImpl implements PostService{
     @Override
     public List<PostsResponse> findRegionPosts(FindRegionPostsDto findRegionPostsDto) {
 
-        PageRequest pageRequest = PageRequest.of(
-                findRegionPostsDto.getPage(),
-                findRegionPostsDto.getSize(),
-                Sort.by(SORT));
+        PageRequest pageRequest = PageRequestCreator.createPageRequestSortCreatedDateDesc(findRegionPostsDto.getPage(), findRegionPostsDto.getSize());
 
         Page<Post> findPostsPage = postRepository.findAllRegionPostsByTypesWithMemberDynamic(
                 findRegionPostsDto.getRegionType(),
@@ -193,10 +186,7 @@ public class PostServiceImpl implements PostService{
     @Override
     public List<SearchResponse> findAllPosts(FindAllPostsDto findAllPostsDto) {
 
-        PageRequest pageRequest = PageRequest.of(
-                findAllPostsDto.getPage(),
-                findAllPostsDto.getSize(),
-                Sort.by(SORT));
+        PageRequest pageRequest = PageRequestCreator.createPageRequestSortCreatedDateDesc(findAllPostsDto.getPage(), findAllPostsDto.getSize());
 
         Page<Post> findPostsPage = postRepository.findAllPostsBySearchWithMemberDynamic(
                         findAllPostsDto.getCondition(),
