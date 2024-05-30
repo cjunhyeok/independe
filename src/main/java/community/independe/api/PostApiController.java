@@ -5,7 +5,6 @@ import community.independe.api.dtos.post.*;
 import community.independe.api.dtos.post.main.*;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.keyword.KeywordDto;
-import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
@@ -65,9 +64,7 @@ public class PostApiController {
                                            sort = "createdDate",
                                            direction = Sort.Direction.DESC) Pageable pageable) {
 
-        if (keyword == null || keyword.isEmpty()) {
-
-        } else {
+        if (keyword != null && !keyword.isEmpty()) {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
 
@@ -145,9 +142,7 @@ public class PostApiController {
                                       direction = Sort.Direction.DESC)Pageable pageable) {
 
         // 검색어 저장
-        if (keyword == null || keyword.isEmpty()) {
-
-        } else {
+        if (keyword != null && !keyword.isEmpty()) {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
 
@@ -235,12 +230,12 @@ public class PostApiController {
     public Result post(@Parameter(description = "게시글 ID(PK)")@PathVariable(name = "postId") Long postId,
                        @AuthenticationPrincipal MemberContext memberContext) {
 
-        Member member = null;
+        Long loginMemberId;
 
         if (memberContext == null) {
-            member = null;
+            loginMemberId = null;
         } else {
-            member = memberContext.getMember();
+            loginMemberId = memberContext.getMemberId();
         }
 
         postService.increaseViews(postId); // 조회수 증가
@@ -278,7 +273,7 @@ public class PostApiController {
                         recommendCommentService.countAllByCommentIdAndIsRecommend(c.getId()),
                         (c.getParent() == null) ? null : c.getParent().getId(),
                         c.getMember().getId(),
-                        isRecommendComment(c.getId(), findPost.getId(), (memberContext == null) ? null : memberContext.getMember())
+                        isRecommendComment(c.getId(), findPost.getId(), (memberContext == null) ? null : loginMemberId)
                 )).collect(Collectors.toList());
 
         // 게시글 Dto 생성
@@ -288,9 +283,9 @@ public class PostApiController {
                 commentsDto,
                 commentService.countAllByPostId(postId),
                 recommendCount,
-                isRecommend(findPost.getId(), member),
-                isFavorite(findPost.getId(), member),
-                isReport(findPost.getId(), member)
+                isRecommend(findPost.getId(), loginMemberId),
+                isFavorite(findPost.getId(), loginMemberId),
+                isReport(findPost.getId(), loginMemberId)
         );
 
         return new Result(postResponse);
@@ -304,9 +299,7 @@ public class PostApiController {
                                      sort = "createdDate",
                                      direction = Sort.Direction.DESC)Pageable pageable) {
 
-        if (keyword == null || keyword.isEmpty()) {
-
-        } else {
+        if (keyword != null && !keyword.isEmpty()) {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
 
@@ -425,11 +418,11 @@ public class PostApiController {
         return new Result(mainPostDto);
     }
 
-    private boolean isRecommendComment(Long commentId, Long postId, Member member) {
-        if (member == null) {
+    private boolean isRecommendComment(Long commentId, Long postId, Long memberId) {
+        if (memberId == null) {
             return false;
         } else {
-            if (recommendCommentService.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, member.getId()) == null) {
+            if (recommendCommentService.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, memberId) == null) {
                 return false;
             } else {
                 return true;
@@ -437,11 +430,11 @@ public class PostApiController {
         }
     }
 
-    private boolean isRecommend(Long postId, Member member) {
-        if(member == null) {
+    private boolean isRecommend(Long postId, Long memberId) {
+        if(memberId == null) {
             return false;
         } else {
-            if(recommendPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
+            if(recommendPostService.findByPostIdAndMemberIdAndIsRecommend(postId, memberId) == null) {
                 return false;
             } else {
                 return true;
@@ -449,11 +442,11 @@ public class PostApiController {
         }
     }
 
-    private boolean isFavorite(Long postId, Member member) {
-        if(member == null) {
+    private boolean isFavorite(Long postId, Long memberId) {
+        if(memberId == null) {
             return false;
         } else {
-            if(favoritePostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
+            if(favoritePostService.findByPostIdAndMemberIdAndIsRecommend(postId, memberId) == null) {
                 return false;
             } else {
                 return true;
@@ -461,11 +454,11 @@ public class PostApiController {
         }
     }
 
-    private boolean isReport(Long postId, Member member) {
-        if(member == null) {
+    private boolean isReport(Long postId, Long memberId) {
+        if(memberId == null) {
             return false;
         } else {
-            if(reportPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
+            if(reportPostService.findByPostIdAndMemberIdAndIsRecommend(postId, memberId) == null) {
                 return false;
             } else {
                 return true;
