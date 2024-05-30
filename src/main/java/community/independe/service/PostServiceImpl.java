@@ -140,17 +140,18 @@ public class PostServiceImpl implements PostService{
         long totalCount = findPostsPage.getTotalElements();
 
         List<PostsResponse> postsCollect = findPosts.stream()
-                .map(p -> new PostsResponse(
-                        p.getId(),
-                        p.getMember().getNickname(),
-                        p.getTitle(),
-                        p.getCreatedDate(),
-                        p.getViews(),
-                        recommendPostRepository.countAllByPostIdAndIsRecommend(p.getId()),
-                        commentRepository.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty(),
-                        totalCount
-                ))
+                .map(p -> PostsResponse
+                        .builder()
+                        .postId(p.getId())
+                        .nickName(p.getMember().getNickname())
+                        .title(p.getTitle())
+                        .createdDate(p.getCreatedDate())
+                        .views(p.getViews())
+                        .recommendCount(recommendPostRepository.countAllByPostIdAndIsRecommend(p.getId()))
+                        .commentCount(commentRepository.countAllByPostId(p.getId()))
+                        .isPicture(!filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty())
+                        .totalCount(totalCount)
+                        .build())
                 .collect(Collectors.toList());
 
         return postsCollect;
@@ -175,17 +176,18 @@ public class PostServiceImpl implements PostService{
         long totalCount = findPostsPage.getTotalElements();
 
         List<PostsResponse> postsCollect = findPosts.stream()
-                .map(p -> new PostsResponse(
-                        p.getId(),
-                        p.getMember().getNickname(),
-                        p.getTitle(),
-                        p.getCreatedDate(),
-                        p.getViews(),
-                        recommendPostRepository.countAllByPostIdAndIsRecommend(p.getId()),
-                        commentRepository.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty(),
-                        totalCount
-                ))
+                .map(p -> PostsResponse
+                        .builder()
+                        .postId(p.getId())
+                        .nickName(p.getMember().getNickname())
+                        .title(p.getTitle())
+                        .createdDate(p.getCreatedDate())
+                        .views(p.getViews())
+                        .recommendCount(recommendPostRepository.countAllByPostIdAndIsRecommend(p.getId()))
+                        .commentCount(commentRepository.countAllByPostId(p.getId()))
+                        .isPicture(!filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty())
+                        .totalCount(totalCount)
+                        .build())
                 .collect(Collectors.toList());
 
         return postsCollect;

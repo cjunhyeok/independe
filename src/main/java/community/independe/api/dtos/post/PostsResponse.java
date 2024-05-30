@@ -1,13 +1,10 @@
 package community.independe.api.dtos.post;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
-@AllArgsConstructor
+@Getter
 @NoArgsConstructor
 public class PostsResponse {
 
@@ -20,4 +17,17 @@ public class PostsResponse {
     private Long commentCount; // 댓글수
     private boolean isPicture;
     private Long totalCount;
+
+    @Builder
+    public PostsResponse(Long postId, String nickName, String title, LocalDateTime createdDate, Integer views, Long recommendCount, Long commentCount, boolean isPicture, Long totalCount) {
+        this.postId = postId;
+        this.nickName = nickName;
+        this.title = title;
+        this.createdDate = createdDate;
+        this.views = views;
+        this.recommendCount = recommendCount;
+        this.commentCount = commentCount;
+        this.isPicture = isPicture;
+        this.totalCount = totalCount;
+    }
 }
