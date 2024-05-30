@@ -1,6 +1,7 @@
 package community.independe.service;
 
 import community.independe.api.dtos.post.PostsResponse;
+import community.independe.api.dtos.post.SearchResponse;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
@@ -17,13 +18,13 @@ import community.independe.repository.post.PostRepository;
 import community.independe.repository.util.PageRequestCreator;
 import community.independe.service.dtos.MyPostServiceDto;
 import community.independe.service.dtos.MyRecommendPostServiceDto;
+import community.independe.service.dtos.post.FindAllPostsDto;
 import community.independe.service.dtos.post.FindIndependentPostsDto;
 import community.independe.service.dtos.post.FindRegionPostsDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -139,7 +140,7 @@ public class PostServiceImpl implements PostService{
         List<Post> findPosts = findPostsPage.getContent();
         long totalCount = findPostsPage.getTotalElements();
 
-        List<PostsResponse> postsCollect = findPosts.stream()
+        return findPosts.stream()
                 .map(p -> PostsResponse
                         .builder()
                         .postId(p.getId())
@@ -153,8 +154,6 @@ public class PostServiceImpl implements PostService{
                         .totalCount(totalCount)
                         .build())
                 .collect(Collectors.toList());
-
-        return postsCollect;
     }
 
     @Override
@@ -175,7 +174,7 @@ public class PostServiceImpl implements PostService{
         List<Post> findPosts = findPostsPage.getContent();
         long totalCount = findPostsPage.getTotalElements();
 
-        List<PostsResponse> postsCollect = findPosts.stream()
+        return findPosts.stream()
                 .map(p -> PostsResponse
                         .builder()
                         .postId(p.getId())
@@ -189,13 +188,43 @@ public class PostServiceImpl implements PostService{
                         .totalCount(totalCount)
                         .build())
                 .collect(Collectors.toList());
-
-        return postsCollect;
     }
 
     @Override
-    public Page<Post> findAllPostsBySearchWithMember(String condition, String keyword, Pageable pageable) {
-        return postRepository.findAllPostsBySearchWithMemberDynamic(condition, keyword, pageable);
+    public List<SearchResponse> findAllPosts(FindAllPostsDto findAllPostsDto) {
+
+        PageRequest pageRequest = PageRequest.of(
+                findAllPostsDto.getPage(),
+                findAllPostsDto.getSize(),
+                Sort.by(SORT));
+
+        Page<Post> findPostsPage = postRepository.findAllPostsBySearchWithMemberDynamic(
+                        findAllPostsDto.getCondition(),
+                        findAllPostsDto.getKeyword(),
+                        pageRequest);
+
+        List<Post> findPosts = findPostsPage.getContent();
+        long totalCount = findPostsPage.getTotalElements();
+
+        return findPosts.stream()
+                .map(p -> SearchResponse
+                        .builder()
+                        .postId(p.getId())
+                        .title(p.getTitle())
+                        .nickname(p.getMember().getNickname())
+                        .independentPostType((p.getIndependentPostType() == null) ? null : p.getIndependentPostType().getDescription())
+                        .regionType((p.getIndependentPostType() == null) ? null : p.getIndependentPostType().getDescription())
+                        .regionPostType((p.getRegionPostType() == null) ? null : p.getRegionPostType().getDescription())
+                        .independentPostTypeEn(p.getIndependentPostType())
+                        .regionTypeEn(p.getRegionType())
+                        .regionPostTypeEn(p.getRegionPostType())
+                        .views(p.getViews())
+                        .recommendCount(recommendPostRepository.countAllByPostIdAndIsRecommend(p.getId()))
+                        .commentCount(commentRepository.countAllByPostId(p.getId()))
+                        .isPicture(!filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty())
+                        .totalCount(totalCount)
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override

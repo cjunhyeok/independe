@@ -13,6 +13,7 @@ import community.independe.domain.video.Video;
 import community.independe.repository.query.MainPostApiRepository;
 import community.independe.security.service.MemberContext;
 import community.independe.service.*;
+import community.independe.service.dtos.post.FindAllPostsRequest;
 import community.independe.service.dtos.post.FindIndependentPostRequest;
 import community.independe.service.dtos.post.FindRegionPostRequest;
 import community.independe.service.manytomany.FavoritePostService;
@@ -24,10 +25,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -193,6 +190,8 @@ public class PostApiController {
     public ResponseEntity deletePost(@PathVariable(name = "postId") Long postId,
                                      @AuthenticationPrincipal MemberContext memberContext) {
 
+        // todo 요청하는 회원 정보와 일치하는지 확인
+
         postService.deletePost(postId);
 
         return ResponseEntity.ok("ok");
@@ -261,40 +260,24 @@ public class PostApiController {
 
     @Operation(summary = "통합검색")
     @GetMapping("/api/posts/search")
-    public Result searchPost(@RequestParam(name = "condition", defaultValue = "total") String condition,
-                             @RequestParam(name = "keyword", required = false) String keyword,
-                             @PageableDefault(size = 10,
-                                     sort = "createdDate",
-                                     direction = Sort.Direction.DESC)Pageable pageable) {
+    public Result searchPost(@RequestBody FindAllPostsRequest request) {
 
+        // 검색어 저장
+        String keyword = request.getKeyword();
+        String condition = request.getCondition();
         if (keyword != null && !keyword.isEmpty()) {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
 
-        Page<Post> findAllPostsBySearchWithMember = postService.findAllPostsBySearchWithMember(condition, keyword, pageable);
+        List<SearchResponse> findSearchResponses = postService.findAllPosts(FindAllPostsRequest.requestToFindDto(request));
 
-        List<Post> posts = findAllPostsBySearchWithMember.getContent();
-        long totalCount = findAllPostsBySearchWithMember.getTotalElements();
+        // 총 게시글 수
+        Long totalCount = 0L;
+        if (!findSearchResponses.isEmpty()) {
+            totalCount = findSearchResponses.get(0).getTotalCount();
+        }
 
-        List<SearchResponse> collect = posts.stream()
-                .map(p -> new SearchResponse(
-                        p.getId(),
-                        p.getTitle(),
-                        p.getMember().getNickname(),
-                        (p.getIndependentPostType() == null) ? null : p.getIndependentPostType().getDescription(),
-                        (p.getRegionType() == null) ? null : p.getRegionType().getDescription(),
-                        (p.getRegionPostType() == null) ? null : p.getRegionPostType().getDescription(),
-                        p.getIndependentPostType(),
-                        p.getRegionType(),
-                        p.getRegionPostType(),
-                        p.getViews(),
-                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
-                        commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
-                ))
-                .collect(Collectors.toList());
-
-        return new Result(collect, totalCount);
+        return new Result(findSearchResponses, totalCount);
     }
 
     @Operation(summary = "메인화면 조회")

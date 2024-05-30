@@ -1,16 +1,16 @@
 package community.independe.service;
 
 import community.independe.api.dtos.post.PostsResponse;
+import community.independe.api.dtos.post.SearchResponse;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.service.dtos.MyPostServiceDto;
 import community.independe.service.dtos.MyRecommendPostServiceDto;
+import community.independe.service.dtos.post.FindAllPostsDto;
 import community.independe.service.dtos.post.FindIndependentPostsDto;
 import community.independe.service.dtos.post.FindRegionPostsDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public interface PostService {
 
     List<PostsResponse> findRegionPosts(FindRegionPostsDto findRegionPostsDto);
 
-    Page<Post> findAllPostsBySearchWithMember(String condition, String keyword, Pageable pageable);
+    List<SearchResponse> findAllPosts(FindAllPostsDto findAllPostsDto);
 
     void increaseViews(Long postId);
 
