@@ -3,7 +3,6 @@ package community.independe.api;
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.alarm.AlarmsResponse;
 import community.independe.domain.alarm.Alarm;
-import community.independe.domain.member.Member;
 import community.independe.repository.MemberRepository;
 import community.independe.security.service.MemberContext;
 import community.independe.service.AlarmService;
@@ -29,9 +28,9 @@ public class AlarmApiController {
     @Operation(summary = "내 알람 조회 *")
     public Result alarmList(@AuthenticationPrincipal MemberContext memberContext) {
 
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
 
-        List<Alarm> alarms = alarmService.findAllByMemberId(loginMember.getId());
+        List<Alarm> alarms = alarmService.findAllByMemberId(loginMemberId);
 
         List<AlarmsResponse> collect = alarms.stream()
                 .map(a -> AlarmsResponse.builder()

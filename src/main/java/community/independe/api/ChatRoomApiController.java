@@ -2,7 +2,6 @@ package community.independe.api;
 
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.chat.*;
-import community.independe.domain.member.Member;
 import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.security.service.MemberContext;
@@ -30,8 +29,7 @@ public class ChatRoomApiController {
     @Operation(summary = "채팅방 생성 * (발신자와 송신자를 맵핑한 채팅방이 존재하면 저장된 채팅방 정보를 반환)")
     public Result chatRoom(@RequestBody ChatRoomRequest chatRoomRequest,
                            @AuthenticationPrincipal MemberContext memberContext) {
-        Member loginMember = memberContext.getMember();
-        Long senderId = loginMember.getId();
+        Long senderId = memberContext == null ? null : memberContext.getMemberId();
         Long receiverId = chatRoomRequest.getReceiverId();
 
         if (senderId.equals(receiverId)) {
@@ -50,9 +48,9 @@ public class ChatRoomApiController {
     @GetMapping("/api/chat/rooms")
     @Operation(summary = "채팅방 목록 조회 *")
     public Result chatRooms(@AuthenticationPrincipal MemberContext memberContext) {
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
 
-        List<ChatRoomsResponse> chatRoomsResponses = chatRoomService.findChatRooms(loginMember.getId());
+        List<ChatRoomsResponse> chatRoomsResponses = chatRoomService.findChatRooms(loginMemberId);
 
         return new Result<>(chatRoomsResponses);
     }
@@ -62,9 +60,9 @@ public class ChatRoomApiController {
     public Result chatHistory(@RequestParam("chatRoomId") Long chatRoomId,
                               @AuthenticationPrincipal MemberContext memberContext) {
 
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
 
-        List<ChatHistoryResponse> chatHistory = chatService.findChatHistory(chatRoomId, loginMember.getId());
+        List<ChatHistoryResponse> chatHistory = chatService.findChatHistory(chatRoomId, loginMemberId);
 
         return new Result(chatHistory);
     }

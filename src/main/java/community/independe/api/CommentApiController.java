@@ -4,7 +4,6 @@ import community.independe.api.dtos.comment.CreateChildCommentRequest;
 import community.independe.api.dtos.comment.CreateParentCommentRequest;
 import community.independe.domain.alarm.AlarmType;
 import community.independe.domain.comment.Comment;
-import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.security.service.MemberContext;
 import community.independe.service.AlarmService;
@@ -38,10 +37,10 @@ public class CommentApiController {
     public ResponseEntity<Long> createParentComment(@RequestBody @Valid CreateParentCommentRequest request,
                                                     @AuthenticationPrincipal MemberContext memberContext) {
 
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext.getMemberId();
 
         Long parentComment = commentService.createParentComment(
-                loginMember.getId(),
+                loginMemberId,
                 request.getPostId(),
                 request.getContent());
 
@@ -58,10 +57,10 @@ public class CommentApiController {
     public ResponseEntity<Long> createChildComment(@RequestBody @Valid CreateChildCommentRequest request,
                                                    @AuthenticationPrincipal MemberContext memberContext) {
 
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext.getMemberId();
 
         Long childComment = commentService.createChildComment(
-                loginMember.getId(),
+                loginMemberId,
                 request.getPostId(),
                 request.getParentId(),
                 request.getContent()
