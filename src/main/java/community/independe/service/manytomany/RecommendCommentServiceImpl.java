@@ -58,16 +58,6 @@ public class RecommendCommentServiceImpl implements RecommendCommentService{
     }
 
     @Override
-    public Long countAllByCommentIdAndIsRecommend(Long commentId) {
-        return recommendCommentRepository.countAllByCommentIdAndIsRecommend(commentId);
-    }
-
-    @Override
-    public RecommendComment findByCommentIdAndPostIdAndMemberIdAndIsRecommend(Long commentId, Long postId, Long memberId) {
-        return recommendCommentRepository.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, memberId);
-    }
-
-    @Override
     public BestCommentDto findBestComment() {
         List<Object[]> bestCommentList = recommendCommentRepository.findBestComment();
         BestCommentDto bestCommentDto = null;
