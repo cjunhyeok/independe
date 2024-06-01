@@ -7,8 +7,6 @@ import java.util.List;
 
 public interface VideoService {
 
-    List<Video> findAllForMain();
-
     List<Video> findAllByIndependentPostType(IndependentPostType independentPostType);
     List<Video> findAll();
 }

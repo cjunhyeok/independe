@@ -10,18 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
-@Transactional(readOnly = true)
 @Slf4j
+@Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class VideoServiceImpl implements VideoService{
 
     private final VideoRepository videoRepository;
-
-    @Override
-    public List<Video> findAllForMain() {
-        return videoRepository.findAllForMain();
-    }
 
     @Override
     public List<Video> findAllByIndependentPostType(IndependentPostType independentPostType) {
