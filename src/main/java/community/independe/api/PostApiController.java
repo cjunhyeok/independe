@@ -3,7 +3,6 @@ package community.independe.api;
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.post.*;
 import community.independe.api.dtos.post.main.*;
-import community.independe.domain.comment.Comment;
 import community.independe.domain.keyword.KeywordDto;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
@@ -15,11 +14,13 @@ import community.independe.security.service.MemberContext;
 import community.independe.service.*;
 import community.independe.service.dtos.post.FindAllPostsRequest;
 import community.independe.service.dtos.post.FindIndependentPostRequest;
+import community.independe.service.dtos.post.FindPostDto;
 import community.independe.service.dtos.post.FindRegionPostRequest;
 import community.independe.service.manytomany.FavoritePostService;
 import community.independe.service.manytomany.RecommendCommentService;
 import community.independe.service.manytomany.RecommendPostService;
 import community.independe.service.manytomany.ReportPostService;
+import community.independe.service.util.ActionStatusChecker;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,6 +52,7 @@ public class PostApiController {
     private final FavoritePostService favoritePostService;
     private final ReportPostService reportPostService;
     private final RecommendCommentService recommendCommentService;
+    private final ActionStatusChecker actionStatusChecker;
 
     // 자취 게시글 카테고리로 불러오기
     @Operation(summary = "자취 게시글 타입별 조회")
@@ -207,52 +209,26 @@ public class PostApiController {
 
         postService.increaseViews(postId); // 조회수 증가
 
-        // 증가 이후 찾기
-        Post findPost = postService.findById(postId);
-        List<Comment> findComments = commentService.findAllByPostId(postId);
-        Long recommendCount = recommendPostService.countAllByPostIdAndIsRecommend(findPost.getId());
+        // 증가 이후 게시글 조회
+        FindPostDto findPostDto = postService.findById(postId);
+
+        // 댓글
+        List<PostCommentResponse> commentsDto = commentService.findCommentsByPostId(findPostDto.getId(), loginMemberId);
+        Long recommendCount = recommendPostService.countAllByPostIdAndIsRecommend(findPostDto.getId());
 
         // 베스트 댓글 찾기
-        BestCommentDto bestCommentDto = null;
-        List<Object[]> bestCommentList = recommendCommentService.findBestComment();
-        if (bestCommentList.isEmpty()) {
-            bestCommentDto = null;
-        } else {
-            Object[] bestCommentObject = bestCommentList.get(0);
-            Comment bestComment = (Comment) bestCommentObject[0];
-            Long bestCommentRecommendCount = (Long) bestCommentObject[1];
-            bestCommentDto = new BestCommentDto(
-                    bestComment.getId(),
-                    bestComment.getMember().getNickname(),
-                    bestComment.getContent(),
-                    bestComment.getCreatedDate(),
-                    bestCommentRecommendCount
-            );
-        }
-
-        // 댓글 Dto 생성
-        List<PostCommentResponse> commentsDto = findComments.stream()
-                .map(c -> new PostCommentResponse(
-                        c.getId(),
-                        c.getMember().getNickname(),
-                        c.getContent(),
-                        c.getCreatedDate(),
-                        recommendCommentService.countAllByCommentIdAndIsRecommend(c.getId()),
-                        (c.getParent() == null) ? null : c.getParent().getId(),
-                        c.getMember().getId(),
-                        isRecommendComment(c.getId(), findPost.getId(), (memberContext == null) ? null : loginMemberId)
-                )).collect(Collectors.toList());
+        BestCommentDto bestCommentDto = recommendCommentService.findBestComment();
 
         // 게시글 Dto 생성
         PostResponse postResponse = new PostResponse(
-                findPost,
+                findPostDto,
                 bestCommentDto,
                 commentsDto,
                 commentService.countAllByPostId(postId),
                 recommendCount,
-                isRecommend(findPost.getId(), loginMemberId),
-                isFavorite(findPost.getId(), loginMemberId),
-                isReport(findPost.getId(), loginMemberId)
+                actionStatusChecker.isRecommend(postId, loginMemberId),
+                actionStatusChecker.isFavorite(postId, loginMemberId),
+                actionStatusChecker.isReport(postId, loginMemberId)
         );
 
         return new Result(postResponse);
@@ -367,53 +343,5 @@ public class PostApiController {
         );
 
         return new Result(mainPostDto);
-    }
-
-    private boolean isRecommendComment(Long commentId, Long postId, Long memberId) {
-        if (memberId == null) {
-            return false;
-        } else {
-            if (recommendCommentService.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, memberId) == null) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-    }
-
-    private boolean isRecommend(Long postId, Long memberId) {
-        if(memberId == null) {
-            return false;
-        } else {
-            if(recommendPostService.findByPostIdAndMemberIdAndIsRecommend(postId, memberId) == null) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-    }
-
-    private boolean isFavorite(Long postId, Long memberId) {
-        if(memberId == null) {
-            return false;
-        } else {
-            if(favoritePostService.findByPostIdAndMemberIdAndIsRecommend(postId, memberId) == null) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-    }
-
-    private boolean isReport(Long postId, Long memberId) {
-        if(memberId == null) {
-            return false;
-        } else {
-            if(reportPostService.findByPostIdAndMemberIdAndIsRecommend(postId, memberId) == null) {
-                return false;
-            } else {
-                return true;
-            }
-        }
     }
 }
