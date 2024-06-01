@@ -4,22 +4,19 @@ import community.independe.api.dtos.Result;
 import community.independe.api.dtos.post.*;
 import community.independe.api.dtos.post.main.*;
 import community.independe.domain.keyword.KeywordDto;
-import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.domain.video.Video;
-import community.independe.repository.query.MainPostApiRepository;
 import community.independe.security.service.MemberContext;
 import community.independe.service.*;
+import community.independe.service.dtos.main.MainPostPageRequest;
 import community.independe.service.dtos.post.FindAllPostsRequest;
 import community.independe.service.dtos.post.FindIndependentPostRequest;
 import community.independe.service.dtos.post.FindPostDto;
 import community.independe.service.dtos.post.FindRegionPostRequest;
-import community.independe.service.manytomany.FavoritePostService;
 import community.independe.service.manytomany.RecommendCommentService;
 import community.independe.service.manytomany.RecommendPostService;
-import community.independe.service.manytomany.ReportPostService;
 import community.independe.service.util.ActionStatusChecker;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -46,12 +43,10 @@ public class PostApiController {
     private final CommentService commentService;
     private final KeywordService keywordService;
     private final VideoService videoService;
-    private final MainPostApiRepository mainPostApiRepository;
     private final FilesService filesService;
     private final RecommendPostService recommendPostService;
-    private final FavoritePostService favoritePostService;
-    private final ReportPostService reportPostService;
     private final RecommendCommentService recommendCommentService;
+    private final MainPostService mainPostService;
     private final ActionStatusChecker actionStatusChecker;
 
     // 자취 게시글 카테고리로 불러오기
@@ -264,73 +259,33 @@ public class PostApiController {
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1); // 어제
         LocalDateTime lastWeek = LocalDateTime.now().minusDays(7);
 
+        MainPostPageRequest mainPostPageRequest = MainPostPageRequest
+                .builder()
+                .dateOffset(yesterday)
+                .dateLimit(today)
+                .offset(0)
+                .limit(10)
+                .build();
+
         // 인기 게시글(10개)
-        List<Post> findAllPopularPosts = mainPostApiRepository.findAllPopularPosts(yesterday, today, 0, 10);
-        List<PopularPostDto> popularPostDto = findAllPopularPosts.stream()
-                .map(p -> new PopularPostDto(
-                        p.getId(),
-                        p.getTitle(),
-                        (p.getIndependentPostType() == null) ? null : p.getIndependentPostType().getDescription(),
-                        (p.getRegionType() == null) ? null : p.getRegionType().getDescription(),
-                        (p.getRegionPostType() == null) ? null : p.getRegionPostType().getDescription(),
-                        p.getIndependentPostType(),
-                        p.getRegionType(),
-                        p.getRegionPostType(),
-                        p.getViews(),
-                        Long.valueOf(p.getRecommendPosts().size()),
-                        Long.valueOf(p.getComments().size()),
-                        (p.getFiles().isEmpty()) ? false : true
-                )).collect(Collectors.toList());
+        List<PopularPostDto> popularPostDto = mainPostService.findPopularPosts(mainPostPageRequest);
 
         // 추천수 자취 게시글 10개
-        List<Post> findAllIndependentPostByRecommendCount = mainPostApiRepository.findAllIndependentPostByRecommendCount(yesterday, today, 0, 10);
-        List<PopularIndependentPostsDto> popularIndependentPostsDto = findAllIndependentPostByRecommendCount.stream()
-                .map(p -> new PopularIndependentPostsDto(
-                        p.getId(),
-                        p.getTitle(),
-                        p.getIndependentPostType().getDescription(),
-                        p.getIndependentPostType(),
-                        Long.valueOf(p.getRecommendPosts().size()),
-                        Long.valueOf(p.getComments().size()),
-                        (p.getFiles().isEmpty()) ? false : true
-                )).collect(Collectors.toList());
+        List<PopularIndependentPostsDto> popularIndependentPostsDto = mainPostService.findIndependentPosts(mainPostPageRequest);
+
+        mainPostPageRequest.updateLimit(5);
 
         // 전체 지역 게시글 5개
-        List<Post> findAllRegionPostByRecommendCount = mainPostApiRepository.findAllRegionAllPostByRecommendCount(yesterday, today, 0, 5);
-        List<RegionAllPostDto> regionAllPostDto = findAllRegionPostByRecommendCount.stream()
-                .map(p -> new RegionAllPostDto(
-                        p.getId(),
-                        p.getTitle(),
-                        Long.valueOf(p.getRecommendPosts().size()),
-                        Long.valueOf(p.getComments().size()),
-                        (p.getFiles().isEmpty()) ? false : true
-                )).collect(Collectors.toList());
+        List<RegionAllPostDto> regionAllPostDto = mainPostService.findRegionAllPosts(mainPostPageRequest);
 
         // 전체 아닌 지역 게시글 5개
-        List<Post> findRegionNotAllPostByRecommendCount = mainPostApiRepository.findRegionNotAllPostByRecommendCount(yesterday, today, 0, 5);
-        List<RegionNotAllPostDto> regionNotAllPostDto = findRegionNotAllPostByRecommendCount.stream()
-                .map(p -> new RegionNotAllPostDto(
-                        p.getId(),
-                        p.getTitle(),
-                        p.getRegionType().getDescription(),
-                        p.getRegionPostType().getDescription(),
-                        p.getRegionType(),
-                        p.getRegionPostType(),
-                        Long.valueOf(p.getRecommendPosts().size()),
-                        Long.valueOf(p.getComments().size()),
-                        (p.getFiles().isEmpty()) ? false : true
-                )).collect(Collectors.toList());
+        List<RegionNotAllPostDto> regionNotAllPostDto = mainPostService.findRegionNotAllPosts(mainPostPageRequest);
 
         // 인기 검색어 10개
         List<KeywordDto> keywordsDto = keywordService.findKeywordsByGroup();
 
         // 영상
-        List<Video> findAllForMain = videoService.findAllForMain();
-        List<VideoMainDto> videoMainDto = findAllForMain.stream()
-                .map(v -> new VideoMainDto(
-                        v.getVideoTitle(),
-                        v.getVideoUrl()
-                )).collect(Collectors.toList());
+        List<VideoMainDto> videoMainDto = mainPostService.findAllForMain();
 
         MainPostDto mainPostDto = new MainPostDto(
                 "다가오는 장마철 천연 정화석을 구비하여 습기를 제거해보세요",
