@@ -60,6 +60,7 @@ public class PostServiceImpl implements PostService{
                 .regionType(findPost.getRegionType())
                 .regionPostType(findPost.getRegionPostType())
                 .views(findPost.getViews())
+                .createdDate(findPost.getCreatedDate())
                 .memberId(findPost.getMember().getId())
                 .nickname(findPost.getMember().getNickname())
                 .build();
