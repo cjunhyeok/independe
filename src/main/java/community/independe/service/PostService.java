@@ -2,7 +2,6 @@ package community.independe.service;
 
 import community.independe.api.dtos.post.PostsResponse;
 import community.independe.api.dtos.post.SearchResponse;
-import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
@@ -10,13 +9,14 @@ import community.independe.service.dtos.MyPostServiceDto;
 import community.independe.service.dtos.MyRecommendPostServiceDto;
 import community.independe.service.dtos.post.FindAllPostsDto;
 import community.independe.service.dtos.post.FindIndependentPostsDto;
+import community.independe.service.dtos.post.FindPostDto;
 import community.independe.service.dtos.post.FindRegionPostsDto;
 
 import java.util.List;
 
 public interface PostService {
 
-    Post findById(Long postId);
+    FindPostDto findById(Long postId);
 
     // 자취 게시판에 글 쓰기
     Long createIndependentPost(Long memberId, String title, String content,

@@ -20,6 +20,7 @@ import community.independe.service.dtos.MyPostServiceDto;
 import community.independe.service.dtos.MyRecommendPostServiceDto;
 import community.independe.service.dtos.post.FindAllPostsDto;
 import community.independe.service.dtos.post.FindIndependentPostsDto;
+import community.independe.service.dtos.post.FindPostDto;
 import community.independe.service.dtos.post.FindRegionPostsDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,9 +47,22 @@ public class PostServiceImpl implements PostService{
     private static final String SORT = "createdDate";
 
     @Override
-    public Post findById(Long postId) {
-        return postRepository.findById(postId)
+    public FindPostDto findById(Long postId) {
+        Post findPost = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        return FindPostDto
+                .builder()
+                .id(findPost.getId())
+                .title(findPost.getTitle())
+                .content(findPost.getContent())
+                .independentPostType(findPost.getIndependentPostType())
+                .regionType(findPost.getRegionType())
+                .regionPostType(findPost.getRegionPostType())
+                .views(findPost.getViews())
+                .memberId(findPost.getMember().getId())
+                .nickname(findPost.getMember().getNickname())
+                .build();
     }
 
     // 자취 게시글 생성
