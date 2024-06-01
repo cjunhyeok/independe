@@ -1,5 +1,6 @@
 package community.independe.service;
 
+import community.independe.api.dtos.post.PostCommentResponse;
 import community.independe.domain.comment.Comment;
 import community.independe.service.dtos.MyCommentServiceDto;
 import community.independe.service.dtos.MyRecommendCommentServiceDto;
@@ -16,7 +17,7 @@ public interface CommentService {
 
     Long countAllByPostId(Long postId);
 
-    List<Comment> findAllByPostId(Long postId);
+    List<PostCommentResponse> findCommentsByPostId(Long postId, Long loginMemberId);
 
     List<MyCommentServiceDto> getMyComment(Long memberId, int page, int size);
 

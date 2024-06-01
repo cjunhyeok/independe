@@ -1,5 +1,6 @@
 package community.independe.service;
 
+import community.independe.api.dtos.post.PostCommentResponse;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
@@ -8,10 +9,12 @@ import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
+import community.independe.repository.manytomany.RecommendCommentRepository;
 import community.independe.repository.post.PostRepository;
 import community.independe.repository.util.PageRequestCreator;
 import community.independe.service.dtos.MyCommentServiceDto;
 import community.independe.service.dtos.MyRecommendCommentServiceDto;
+import community.independe.service.util.ActionStatusChecker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,6 +34,8 @@ public class CommentServiceImpl implements CommentService{
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final RecommendCommentRepository recommendCommentRepository;
+    private final ActionStatusChecker actionStatusChecker;
 
     @Override
     public Comment findById(Long id) {
@@ -96,8 +101,20 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
-    public List<Comment> findAllByPostId(Long postId) {
-        return commentRepository.findAllByPostId(postId);
+    public List<PostCommentResponse> findCommentsByPostId(Long postId, Long loginMemberId) {
+        List<Comment> findComments = commentRepository.findAllByPostId(postId);
+
+        return findComments.stream()
+                .map(c -> new PostCommentResponse(
+                        c.getId(),
+                        c.getMember().getNickname(),
+                        c.getContent(),
+                        c.getCreatedDate(),
+                        recommendCommentRepository.countAllByCommentIdAndIsRecommend(c.getId()),
+                        (c.getParent() == null) ? null : c.getParent().getId(),
+                        c.getMember().getId(),
+                        actionStatusChecker.isRecommendComment(c.getId(), postId, loginMemberId)
+                )).collect(Collectors.toList());
     }
 
     private void checkRegion(Member findMember, Post findPost) {
