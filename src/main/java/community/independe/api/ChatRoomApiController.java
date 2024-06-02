@@ -5,7 +5,6 @@ import community.independe.api.dtos.chat.*;
 import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.security.service.MemberContext;
-import community.independe.service.MemberService;
 import community.independe.service.chat.ChatRoomService;
 import community.independe.service.chat.ChatService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +22,6 @@ public class ChatRoomApiController {
 
     private final ChatRoomService chatRoomService;
     private final ChatService chatService;
-    private final MemberService memberService;
 
     @PostMapping("/api/chat/room")
     @Operation(summary = "채팅방 생성 * (발신자와 송신자를 맵핑한 채팅방이 존재하면 저장된 채팅방 정보를 반환)")
