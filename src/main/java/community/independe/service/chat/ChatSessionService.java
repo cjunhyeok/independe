@@ -1,6 +1,6 @@
 package community.independe.service.chat;
 
-import community.independe.domain.member.Member;
+import community.independe.service.dtos.FindMemberDto;
 
 import java.util.Set;
 
@@ -11,5 +11,5 @@ public interface ChatSessionService {
     Set<String> getChatRoomMembers(String chatRoomId);
     void enterSocketSession(String sessionId, Long memberId);
     void removeSocketSession(String sessionId);
-    Member getMemberSocketSession(String sessionId);
+    FindMemberDto getMemberSocketSession(String sessionId);
 }
