@@ -12,6 +12,7 @@ import community.independe.repository.MemberRepository;
 import community.independe.repository.manytomany.RecommendCommentRepository;
 import community.independe.repository.post.PostRepository;
 import community.independe.repository.util.PageRequestCreator;
+import community.independe.service.dtos.FindCommentDto;
 import community.independe.service.dtos.MyCommentServiceDto;
 import community.independe.service.dtos.MyRecommendCommentServiceDto;
 import community.independe.service.util.ActionStatusChecker;
@@ -38,9 +39,18 @@ public class CommentServiceImpl implements CommentService{
     private final ActionStatusChecker actionStatusChecker;
 
     @Override
-    public Comment findById(Long id) {
-        return commentRepository.findById(id)
+    public FindCommentDto findById(Long id) {
+        Comment findComment = commentRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+
+        return FindCommentDto
+                .builder()
+                .id(findComment.getId())
+                .content(findComment.getContent())
+                .parentId(findComment.getParent() == null ? null : findComment.getParent().getId())
+                .memberId(findComment.getMember().getId())
+                .createdDate(findComment.getCreatedDate())
+                .build();
     }
 
     @Transactional
@@ -140,6 +150,7 @@ public class CommentServiceImpl implements CommentService{
         PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(page, size);
         Page<Comment> findCommentsPage = commentRepository.findAllByMemberId(memberId, request);
         List<Comment> findComments = findCommentsPage.getContent();
+        long totalCount = findCommentsPage.getTotalElements();
 
         List<MyCommentServiceDto> myCommentServiceDtos = findComments.stream()
                 .map(fc -> MyCommentServiceDto.builder()
@@ -147,9 +158,8 @@ public class CommentServiceImpl implements CommentService{
                         .postId(fc.getPost().getId())
                         .content(fc.getContent())
                         .createdDate(fc.getCreatedDate())
+                        .totalCount(totalCount)
                         .build()).collect(Collectors.toList());
-
-        myCommentServiceDtos.get(0).setTotalCount(findCommentsPage.getTotalElements());
 
         return myCommentServiceDtos;
     }
@@ -159,6 +169,7 @@ public class CommentServiceImpl implements CommentService{
         PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(page, size);
         Page<Comment> findRecommendCommentsPage = commentRepository.findRecommendCommentByMemberId(memberId, request);
         List<Comment> findRecommendComments = findRecommendCommentsPage.getContent();
+        long totalCount = findRecommendCommentsPage.getTotalElements();
 
         List<MyRecommendCommentServiceDto> myCommentServiceDtos = findRecommendComments.stream()
                 .map(frc -> MyRecommendCommentServiceDto.builder()
@@ -166,9 +177,8 @@ public class CommentServiceImpl implements CommentService{
                         .postId(frc.getPost().getId())
                         .content(frc.getContent())
                         .createdDate(frc.getCreatedDate())
+                        .totalCount(totalCount)
                         .build()).collect(Collectors.toList());
-
-        myCommentServiceDtos.get(0).setTotalCount(findRecommendCommentsPage.getTotalElements());
 
         return myCommentServiceDtos;
     }
