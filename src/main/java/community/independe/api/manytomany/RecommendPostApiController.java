@@ -3,7 +3,6 @@ package community.independe.api.manytomany;
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.manytomany.recommendpost.RecommendPostResponse;
 import community.independe.domain.manytomany.RecommendPost;
-import community.independe.domain.member.Member;
 import community.independe.security.service.MemberContext;
 import community.independe.service.PostService;
 import community.independe.service.dtos.MyRecommendPostServiceDto;
@@ -29,12 +28,12 @@ public class RecommendPostApiController {
     public Result addRecommendPost(@PathVariable(name = "postId") Long postId,
                                                  @AuthenticationPrincipal MemberContext memberContext) {
 
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
 
-        RecommendPost findRecommendPostByPost = recommendPostService.findByPostIdAndMemberId(postId, loginMember.getId());
+        RecommendPost findRecommendPostByPost = recommendPostService.findByPostIdAndMemberId(postId, loginMemberId);
 
         if (findRecommendPostByPost == null) {
-            recommendPostService.save(postId, loginMember.getId());
+            recommendPostService.save(postId, loginMemberId);
         } else if(findRecommendPostByPost.getIsRecommend() == false) {
             recommendPostService.updateIsRecommend(findRecommendPostByPost, true);
         } else if(findRecommendPostByPost.getIsRecommend() == true) {
@@ -53,10 +52,14 @@ public class RecommendPostApiController {
     public Result getRecommendPost(@RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                    @RequestParam(name = "size", required = false, defaultValue = "10") int size,
                                    @AuthenticationPrincipal MemberContext memberContext) {
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
+        Long totalCount = 0L;
 
-        List<MyRecommendPostServiceDto> response = postService.getMyRecommendPost(loginMember.getId(), page, size);
-        Long totalCount = response.get(0).getTotalCount();
+        List<MyRecommendPostServiceDto> response = postService.getMyRecommendPost(loginMemberId, page, size);
+
+        if (!response.isEmpty()) {
+            totalCount = response.get(0).getTotalCount();
+        }
 
         return new Result(response, totalCount);
     }

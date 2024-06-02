@@ -2,7 +2,6 @@ package community.independe.api.manytomany;
 
 import community.independe.api.dtos.Result;
 import community.independe.domain.manytomany.RecommendComment;
-import community.independe.domain.member.Member;
 import community.independe.security.service.MemberContext;
 import community.independe.service.CommentService;
 import community.independe.service.dtos.MyRecommendCommentServiceDto;
@@ -29,13 +28,13 @@ public class RecommendCommentApiController {
     public ResponseEntity addRecommendComment(@PathVariable(name = "commentId") Long commentId,
                                               @AuthenticationPrincipal MemberContext memberContext) {
 
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
 
         RecommendComment findRecommendComment = recommendCommentService.findByCommentIdAndMemberId(
-                commentId, loginMember.getId());
+                commentId, loginMemberId);
 
         if (findRecommendComment == null) {
-            Long savedRecommendComment = recommendCommentService.save(commentId, loginMember.getId());
+            Long savedRecommendComment = recommendCommentService.save(commentId, loginMemberId);
         } else if (findRecommendComment.getIsRecommend() == false) {
             recommendCommentService.updateIsRecommend(findRecommendComment, true);
         } else if (findRecommendComment.getIsRecommend() == true) {
@@ -50,10 +49,14 @@ public class RecommendCommentApiController {
     public Result getRecommendComment(@RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                       @RequestParam(name = "size", required = false, defaultValue = "10") int size,
                                       @AuthenticationPrincipal MemberContext memberContext) {
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
+        Long totalCount = 0L;
 
-        List<MyRecommendCommentServiceDto> response = commentService.getMyRecommendComment(loginMember.getId(), page, size);
-        Long totalCount = response.get(0).getTotalCount();
+        List<MyRecommendCommentServiceDto> response = commentService.getMyRecommendComment(loginMemberId, page, size);
+
+        if (!response.isEmpty()) {
+            totalCount = response.get(0).getTotalCount();
+        }
 
         return new Result(response, totalCount);
     }
