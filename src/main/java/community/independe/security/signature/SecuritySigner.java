@@ -8,6 +8,8 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import community.independe.domain.member.Member;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
 import community.independe.security.service.MemberContext;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -51,7 +53,11 @@ public abstract class SecuritySigner {
     protected String getTokenOAuth2(MACSigner jwsSigner, OAuth2User oAuth2User) throws JOSEException {
 
         Map<String, Object> attributes = (Map<String, Object>) oAuth2User.getAttributes().get("response");
-        Member member = ((MemberContext) oAuth2User).getMember();
+        Long loginMemberId = ((MemberContext) oAuth2User).getMemberId();
+
+        Member findMember = memberRepository.findById(loginMemberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+        );
 
 
         JWSHeader header = new JWSHeader.Builder((JWSAlgorithm)jwk.getAlgorithm()).keyID(jwk.getKeyID()).build();
@@ -59,9 +65,9 @@ public abstract class SecuritySigner {
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject("user")
                 .issuer("http://localhost:8080")
-                .claim("username", member.getUsername()) // 사용자 Id
-                .claim("authority", member.getRole()) // 사용자 권한
-                .claim("nickname", member.getNickname()) // 사용자 nickname
+                .claim("username", findMember.getUsername()) // 사용자 Id
+                .claim("authority", findMember.getRole()) // 사용자 권한
+                .claim("nickname", findMember.getNickname()) // 사용자 nickname
                 .expirationTime(new Date(new Date().getTime() + 60 * 1000 * 60)) // 60분
                 .build();
         SignedJWT signedJWT = new SignedJWT(header, jwtClaimsSet);
