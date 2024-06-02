@@ -162,6 +162,7 @@ public class MemberServiceImpl implements MemberService {
         );
 
         return FindMemberDto.builder()
+                .id(findMember.getId())
                 .username(findMember.getUsername())
                 .nickname(findMember.getNickname())
                 .email(findMember.getEmail())
