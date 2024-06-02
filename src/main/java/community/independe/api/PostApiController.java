@@ -11,10 +11,7 @@ import community.independe.domain.video.Video;
 import community.independe.security.service.MemberContext;
 import community.independe.service.*;
 import community.independe.service.dtos.main.MainPostPageRequest;
-import community.independe.service.dtos.post.FindAllPostsRequest;
-import community.independe.service.dtos.post.FindIndependentPostRequest;
-import community.independe.service.dtos.post.FindPostDto;
-import community.independe.service.dtos.post.FindRegionPostRequest;
+import community.independe.service.dtos.post.*;
 import community.independe.service.manytomany.RecommendCommentService;
 import community.independe.service.manytomany.RecommendPostService;
 import community.independe.service.util.ActionStatusChecker;
@@ -52,18 +49,28 @@ public class PostApiController {
     // 자취 게시글 카테고리로 불러오기
     @Operation(summary = "자취 게시글 타입별 조회")
     @GetMapping("/api/posts/independent/{independentPostType}")
-    public Result independentPosts(
-            @RequestBody FindIndependentPostRequest request) {
+    public Result independentPosts(@PathVariable(name = "independentPostType") IndependentPostType independentPostType,
+                                   @RequestParam(name = "condition", defaultValue = "no") String condition,
+                                   @RequestParam(name = "keyword", required = false) String keyword,
+                                   @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                   @RequestParam(name = "size", defaultValue = "10") Integer size) {
 
-        String keyword = request.getKeyword();
-        String condition = request.getCondition();
         if (keyword != null && !keyword.isEmpty()) {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
 
+        FindIndependentPostsDto findIndependentPostsDto = FindIndependentPostsDto
+                .builder()
+                .independentPostType(independentPostType)
+                .condition(condition)
+                .keyword(keyword)
+                .page(page)
+                .size(size)
+                .build();
+
         // 게시글 불러오기
         List<PostsResponse> findPostsResponse
-                = postService.findIndependentPosts(FindIndependentPostRequest.requestToFindDto(request));
+                = postService.findIndependentPosts(findIndependentPostsDto);
 
         // 총 게시글 수
         Long totalCount = 0L;
@@ -72,7 +79,7 @@ public class PostApiController {
         }
 
         // 영상 불러오기
-        List<Video> findAllByIndependentPostType = videoService.findAllByIndependentPostType(request.getIndependentPostType());
+        List<Video> findAllByIndependentPostType = videoService.findAllByIndependentPostType(independentPostType);
         List<IndependentPostVideoDto> videoCollect = findAllByIndependentPostType.stream()
                 .map(v -> new IndependentPostVideoDto(
                         v.getVideoTitle(),
@@ -115,17 +122,30 @@ public class PostApiController {
     // 지역 게시글 카테고리 별로 가져오기
     @Operation(summary = "지역 게시글 타입별 조회")
     @GetMapping("/api/posts/region/{regionType}/{regionPostType}")
-    public Result regionPosts(@RequestBody FindRegionPostRequest request) {
+    public Result regionPosts(@PathVariable(name = "regionType") RegionType regionType,
+                              @PathVariable(name = "regionPostType") RegionPostType regionPostType,
+                              @RequestParam(name = "condition", defaultValue = "no") String condition,
+                              @RequestParam(name = "keyword", required = false) String keyword,
+                              @RequestParam(name = "page", defaultValue = "0") Integer page,
+                              @RequestParam(name = "size", defaultValue = "10") Integer size) {
 
         // 검색어 저장
-        String keyword = request.getKeyword();
-        String condition = request.getCondition();
         if (keyword != null && !keyword.isEmpty()) {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
 
+        FindRegionPostsDto findRegionPostsDto = FindRegionPostsDto
+                .builder()
+                .regionType(regionType)
+                .regionPostType(regionPostType)
+                .condition(condition)
+                .keyword(keyword)
+                .page(page)
+                .size(size)
+                .build();
+
         // 게시글 가져오기
-        List<PostsResponse> findPostsResponse = postService.findRegionPosts(FindRegionPostRequest.requestToFindDto(request));
+        List<PostsResponse> findPostsResponse = postService.findRegionPosts(findRegionPostsDto);
 
         // 총 게시글 수
         Long totalCount = 0L;
@@ -231,16 +251,25 @@ public class PostApiController {
 
     @Operation(summary = "통합검색")
     @GetMapping("/api/posts/search")
-    public Result searchPost(@RequestBody FindAllPostsRequest request) {
+    public Result searchPost(@RequestParam(name = "condition", defaultValue = "no") String condition,
+                             @RequestParam(name = "keyword", required = false) String keyword,
+                             @RequestParam(name = "page", defaultValue = "0") Integer page,
+                             @RequestParam(name = "size", defaultValue = "10") Integer size) {
 
         // 검색어 저장
-        String keyword = request.getKeyword();
-        String condition = request.getCondition();
         if (keyword != null && !keyword.isEmpty()) {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
 
-        List<SearchResponse> findSearchResponses = postService.findAllPosts(FindAllPostsRequest.requestToFindDto(request));
+        FindAllPostsDto findAllPostsDto = FindAllPostsDto
+                .builder()
+                .condition(condition)
+                .keyword(keyword)
+                .page(page)
+                .size(size)
+                .build();
+
+        List<SearchResponse> findSearchResponses = postService.findAllPosts(findAllPostsDto);
 
         // 총 게시글 수
         Long totalCount = 0L;
