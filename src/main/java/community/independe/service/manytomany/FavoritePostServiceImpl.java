@@ -77,6 +77,7 @@ public class FavoritePostServiceImpl implements FavoritePostService {
 
         Page<FavoritePost> findFavoritePostPage = favoritePostRepository.findByMemberId(memberId, request);
         List<FavoritePost> findFavoritePosts = findFavoritePostPage.getContent();
+        long totalCount = findFavoritePostPage.getTotalElements();
 
         List<GetFavoritePostServiceDto> serviceDto = findFavoritePosts.stream()
                 .map(fp -> {
@@ -91,11 +92,10 @@ public class FavoritePostServiceImpl implements FavoritePostService {
                             .regionPostType(post.getRegionPostType())
                             .nickname(member.getNickname())
                             .createdDate(fp.getCreatedDate())
+                            .totalCount(totalCount)
                             .build();
                 })
                 .collect(Collectors.toList());
-
-        serviceDto.get(0).setTotalCount(findFavoritePostPage.getTotalElements());
 
         return serviceDto;
     }

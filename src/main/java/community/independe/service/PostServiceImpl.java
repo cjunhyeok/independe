@@ -248,6 +248,7 @@ public class PostServiceImpl implements PostService{
         PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(page, size);
         Page<Post> findPostPage = postRepository.findAllByMemberId(memberId, request);
         List<Post> findPosts = findPostPage.getContent();
+        long totalCount = findPostPage.getTotalElements();
 
         List<MyPostServiceDto> myPostServiceDtos = findPosts.stream()
                 .map(fp -> MyPostServiceDto.builder()
@@ -259,9 +260,8 @@ public class PostServiceImpl implements PostService{
                         .regionPostType(fp.getRegionPostType())
                         .nickname(fp.getMember().getNickname())
                         .createdDate(fp.getCreatedDate())
+                        .totalCount(totalCount)
                         .build()).collect(Collectors.toList());
-
-        myPostServiceDtos.get(0).setTotalCount(findPostPage.getTotalElements());
 
         return myPostServiceDtos;
     }
@@ -272,6 +272,7 @@ public class PostServiceImpl implements PostService{
         PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(page, size);
         Page<Post> recommendPostPage = postRepository.findRecommendPostByMemberId(memberId, request);
         List<Post> recommendPosts = recommendPostPage.getContent();
+        long totalCount = recommendPostPage.getTotalElements();
 
         List<MyRecommendPostServiceDto> myRecommendPostServiceDtos = recommendPosts.stream()
                 .map(rp -> MyRecommendPostServiceDto.builder()
@@ -283,8 +284,8 @@ public class PostServiceImpl implements PostService{
                         .regionPostType(rp.getRegionPostType())
                         .nickname(rp.getMember().getNickname())
                         .createdDate(rp.getCreatedDate())
+                        .totalCount(totalCount)
                         .build()).collect(Collectors.toList());
-        myRecommendPostServiceDtos.get(0).setTotalCount(recommendPostPage.getTotalElements());
 
         return myRecommendPostServiceDtos;
     }
