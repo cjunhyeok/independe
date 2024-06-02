@@ -22,7 +22,7 @@ public class MyPostServiceDto {
     private Long totalCount;
 
     @Builder
-    public MyPostServiceDto(Long postId, Long memberId, String title, IndependentPostType independentPostType, RegionType regionType, RegionPostType regionPostType, String nickname, LocalDateTime createdDate) {
+    public MyPostServiceDto(Long postId, Long memberId, String title, IndependentPostType independentPostType, RegionType regionType, RegionPostType regionPostType, String nickname, LocalDateTime createdDate, Long totalCount) {
         this.postId = postId;
         this.memberId = memberId;
         this.title = title;
@@ -31,9 +31,6 @@ public class MyPostServiceDto {
         this.regionPostType = regionPostType;
         this.nickname = nickname;
         this.createdDate = createdDate;
-    }
-
-    public void setTotalCount(Long totalCount) {
         this.totalCount = totalCount;
     }
 }
