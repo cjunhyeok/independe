@@ -94,7 +94,12 @@ public class S3FilesServiceImpl implements FilesService{
 
     @Override
     public PostFileResponse findAllFilesByPostId(Long postId) {
-        List<Files> findFiles = filesRepository.findAllFilesByPostId(postId);
+
+        Post findPost = postRepository.findById(postId).orElseThrow(
+                () -> new CustomException(ErrorCode.POST_NOT_FOUND)
+        );
+
+        List<Files> findFiles = filesRepository.findAllFilesByPostId(findPost.getId());
         PostFileResponse postFileResponse = new PostFileResponse();
         List<String> s3Urls = new ArrayList<>();
         for (Files findFile : findFiles) {
