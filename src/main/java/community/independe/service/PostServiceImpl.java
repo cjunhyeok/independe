@@ -12,7 +12,6 @@ import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
-import community.independe.repository.file.FilesRepository;
 import community.independe.repository.manytomany.RecommendPostRepository;
 import community.independe.repository.post.PostRepository;
 import community.independe.repository.util.PageRequestCreator;
@@ -41,10 +40,8 @@ public class PostServiceImpl implements PostService{
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private final FilesRepository filesRepository;
     private final FilesService filesService;
     private final RecommendPostRepository recommendPostRepository;
-    private static final String SORT = "createdDate";
 
     @Override
     public FindPostDto findById(Long postId) {
