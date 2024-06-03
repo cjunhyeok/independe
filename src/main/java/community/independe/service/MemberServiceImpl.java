@@ -38,7 +38,7 @@ public class MemberServiceImpl implements MemberService {
         String nickname = joinServiceDto.getNickname();
         Member findNickname = memberRepository.findByNickname(nickname);
         if (findNickname != null) {
-            throw new CustomException(ErrorCode.USERNAME_DUPLICATED);
+            throw new CustomException(ErrorCode.NICKNAME_DUPLICATED);
         }
 
         Member member = Member.builder()
