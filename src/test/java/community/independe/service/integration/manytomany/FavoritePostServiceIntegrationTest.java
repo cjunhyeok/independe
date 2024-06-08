@@ -1,4 +1,4 @@
-package community.independe.service.manytomany;
+package community.independe.service.integration.manytomany;
 
 import community.independe.IntegrationTestSupporter;
 import community.independe.domain.manytomany.FavoritePost;
@@ -8,6 +8,7 @@ import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.manytomany.FavoritePostRepository;
 import community.independe.repository.post.PostRepository;
+import community.independe.service.manytomany.FavoritePostService;
 import community.independe.service.manytomany.dtos.GetFavoritePostServiceDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
