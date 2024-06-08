@@ -7,7 +7,6 @@ import community.independe.domain.keyword.KeywordDto;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
-import community.independe.domain.video.Video;
 import community.independe.security.service.MemberContext;
 import community.independe.service.*;
 import community.independe.service.dtos.main.MainPostPageRequest;
@@ -29,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -79,17 +77,11 @@ public class PostApiController {
         }
 
         // 영상 불러오기
-        List<Video> findAllByIndependentPostType = videoService.findAllByIndependentPostType(independentPostType);
-        List<IndependentPostVideoDto> videoCollect = findAllByIndependentPostType.stream()
-                .map(v -> new IndependentPostVideoDto(
-                        v.getVideoTitle(),
-                        v.getVideoUrl()
-                ))
-                .collect(Collectors.toList());
+        List<IndependentPostVideoDto> findVideos = videoService.findAllByIndependentPostType(independentPostType);
 
         PostsResponseDto postsResponseDto = new PostsResponseDto(
                 findPostsResponse,
-                videoCollect
+                findVideos
         );
 
         return new Result(postsResponseDto, totalCount);
