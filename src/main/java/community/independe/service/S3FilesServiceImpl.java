@@ -110,12 +110,6 @@ public class S3FilesServiceImpl implements FilesService{
     }
 
     @Override
-    public Files findById(Long filesId) {
-        return filesRepository.findById(filesId)
-                .orElseThrow(() -> new CustomException(ErrorCode.FILE_NOT_FOUND));
-    }
-
-    @Override
     @Transactional
     public void deleteFile(Long postId) {
 
