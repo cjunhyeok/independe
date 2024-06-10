@@ -1,6 +1,10 @@
 package community.independe;
 
 import community.independe.repository.MemberRepository;
+import community.independe.repository.chat.ChatReadRepository;
+import community.independe.repository.chat.ChatRepository;
+import community.independe.repository.chat.ChatRoomParticipantRepository;
+import community.independe.repository.chat.ChatRoomRepository;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.keyword.KeywordRepository;
 import community.independe.repository.post.PostRepository;
@@ -32,12 +36,20 @@ public class InitDbTest {
     private VideoRepository videoRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ChatRoomRepository chatRoomRepository;
+    @Autowired
+    private ChatRoomParticipantRepository chatRoomParticipantRepository;
+    @Autowired
+    private ChatReadRepository chatReadRepository;
+    @Autowired
+    private ChatRepository chatRepository;
 
     @Test
     @Transactional
     void initDb() {
         // given
-        InitDB.InitService initService = new InitDB.InitService(em, memberRepository, postRepository, commentRepository, keywordRepository, videoRepository, passwordEncoder);
+        InitDB.InitService initService = new InitDB.InitService(em, memberRepository, postRepository, commentRepository, keywordRepository, videoRepository, passwordEncoder, chatRoomRepository, chatRoomParticipantRepository, chatReadRepository, chatRepository);
         InitDB initDB = new InitDB(initService);
         initDB.init();
     }
