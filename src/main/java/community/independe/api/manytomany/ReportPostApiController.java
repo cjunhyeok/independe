@@ -1,7 +1,6 @@
 package community.independe.api.manytomany;
 
 import community.independe.domain.manytomany.ReportPost;
-import community.independe.domain.member.Member;
 import community.independe.security.service.MemberContext;
 import community.independe.service.manytomany.ReportPostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,12 +24,12 @@ public class ReportPostApiController {
     public ResponseEntity addReportPost(@PathVariable(name = "postId") Long postId,
                                         @AuthenticationPrincipal MemberContext memberContext) {
 
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
 
-        ReportPost findReportPost = reportPostService.findByPostIdAndMemberId(postId, loginMember.getId());
+        ReportPost findReportPost = reportPostService.findByPostIdAndMemberId(postId, loginMemberId);
 
         if (findReportPost == null) {
-            reportPostService.save(postId, loginMember.getId());
+            reportPostService.save(postId, loginMemberId);
         } else if (findReportPost.getIsReport() == false) {
             reportPostService.updateIsReport(findReportPost, true);
         } else if (findReportPost.getIsReport() == true) {

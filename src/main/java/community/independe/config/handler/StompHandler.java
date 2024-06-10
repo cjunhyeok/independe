@@ -1,8 +1,8 @@
 package community.independe.config.handler;
 
-import community.independe.domain.member.Member;
 import community.independe.security.service.MemberContext;
 import community.independe.service.chat.ChatSessionService;
+import community.independe.service.dtos.FindMemberDto;
 import community.independe.util.JwtTokenVerifier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,21 +37,21 @@ public class StompHandler implements ChannelInterceptor {
         if (command == StompCommand.CONNECT) {
             token = accessor.getFirstNativeHeader("Authorization");
             jwtTokenVerifier.verifyToken(token);
-            Member loginMember = ((MemberContext) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getMember();
+            Long loginMemberId = ((MemberContext) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getMemberId();
 
-            chatSessionService.enterSocketSession(sessionId, loginMember.getId());
+            chatSessionService.enterSocketSession(sessionId, loginMemberId);
         } else if (command == StompCommand.SUBSCRIBE) {
             String destination = accessor.getDestination();
             if (destination.contains("/private")) {
                 Long chatRoomId = Long.parseLong(extractChatRoomId(destination));
-                Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
+                FindMemberDto loginMember = chatSessionService.getMemberSocketSession(sessionId);
 
                 // 세션(redis)에 회원 정보를 넣음
                 chatSessionService.enterChatRoom(loginMember.getId(), chatRoomId);
             }
         } else if (command == StompCommand.UNSUBSCRIBE) {
             // 세션(redis)에 회원 정보를 삭제
-            Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
+            FindMemberDto loginMember = chatSessionService.getMemberSocketSession(sessionId);
             Long chatRoomId = Long.parseLong(accessor.getFirstNativeHeader("ChatRoomId"));
             chatSessionService.leaveChatRoom(loginMember.getId(), chatRoomId);
         } else if (command == StompCommand.DISCONNECT) {

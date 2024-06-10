@@ -1,5 +1,6 @@
 package community.independe.service;
 
+import community.independe.api.dtos.alarm.AlarmsResponse;
 import community.independe.domain.alarm.Alarm;
 import community.independe.domain.alarm.AlarmType;
 import community.independe.domain.member.Member;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -43,7 +45,16 @@ public class AlarmServiceImpl implements AlarmService{
     }
 
     @Override
-    public List<Alarm> findAllByMemberId(Long memberId) {
-        return alarmRepository.findAllByMemberId(memberId);
+    public List<AlarmsResponse> findAllByMemberId(Long memberId) {
+        List<Alarm> findAlarms = alarmRepository.findAllByMemberId(memberId);
+
+        return findAlarms.stream()
+                .map(a -> AlarmsResponse.builder()
+                        .alarmType(a.getAlarmType())
+                        .message(a.getMessage())
+                        .isRead(a.getIsRead())
+                        .memberId(a.getMember().getId())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

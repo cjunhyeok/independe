@@ -2,8 +2,6 @@ package community.independe.api;
 
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.alarm.AlarmsResponse;
-import community.independe.domain.alarm.Alarm;
-import community.independe.domain.member.Member;
 import community.independe.repository.MemberRepository;
 import community.independe.security.service.MemberContext;
 import community.independe.service.AlarmService;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -29,19 +26,10 @@ public class AlarmApiController {
     @Operation(summary = "내 알람 조회 *")
     public Result alarmList(@AuthenticationPrincipal MemberContext memberContext) {
 
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
 
-        List<Alarm> alarms = alarmService.findAllByMemberId(loginMember.getId());
+        List<AlarmsResponse> findAlarmResponses = alarmService.findAllByMemberId(loginMemberId);
 
-        List<AlarmsResponse> collect = alarms.stream()
-                .map(a -> AlarmsResponse.builder()
-                        .alarmType(a.getAlarmType())
-                        .message(a.getMessage())
-                        .isRead(a.getIsRead())
-                        .memberId(a.getMember().getId())
-                        .build())
-                .collect(Collectors.toList());
-
-        return new Result(collect);
+        return new Result(findAlarmResponses);
     }
 }

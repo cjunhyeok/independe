@@ -1,5 +1,6 @@
 package community.independe.service;
 
+import community.independe.api.dtos.post.PostCommentResponse;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
@@ -8,10 +9,13 @@ import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.MemberRepository;
+import community.independe.repository.manytomany.RecommendCommentRepository;
 import community.independe.repository.post.PostRepository;
 import community.independe.repository.util.PageRequestCreator;
+import community.independe.service.dtos.FindCommentDto;
 import community.independe.service.dtos.MyCommentServiceDto;
 import community.independe.service.dtos.MyRecommendCommentServiceDto;
+import community.independe.service.util.ActionStatusChecker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,11 +35,22 @@ public class CommentServiceImpl implements CommentService{
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final RecommendCommentRepository recommendCommentRepository;
+    private final ActionStatusChecker actionStatusChecker;
 
     @Override
-    public Comment findById(Long id) {
-        return commentRepository.findById(id)
+    public FindCommentDto findById(Long id) {
+        Comment findComment = commentRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+
+        return FindCommentDto
+                .builder()
+                .id(findComment.getId())
+                .content(findComment.getContent())
+                .parentId(findComment.getParent() == null ? null : findComment.getParent().getId())
+                .memberId(findComment.getMember().getId())
+                .createdDate(findComment.getCreatedDate())
+                .build();
     }
 
     @Transactional
@@ -96,8 +111,20 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
-    public List<Comment> findAllByPostId(Long postId) {
-        return commentRepository.findAllByPostId(postId);
+    public List<PostCommentResponse> findCommentsByPostId(Long postId, Long loginMemberId) {
+        List<Comment> findComments = commentRepository.findAllByPostId(postId);
+
+        return findComments.stream()
+                .map(c -> new PostCommentResponse(
+                        c.getId(),
+                        c.getMember().getNickname(),
+                        c.getContent(),
+                        c.getCreatedDate(),
+                        recommendCommentRepository.countAllByCommentIdAndIsRecommend(c.getId()),
+                        (c.getParent() == null) ? null : c.getParent().getId(),
+                        c.getMember().getId(),
+                        actionStatusChecker.isRecommendComment(c.getId(), postId, loginMemberId)
+                )).collect(Collectors.toList());
     }
 
     private void checkRegion(Member findMember, Post findPost) {
@@ -123,6 +150,7 @@ public class CommentServiceImpl implements CommentService{
         PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(page, size);
         Page<Comment> findCommentsPage = commentRepository.findAllByMemberId(memberId, request);
         List<Comment> findComments = findCommentsPage.getContent();
+        long totalCount = findCommentsPage.getTotalElements();
 
         List<MyCommentServiceDto> myCommentServiceDtos = findComments.stream()
                 .map(fc -> MyCommentServiceDto.builder()
@@ -130,9 +158,8 @@ public class CommentServiceImpl implements CommentService{
                         .postId(fc.getPost().getId())
                         .content(fc.getContent())
                         .createdDate(fc.getCreatedDate())
+                        .totalCount(totalCount)
                         .build()).collect(Collectors.toList());
-
-        myCommentServiceDtos.get(0).setTotalCount(findCommentsPage.getTotalElements());
 
         return myCommentServiceDtos;
     }
@@ -142,6 +169,7 @@ public class CommentServiceImpl implements CommentService{
         PageRequest request = PageRequestCreator.createPageRequestSortCreatedDateDesc(page, size);
         Page<Comment> findRecommendCommentsPage = commentRepository.findRecommendCommentByMemberId(memberId, request);
         List<Comment> findRecommendComments = findRecommendCommentsPage.getContent();
+        long totalCount = findRecommendCommentsPage.getTotalElements();
 
         List<MyRecommendCommentServiceDto> myCommentServiceDtos = findRecommendComments.stream()
                 .map(frc -> MyRecommendCommentServiceDto.builder()
@@ -149,9 +177,8 @@ public class CommentServiceImpl implements CommentService{
                         .postId(frc.getPost().getId())
                         .content(frc.getContent())
                         .createdDate(frc.getCreatedDate())
+                        .totalCount(totalCount)
                         .build()).collect(Collectors.toList());
-
-        myCommentServiceDtos.get(0).setTotalCount(findRecommendCommentsPage.getTotalElements());
 
         return myCommentServiceDtos;
     }

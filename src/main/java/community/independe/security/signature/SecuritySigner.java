@@ -8,6 +8,8 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import community.independe.domain.member.Member;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
 import community.independe.security.service.MemberContext;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -18,12 +20,14 @@ import java.util.Map;
 public abstract class SecuritySigner {
 
     private final MemberRepository memberRepository;
+    protected final JWK jwk;
 
-    public SecuritySigner(MemberRepository memberRepository) {
+    public SecuritySigner(MemberRepository memberRepository, JWK jwk) {
         this.memberRepository = memberRepository;
+        this.jwk = jwk;
     }
 
-    protected String getJwtTokenInternal(MACSigner jwsSigner, String username, JWK jwk) throws JOSEException {
+    protected String getJwtTokenInternal(MACSigner jwsSigner, String username) throws JOSEException {
 
         Member findMember = memberRepository.findByUsername(username);
 
@@ -46,10 +50,14 @@ public abstract class SecuritySigner {
         return jwtToken;
     }
 
-    protected String getTokenOAuth2(MACSigner jwsSigner, OAuth2User oAuth2User, JWK jwk) throws JOSEException {
+    protected String getTokenOAuth2(MACSigner jwsSigner, OAuth2User oAuth2User) throws JOSEException {
 
         Map<String, Object> attributes = (Map<String, Object>) oAuth2User.getAttributes().get("response");
-        Member member = ((MemberContext) oAuth2User).getMember();
+        Long loginMemberId = ((MemberContext) oAuth2User).getMemberId();
+
+        Member findMember = memberRepository.findById(loginMemberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
+        );
 
 
         JWSHeader header = new JWSHeader.Builder((JWSAlgorithm)jwk.getAlgorithm()).keyID(jwk.getKeyID()).build();
@@ -57,9 +65,9 @@ public abstract class SecuritySigner {
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject("user")
                 .issuer("http://localhost:8080")
-                .claim("username", member.getUsername()) // 사용자 Id
-                .claim("authority", member.getRole()) // 사용자 권한
-                .claim("nickname", member.getNickname()) // 사용자 nickname
+                .claim("username", findMember.getUsername()) // 사용자 Id
+                .claim("authority", findMember.getRole()) // 사용자 권한
+                .claim("nickname", findMember.getNickname()) // 사용자 nickname
                 .expirationTime(new Date(new Date().getTime() + 60 * 1000 * 60)) // 60분
                 .build();
         SignedJWT signedJWT = new SignedJWT(header, jwtClaimsSet);
@@ -69,7 +77,7 @@ public abstract class SecuritySigner {
         return jwtToken;
     }
 
-    protected String getRefreshToken(MACSigner jwsSigner, String username, JWK jwk) throws JOSEException {
+    protected String getRefreshToken(MACSigner jwsSigner, String username) throws JOSEException {
 
         Member findMember = memberRepository.findByUsername(username);
 
@@ -92,9 +100,9 @@ public abstract class SecuritySigner {
         return jwtToken;
     }
 
-    public abstract String getJwtToken(String username, JWK jwk) throws JOSEException;
+    public abstract String getJwtToken(String username) throws JOSEException;
 
-    public abstract String getOAuth2JwtToken(OAuth2User oAuth2User, JWK jwk) throws JOSEException;
+    public abstract String getOAuth2JwtToken(OAuth2User oAuth2User) throws JOSEException;
 
-    public abstract String getRefreshJwtToken(String username, JWK jwk) throws JOSEException;
+    public abstract String getRefreshJwtToken(String username) throws JOSEException;
 }

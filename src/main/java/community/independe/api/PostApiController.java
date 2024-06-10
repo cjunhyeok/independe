@@ -3,30 +3,22 @@ package community.independe.api;
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.post.*;
 import community.independe.api.dtos.post.main.*;
-import community.independe.domain.comment.Comment;
 import community.independe.domain.keyword.KeywordDto;
-import community.independe.domain.member.Member;
-import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
-import community.independe.domain.video.Video;
-import community.independe.repository.query.MainPostApiRepository;
 import community.independe.security.service.MemberContext;
 import community.independe.service.*;
-import community.independe.service.manytomany.FavoritePostService;
+import community.independe.service.dtos.main.MainPostPageRequest;
+import community.independe.service.dtos.post.*;
 import community.independe.service.manytomany.RecommendCommentService;
 import community.independe.service.manytomany.RecommendPostService;
-import community.independe.service.manytomany.ReportPostService;
+import community.independe.service.util.ActionStatusChecker;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -47,12 +38,11 @@ public class PostApiController {
     private final CommentService commentService;
     private final KeywordService keywordService;
     private final VideoService videoService;
-    private final MainPostApiRepository mainPostApiRepository;
     private final FilesService filesService;
     private final RecommendPostService recommendPostService;
-    private final FavoritePostService favoritePostService;
-    private final ReportPostService reportPostService;
     private final RecommendCommentService recommendCommentService;
+    private final MainPostService mainPostService;
+    private final ActionStatusChecker actionStatusChecker;
 
     // 자취 게시글 카테고리로 불러오기
     @Operation(summary = "자취 게시글 타입별 조회")
@@ -60,50 +50,38 @@ public class PostApiController {
     public Result independentPosts(@PathVariable(name = "independentPostType") IndependentPostType independentPostType,
                                    @RequestParam(name = "condition", defaultValue = "no") String condition,
                                    @RequestParam(name = "keyword", required = false) String keyword,
-                                   @PageableDefault(
-                                           size = 10,
-                                           sort = "createdDate",
-                                           direction = Sort.Direction.DESC) Pageable pageable) {
+                                   @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                   @RequestParam(name = "size", defaultValue = "10") Integer size) {
 
-        if (keyword == null || keyword.isEmpty()) {
-
-        } else {
+        if (keyword != null && !keyword.isEmpty()) {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
 
-        // 게시글 불러오기
-//        Page<Post> allIndependentPosts =
-//                postService.findAllIndependentPostsByTypeWithMember(independentPostType, pageable);
-        Page<Post> allIndependentPosts =
-                postService.findAllIndependentPostsByTypeWithMember(independentPostType, condition, keyword, pageable);
-        List<Post> independentPosts = allIndependentPosts.getContent();
-        long totalCount = allIndependentPosts.getTotalElements();
+        FindIndependentPostsDto findIndependentPostsDto = FindIndependentPostsDto
+                .builder()
+                .independentPostType(independentPostType)
+                .condition(condition)
+                .keyword(keyword)
+                .page(page)
+                .size(size)
+                .build();
 
-        List<PostsResponse> postsCollect = independentPosts.stream()
-                .map(p -> new PostsResponse(
-                        p.getId(),
-                        p.getMember().getNickname(),
-                        p.getTitle(),
-                        p.getCreatedDate(),
-                        p.getViews(),
-                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
-                        commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
-                ))
-                .collect(Collectors.toList());
+        // 게시글 불러오기
+        List<PostsResponse> findPostsResponse
+                = postService.findIndependentPosts(findIndependentPostsDto);
+
+        // 총 게시글 수
+        Long totalCount = 0L;
+        if (!findPostsResponse.isEmpty()) {
+            totalCount = findPostsResponse.get(0).getTotalCount();
+        }
 
         // 영상 불러오기
-        List<Video> findAllByIndependentPostType = videoService.findAllByIndependentPostType(independentPostType);
-        List<IndependentPostVideoDto> videoCollect = findAllByIndependentPostType.stream()
-                .map(v -> new IndependentPostVideoDto(
-                        v.getVideoTitle(),
-                        v.getVideoUrl()
-                ))
-                .collect(Collectors.toList());
+        List<IndependentPostVideoDto> findVideos = videoService.findAllByIndependentPostType(independentPostType);
 
         PostsResponseDto postsResponseDto = new PostsResponseDto(
-                postsCollect,
-                videoCollect
+                findPostsResponse,
+                findVideos
         );
 
         return new Result(postsResponseDto, totalCount);
@@ -118,11 +96,10 @@ public class PostApiController {
                                                       @Parameter(description = "이미지") @RequestParam(required = false) List<MultipartFile> files,
                                                       @AuthenticationPrincipal MemberContext memberContext) throws IOException {
 
-        Member loginMember = memberContext.getMember();
-        Long memberId = loginMember.getId();
+        Long loginMemberId = memberContext.getMemberId();
 
         Long independentPost = postService.createIndependentPost(
-                memberId,
+                loginMemberId,
                 title,
                 content,
                 independentPostType);
@@ -141,37 +118,34 @@ public class PostApiController {
                               @PathVariable(name = "regionPostType") RegionPostType regionPostType,
                               @RequestParam(name = "condition", defaultValue = "no") String condition,
                               @RequestParam(name = "keyword", required = false) String keyword,
-                              @PageableDefault(size = 10,
-                                      sort = "createdDate",
-                                      direction = Sort.Direction.DESC)Pageable pageable) {
+                              @RequestParam(name = "page", defaultValue = "0") Integer page,
+                              @RequestParam(name = "size", defaultValue = "10") Integer size) {
 
         // 검색어 저장
-        if (keyword == null || keyword.isEmpty()) {
-
-        } else {
+        if (keyword != null && !keyword.isEmpty()) {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
 
+        FindRegionPostsDto findRegionPostsDto = FindRegionPostsDto
+                .builder()
+                .regionType(regionType)
+                .regionPostType(regionPostType)
+                .condition(condition)
+                .keyword(keyword)
+                .page(page)
+                .size(size)
+                .build();
+
         // 게시글 가져오기
-//        Page<Post> allRegionPosts = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, pageable);
-        Page<Post> allRegionPosts = postService.findAllRegionPostsByTypesWithMember(regionType, regionPostType, condition, keyword, pageable);
-        List<Post> regionPosts = allRegionPosts.getContent();
-        long totalCount = allRegionPosts.getTotalElements();
+        List<PostsResponse> findPostsResponse = postService.findRegionPosts(findRegionPostsDto);
 
-        List<PostsResponse> collect = regionPosts.stream()
-                .map(p -> new PostsResponse(
-                        p.getId(),
-                        p.getMember().getNickname(),
-                        p.getTitle(),
-                        p.getCreatedDate(),
-                        p.getViews(),
-                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
-                        commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
-                ))
-                .collect(Collectors.toList());
+        // 총 게시글 수
+        Long totalCount = 0L;
+        if (!findPostsResponse.isEmpty()) {
+            totalCount = findPostsResponse.get(0).getTotalCount();
+        }
 
-        return new Result(collect, totalCount);
+        return new Result(findPostsResponse, totalCount);
     }
 
     // 지역 게시글 생성
@@ -184,11 +158,10 @@ public class PostApiController {
                                                  @Parameter(description = "이미지") @RequestParam(required = false) List<MultipartFile> files,
                                                  @AuthenticationPrincipal MemberContext memberContext) throws IOException {
 
-        Member loginMember = memberContext.getMember();
-        Long memberId = loginMember.getId();
+        Long loginMemberId = memberContext.getMemberId();
 
         Long regionPost = postService.createRegionPost(
-                memberId,
+                loginMemberId,
                 title,
                 content,
                 regionType,
@@ -226,6 +199,8 @@ public class PostApiController {
     public ResponseEntity deletePost(@PathVariable(name = "postId") Long postId,
                                      @AuthenticationPrincipal MemberContext memberContext) {
 
+        // todo 요청하는 회원 정보와 일치하는지 확인
+
         postService.deletePost(postId);
 
         return ResponseEntity.ok("ok");
@@ -237,62 +212,30 @@ public class PostApiController {
     public Result post(@Parameter(description = "게시글 ID(PK)")@PathVariable(name = "postId") Long postId,
                        @AuthenticationPrincipal MemberContext memberContext) {
 
-        Member member = null;
-
-        if (memberContext == null) {
-            member = null;
-        } else {
-            member = memberContext.getMember();
-        }
+        Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
 
         postService.increaseViews(postId); // 조회수 증가
 
-        // 증가 이후 찾기
-        Post findPost = postService.findById(postId);
-        List<Comment> findComments = commentService.findAllByPostId(postId);
-        Long recommendCount = recommendPostService.countAllByPostIdAndIsRecommend(findPost.getId());
+        // 증가 이후 게시글 조회
+        FindPostDto findPostDto = postService.findById(postId);
+
+        // 댓글
+        List<PostCommentResponse> commentsDto = commentService.findCommentsByPostId(findPostDto.getId(), loginMemberId);
+        Long recommendCount = recommendPostService.countAllByPostIdAndIsRecommend(findPostDto.getId());
 
         // 베스트 댓글 찾기
-        BestCommentDto bestCommentDto = null;
-        List<Object[]> bestCommentList = recommendCommentService.findBestComment();
-        if (bestCommentList.isEmpty()) {
-            bestCommentDto = null;
-        } else {
-            Object[] bestCommentObject = bestCommentList.get(0);
-            Comment bestComment = (Comment) bestCommentObject[0];
-            Long bestCommentRecommendCount = (Long) bestCommentObject[1];
-            bestCommentDto = new BestCommentDto(
-                    bestComment.getId(),
-                    bestComment.getMember().getNickname(),
-                    bestComment.getContent(),
-                    bestComment.getCreatedDate(),
-                    bestCommentRecommendCount
-            );
-        }
-
-        // 댓글 Dto 생성
-        List<PostCommentResponse> commentsDto = findComments.stream()
-                .map(c -> new PostCommentResponse(
-                        c.getId(),
-                        c.getMember().getNickname(),
-                        c.getContent(),
-                        c.getCreatedDate(),
-                        recommendCommentService.countAllByCommentIdAndIsRecommend(c.getId()),
-                        (c.getParent() == null) ? null : c.getParent().getId(),
-                        c.getMember().getId(),
-                        isRecommendComment(c.getId(), findPost.getId(), (memberContext == null) ? null : memberContext.getMember())
-                )).collect(Collectors.toList());
+        BestCommentDto bestCommentDto = recommendCommentService.findBestComment();
 
         // 게시글 Dto 생성
         PostResponse postResponse = new PostResponse(
-                findPost,
+                findPostDto,
                 bestCommentDto,
                 commentsDto,
                 commentService.countAllByPostId(postId),
                 recommendCount,
-                isRecommend(findPost.getId(), member),
-                isFavorite(findPost.getId(), member),
-                isReport(findPost.getId(), member)
+                actionStatusChecker.isRecommend(postId, loginMemberId),
+                actionStatusChecker.isFavorite(postId, loginMemberId),
+                actionStatusChecker.isReport(postId, loginMemberId)
         );
 
         return new Result(postResponse);
@@ -300,42 +243,33 @@ public class PostApiController {
 
     @Operation(summary = "통합검색")
     @GetMapping("/api/posts/search")
-    public Result searchPost(@RequestParam(name = "condition", defaultValue = "total") String condition,
+    public Result searchPost(@RequestParam(name = "condition", defaultValue = "no") String condition,
                              @RequestParam(name = "keyword", required = false) String keyword,
-                             @PageableDefault(size = 10,
-                                     sort = "createdDate",
-                                     direction = Sort.Direction.DESC)Pageable pageable) {
+                             @RequestParam(name = "page", defaultValue = "0") Integer page,
+                             @RequestParam(name = "size", defaultValue = "10") Integer size) {
 
-        if (keyword == null || keyword.isEmpty()) {
-
-        } else {
+        // 검색어 저장
+        if (keyword != null && !keyword.isEmpty()) {
             keywordService.saveKeywordWithCondition(condition, keyword);
         }
 
-        Page<Post> findAllPostsBySearchWithMember = postService.findAllPostsBySearchWithMember(condition, keyword, pageable);
+        FindAllPostsDto findAllPostsDto = FindAllPostsDto
+                .builder()
+                .condition(condition)
+                .keyword(keyword)
+                .page(page)
+                .size(size)
+                .build();
 
-        List<Post> posts = findAllPostsBySearchWithMember.getContent();
-        long totalCount = findAllPostsBySearchWithMember.getTotalElements();
+        List<SearchResponse> findSearchResponses = postService.findAllPosts(findAllPostsDto);
 
-        List<SearchResponse> collect = posts.stream()
-                .map(p -> new SearchResponse(
-                        p.getId(),
-                        p.getTitle(),
-                        p.getMember().getNickname(),
-                        (p.getIndependentPostType() == null) ? null : p.getIndependentPostType().getDescription(),
-                        (p.getRegionType() == null) ? null : p.getRegionType().getDescription(),
-                        (p.getRegionPostType() == null) ? null : p.getRegionPostType().getDescription(),
-                        p.getIndependentPostType(),
-                        p.getRegionType(),
-                        p.getRegionPostType(),
-                        p.getViews(),
-                        recommendPostService.countAllByPostIdAndIsRecommend(p.getId()),
-                        commentService.countAllByPostId(p.getId()),
-                        !filesService.findAllFilesByPostId(p.getId()).getS3Urls().isEmpty()
-                ))
-                .collect(Collectors.toList());
+        // 총 게시글 수
+        Long totalCount = 0L;
+        if (!findSearchResponses.isEmpty()) {
+            totalCount = findSearchResponses.get(0).getTotalCount();
+        }
 
-        return new Result(collect, totalCount);
+        return new Result(findSearchResponses, totalCount);
     }
 
     @Operation(summary = "메인화면 조회")
@@ -346,73 +280,33 @@ public class PostApiController {
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1); // 어제
         LocalDateTime lastWeek = LocalDateTime.now().minusDays(7);
 
+        MainPostPageRequest mainPostPageRequest = MainPostPageRequest
+                .builder()
+                .dateOffset(yesterday)
+                .dateLimit(today)
+                .offset(0)
+                .limit(10)
+                .build();
+
         // 인기 게시글(10개)
-        List<Post> findAllPopularPosts = mainPostApiRepository.findAllPopularPosts(yesterday, today, 0, 10);
-        List<PopularPostDto> popularPostDto = findAllPopularPosts.stream()
-                .map(p -> new PopularPostDto(
-                        p.getId(),
-                        p.getTitle(),
-                        (p.getIndependentPostType() == null) ? null : p.getIndependentPostType().getDescription(),
-                        (p.getRegionType() == null) ? null : p.getRegionType().getDescription(),
-                        (p.getRegionPostType() == null) ? null : p.getRegionPostType().getDescription(),
-                        p.getIndependentPostType(),
-                        p.getRegionType(),
-                        p.getRegionPostType(),
-                        p.getViews(),
-                        Long.valueOf(p.getRecommendPosts().size()),
-                        Long.valueOf(p.getComments().size()),
-                        (p.getFiles().isEmpty()) ? false : true
-                )).collect(Collectors.toList());
+        List<PopularPostDto> popularPostDto = mainPostService.findPopularPosts(mainPostPageRequest);
 
         // 추천수 자취 게시글 10개
-        List<Post> findAllIndependentPostByRecommendCount = mainPostApiRepository.findAllIndependentPostByRecommendCount(yesterday, today, 0, 10);
-        List<PopularIndependentPostsDto> popularIndependentPostsDto = findAllIndependentPostByRecommendCount.stream()
-                .map(p -> new PopularIndependentPostsDto(
-                        p.getId(),
-                        p.getTitle(),
-                        p.getIndependentPostType().getDescription(),
-                        p.getIndependentPostType(),
-                        Long.valueOf(p.getRecommendPosts().size()),
-                        Long.valueOf(p.getComments().size()),
-                        (p.getFiles().isEmpty()) ? false : true
-                )).collect(Collectors.toList());
+        List<PopularIndependentPostsDto> popularIndependentPostsDto = mainPostService.findIndependentPosts(mainPostPageRequest);
+
+        mainPostPageRequest.updateLimit(5);
 
         // 전체 지역 게시글 5개
-        List<Post> findAllRegionPostByRecommendCount = mainPostApiRepository.findAllRegionAllPostByRecommendCount(yesterday, today, 0, 5);
-        List<RegionAllPostDto> regionAllPostDto = findAllRegionPostByRecommendCount.stream()
-                .map(p -> new RegionAllPostDto(
-                        p.getId(),
-                        p.getTitle(),
-                        Long.valueOf(p.getRecommendPosts().size()),
-                        Long.valueOf(p.getComments().size()),
-                        (p.getFiles().isEmpty()) ? false : true
-                )).collect(Collectors.toList());
+        List<RegionAllPostDto> regionAllPostDto = mainPostService.findRegionAllPosts(mainPostPageRequest);
 
         // 전체 아닌 지역 게시글 5개
-        List<Post> findRegionNotAllPostByRecommendCount = mainPostApiRepository.findRegionNotAllPostByRecommendCount(yesterday, today, 0, 5);
-        List<RegionNotAllPostDto> regionNotAllPostDto = findRegionNotAllPostByRecommendCount.stream()
-                .map(p -> new RegionNotAllPostDto(
-                        p.getId(),
-                        p.getTitle(),
-                        p.getRegionType().getDescription(),
-                        p.getRegionPostType().getDescription(),
-                        p.getRegionType(),
-                        p.getRegionPostType(),
-                        Long.valueOf(p.getRecommendPosts().size()),
-                        Long.valueOf(p.getComments().size()),
-                        (p.getFiles().isEmpty()) ? false : true
-                )).collect(Collectors.toList());
+        List<RegionNotAllPostDto> regionNotAllPostDto = mainPostService.findRegionNotAllPosts(mainPostPageRequest);
 
         // 인기 검색어 10개
         List<KeywordDto> keywordsDto = keywordService.findKeywordsByGroup();
 
         // 영상
-        List<Video> findAllForMain = videoService.findAllForMain();
-        List<VideoMainDto> videoMainDto = findAllForMain.stream()
-                .map(v -> new VideoMainDto(
-                        v.getVideoTitle(),
-                        v.getVideoUrl()
-                )).collect(Collectors.toList());
+        List<VideoMainDto> videoMainDto = mainPostService.findAllForMain();
 
         MainPostDto mainPostDto = new MainPostDto(
                 "다가오는 장마철 천연 정화석을 구비하여 습기를 제거해보세요",
@@ -425,53 +319,5 @@ public class PostApiController {
         );
 
         return new Result(mainPostDto);
-    }
-
-    private boolean isRecommendComment(Long commentId, Long postId, Member member) {
-        if (member == null) {
-            return false;
-        } else {
-            if (recommendCommentService.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, member.getId()) == null) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-    }
-
-    private boolean isRecommend(Long postId, Member member) {
-        if(member == null) {
-            return false;
-        } else {
-            if(recommendPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-    }
-
-    private boolean isFavorite(Long postId, Member member) {
-        if(member == null) {
-            return false;
-        } else {
-            if(favoritePostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-    }
-
-    private boolean isReport(Long postId, Member member) {
-        if(member == null) {
-            return false;
-        } else {
-            if(reportPostService.findByPostIdAndMemberIdAndIsRecommend(postId, member.getId()) == null) {
-                return false;
-            } else {
-                return true;
-            }
-        }
     }
 }

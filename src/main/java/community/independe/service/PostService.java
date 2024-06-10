@@ -1,19 +1,22 @@
 package community.independe.service;
 
-import community.independe.domain.post.Post;
+import community.independe.api.dtos.post.PostsResponse;
+import community.independe.api.dtos.post.SearchResponse;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.service.dtos.MyPostServiceDto;
 import community.independe.service.dtos.MyRecommendPostServiceDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import community.independe.service.dtos.post.FindAllPostsDto;
+import community.independe.service.dtos.post.FindIndependentPostsDto;
+import community.independe.service.dtos.post.FindPostDto;
+import community.independe.service.dtos.post.FindRegionPostsDto;
 
 import java.util.List;
 
 public interface PostService {
 
-    Post findById(Long postId);
+    FindPostDto findById(Long postId);
 
     // 자취 게시판에 글 쓰기
     Long createIndependentPost(Long memberId, String title, String content,
@@ -29,18 +32,11 @@ public interface PostService {
     // 게시글 삭제
     void deletePost(Long postId);
 
-    Page<Post> findAllIndependentPostsByTypeWithMember(IndependentPostType independentPostType,
-                                                       String condition,
-                                                       String keyword,
-                                                       Pageable pageable);
+    List<PostsResponse> findIndependentPosts(FindIndependentPostsDto findIndependentPostsDto);
 
-    Page<Post> findAllRegionPostsByTypesWithMember(RegionType regionType,
-                                                   RegionPostType regionPostType,
-                                                   String condition,
-                                                   String keyword,
-                                                   Pageable pageable);
+    List<PostsResponse> findRegionPosts(FindRegionPostsDto findRegionPostsDto);
 
-    Page<Post> findAllPostsBySearchWithMember(String condition, String keyword, Pageable pageable);
+    List<SearchResponse> findAllPosts(FindAllPostsDto findAllPostsDto);
 
     void increaseViews(Long postId);
 

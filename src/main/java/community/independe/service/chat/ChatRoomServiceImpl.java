@@ -101,7 +101,7 @@ public class ChatRoomServiceImpl implements ChatRoomService{
                     = chatRoomParticipantRepository.findChatRoomParticipantsByChatRoomIdFetchMember(chatRoom.getId());
 
             ChatRoomsResponse.ChatRoomsResponseBuilder chatRoomsResponseBuilder = ChatRoomsResponse.builder()
-                    .chatRoomId(findLastChat.getId())
+                    .chatRoomId(chatRoom.getId())
                     .lastMessage(findLastChat.getMessage())
                     .unReadCount(findUnReadCount);
 

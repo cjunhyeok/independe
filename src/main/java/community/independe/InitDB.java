@@ -1,5 +1,9 @@
 package community.independe;
 
+import community.independe.domain.chat.Chat;
+import community.independe.domain.chat.ChatRead;
+import community.independe.domain.chat.ChatRoom;
+import community.independe.domain.chat.ChatRoomParticipant;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.keyword.Keyword;
 import community.independe.domain.member.Member;
@@ -8,6 +12,10 @@ import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.domain.video.Video;
+import community.independe.repository.chat.ChatReadRepository;
+import community.independe.repository.chat.ChatRepository;
+import community.independe.repository.chat.ChatRoomParticipantRepository;
+import community.independe.repository.chat.ChatRoomRepository;
 import community.independe.repository.comment.CommentRepository;
 import community.independe.repository.keyword.KeywordRepository;
 import community.independe.repository.MemberRepository;
@@ -46,6 +54,10 @@ public class InitDB {
         private final KeywordRepository keywordRepository;
         private final VideoRepository videoRepository;
         private final PasswordEncoder passwordEncoder;
+        private final ChatRoomRepository chatRoomRepository;
+        private final ChatRoomParticipantRepository chatRoomParticipantRepository;
+        private final ChatReadRepository chatReadRepository;
+        private final ChatRepository chatRepository;
 
         public void dbInit() {
 
@@ -55,7 +67,7 @@ public class InitDB {
                     .nickname("nick1")
                     .role("ROLE_USER")
                     .build();
-            memberRepository.save(member);
+            Member savedMember1 = memberRepository.save(member);
 
             Member member2 = Member.builder()
                     .username("id2")
@@ -63,7 +75,15 @@ public class InitDB {
                     .nickname("nick2")
                     .role("ROLE_USER")
                     .build();
-            memberRepository.save(member2);
+            Member savedMember2 = memberRepository.save(member2);
+
+            Member member3 = Member.builder()
+                    .username("id3")
+                    .password(passwordEncoder.encode("abc12!"))
+                    .nickname("nick3")
+                    .role("ROLE_USER")
+                    .build();
+            Member savedMember3 = memberRepository.save(member3);
 
             Post regionPost = Post.builder()
                     .title("regionTitle")
@@ -209,8 +229,58 @@ public class InitDB {
             commentRepository.save(comment4);
 
             saveDefaultData();
-        }
 
+            ChatRoom chatRoom12 = ChatRoom.builder().title("1_2").build();
+            ChatRoom savedChatRoom12 = chatRoomRepository.save(chatRoom12);
+            chatRoomParticipantRepository.save(ChatRoomParticipant.builder().chatRoom(savedChatRoom12).member(savedMember1).build());
+            chatRoomParticipantRepository.save(ChatRoomParticipant.builder().chatRoom(savedChatRoom12).member(savedMember2).build());
+            Chat chat1to2f = chatRepository.save(Chat.builder().chatRoom(savedChatRoom12).message("1 to 2 first").member(savedMember1).build());
+            Chat chat2to1f = chatRepository.save(Chat.builder().chatRoom(savedChatRoom12).message("2 to 1 first").member(savedMember2).build());
+            Chat chat1to2s = chatRepository.save(Chat.builder().chatRoom(savedChatRoom12).message("1 to 2 second").member(savedMember1).build());
+            Chat chat2to1s = chatRepository.save(Chat.builder().chatRoom(savedChatRoom12).message("2 to 1 second").member(savedMember2).build());
+            Chat chat1to2t = chatRepository.save(Chat.builder().chatRoom(savedChatRoom12).message("1 to 2 third").member(savedMember1).build());
+            Chat chat2to1t = chatRepository.save(Chat.builder().chatRoom(savedChatRoom12).message("2 to 1 third").member(savedMember2).build());
+            chatReadRepository.save(ChatRead.builder().isRead(true).member(savedMember2).chat(chat1to2f).build());
+            chatReadRepository.save(ChatRead.builder().isRead(true).member(savedMember1).chat(chat2to1f).build());
+            chatReadRepository.save(ChatRead.builder().isRead(false).member(savedMember2).chat(chat1to2s).build());
+            chatReadRepository.save(ChatRead.builder().isRead(false).member(savedMember1).chat(chat2to1s).build());
+            chatReadRepository.save(ChatRead.builder().isRead(false).member(savedMember2).chat(chat1to2t).build());
+            chatReadRepository.save(ChatRead.builder().isRead(false).member(savedMember1).chat(chat2to1t).build());
+
+            ChatRoom chatRoom13 = ChatRoom.builder().title("1_3").build();
+            ChatRoom savedChatRoom13 = chatRoomRepository.save(chatRoom13);
+            chatRoomParticipantRepository.save(ChatRoomParticipant.builder().chatRoom(savedChatRoom13).member(savedMember1).build());
+            chatRoomParticipantRepository.save(ChatRoomParticipant.builder().chatRoom(savedChatRoom13).member(savedMember3).build());
+            Chat chat1to3f = chatRepository.save(Chat.builder().chatRoom(savedChatRoom13).message("1 to 3 first").member(savedMember1).build());
+            Chat chat3to1f = chatRepository.save(Chat.builder().chatRoom(savedChatRoom13).message("3 to 1 first").member(savedMember3).build());
+            Chat chat1to3s = chatRepository.save(Chat.builder().chatRoom(savedChatRoom13).message("1 to 3 second").member(savedMember1).build());
+            Chat chat3to1s = chatRepository.save(Chat.builder().chatRoom(savedChatRoom13).message("3 to 1 second").member(savedMember3).build());
+            Chat chat1to3t = chatRepository.save(Chat.builder().chatRoom(savedChatRoom13).message("1 to 3 third").member(savedMember1).build());
+            Chat chat3to1t = chatRepository.save(Chat.builder().chatRoom(savedChatRoom13).message("3 to 1 third").member(savedMember3).build());
+            chatReadRepository.save(ChatRead.builder().isRead(true).member(savedMember3).chat(chat1to3f).build());
+            chatReadRepository.save(ChatRead.builder().isRead(true).member(savedMember1).chat(chat3to1f).build());
+            chatReadRepository.save(ChatRead.builder().isRead(false).member(savedMember3).chat(chat1to3s).build());
+            chatReadRepository.save(ChatRead.builder().isRead(false).member(savedMember1).chat(chat3to1s).build());
+            chatReadRepository.save(ChatRead.builder().isRead(false).member(savedMember3).chat(chat1to3t).build());
+            chatReadRepository.save(ChatRead.builder().isRead(false).member(savedMember1).chat(chat3to1t).build());
+
+            ChatRoom chatRoom23 = ChatRoom.builder().title("2_3").build();
+            ChatRoom savedChatRoom23 = chatRoomRepository.save(chatRoom23);
+            chatRoomParticipantRepository.save(ChatRoomParticipant.builder().chatRoom(savedChatRoom23).member(savedMember2).build());
+            chatRoomParticipantRepository.save(ChatRoomParticipant.builder().chatRoom(savedChatRoom23).member(savedMember3).build());
+            Chat chat2to3f = chatRepository.save(Chat.builder().chatRoom(savedChatRoom23).message("2 to 3 first").member(savedMember2).build());
+            Chat chat3to2f = chatRepository.save(Chat.builder().chatRoom(savedChatRoom23).message("3 to 2 first").member(savedMember3).build());
+            Chat chat2to3s = chatRepository.save(Chat.builder().chatRoom(savedChatRoom23).message("2 to 3 second").member(savedMember2).build());
+            Chat chat3to2s = chatRepository.save(Chat.builder().chatRoom(savedChatRoom23).message("3 to 2 second").member(savedMember3).build());
+            Chat chat2to3t = chatRepository.save(Chat.builder().chatRoom(savedChatRoom23).message("2 to 3 third").member(savedMember2).build());
+            Chat chat3to2t = chatRepository.save(Chat.builder().chatRoom(savedChatRoom23).message("3 to 2 third").member(savedMember3).build());
+            chatReadRepository.save(ChatRead.builder().isRead(true).member(savedMember3).chat(chat2to3f).build());
+            chatReadRepository.save(ChatRead.builder().isRead(true).member(savedMember2).chat(chat3to2f).build());
+            chatReadRepository.save(ChatRead.builder().isRead(false).member(savedMember3).chat(chat2to3s).build());
+            chatReadRepository.save(ChatRead.builder().isRead(false).member(savedMember2).chat(chat3to2s).build());
+            chatReadRepository.save(ChatRead.builder().isRead(false).member(savedMember3).chat(chat2to3t).build());
+            chatReadRepository.save(ChatRead.builder().isRead(false).member(savedMember2).chat(chat3to2t).build());
+        }
 
         private void saveDefaultMemberPostData() {
             for (int i = 0; i < 100; i++) {

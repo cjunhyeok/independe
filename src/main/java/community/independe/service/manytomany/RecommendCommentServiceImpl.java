@@ -1,5 +1,6 @@
 package community.independe.service.manytomany;
 
+import community.independe.api.dtos.post.BestCommentDto;
 import community.independe.domain.comment.Comment;
 import community.independe.domain.manytomany.RecommendComment;
 import community.independe.domain.member.Member;
@@ -57,17 +58,25 @@ public class RecommendCommentServiceImpl implements RecommendCommentService{
     }
 
     @Override
-    public Long countAllByCommentIdAndIsRecommend(Long commentId) {
-        return recommendCommentRepository.countAllByCommentIdAndIsRecommend(commentId);
-    }
+    public BestCommentDto findBestComment() {
+        List<Object[]> bestCommentList = recommendCommentRepository.findBestComment();
+        BestCommentDto bestCommentDto = null;
 
-    @Override
-    public RecommendComment findByCommentIdAndPostIdAndMemberIdAndIsRecommend(Long commentId, Long postId, Long memberId) {
-        return recommendCommentRepository.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, memberId);
-    }
+        if (bestCommentList.isEmpty()) {
+            bestCommentDto = null;
+        } else {
+            Object[] bestCommentObject = bestCommentList.get(0);
+            Comment bestComment = (Comment) bestCommentObject[0];
+            Long bestCommentRecommendCount = (Long) bestCommentObject[1];
+            bestCommentDto = new BestCommentDto(
+                    bestComment.getId(),
+                    bestComment.getMember().getNickname(),
+                    bestComment.getContent(),
+                    bestComment.getCreatedDate(),
+                    bestCommentRecommendCount
+            );
+        }
 
-    @Override
-    public List<Object[]> findBestComment() {
-        return recommendCommentRepository.findBestComment();
+        return bestCommentDto;
     }
 }

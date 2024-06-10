@@ -21,7 +21,7 @@ public class MyRecommendPostServiceDto {
     private Long totalCount;
 
     @Builder
-    public MyRecommendPostServiceDto(Long postId, Long memberId, String title, IndependentPostType independentPostType, RegionType regionType, RegionPostType regionPostType, String nickname, LocalDateTime createdDate) {
+    public MyRecommendPostServiceDto(Long postId, Long memberId, String title, IndependentPostType independentPostType, RegionType regionType, RegionPostType regionPostType, String nickname, LocalDateTime createdDate, Long totalCount) {
         this.postId = postId;
         this.memberId = memberId;
         this.title = title;
@@ -30,9 +30,6 @@ public class MyRecommendPostServiceDto {
         this.regionPostType = regionPostType;
         this.nickname = nickname;
         this.createdDate = createdDate;
-    }
-
-    public void setTotalCount(Long totalCount) {
         this.totalCount = totalCount;
     }
 }

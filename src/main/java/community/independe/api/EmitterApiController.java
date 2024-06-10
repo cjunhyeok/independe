@@ -1,6 +1,5 @@
 package community.independe.api;
 
-import community.independe.domain.member.Member;
 import community.independe.security.service.MemberContext;
 import community.independe.service.EmitterService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,7 +24,7 @@ public class EmitterApiController {
     public SseEmitter subscribe(@RequestHeader(value = "Last-Event-Id", required = false, defaultValue = " ") String lastEventId,
                                 @AuthenticationPrincipal MemberContext memberContext) {
 
-        Member loginMember = memberContext.getMember();
-        return emitterService.subscribe(loginMember.getId());
+        Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
+        return emitterService.subscribe(loginMemberId);
     }
 }

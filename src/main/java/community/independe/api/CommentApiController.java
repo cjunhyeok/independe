@@ -3,14 +3,13 @@ package community.independe.api;
 import community.independe.api.dtos.comment.CreateChildCommentRequest;
 import community.independe.api.dtos.comment.CreateParentCommentRequest;
 import community.independe.domain.alarm.AlarmType;
-import community.independe.domain.comment.Comment;
-import community.independe.domain.member.Member;
-import community.independe.domain.post.Post;
 import community.independe.security.service.MemberContext;
 import community.independe.service.AlarmService;
 import community.independe.service.CommentService;
 import community.independe.service.EmitterService;
 import community.independe.service.PostService;
+import community.independe.service.dtos.FindCommentDto;
+import community.independe.service.dtos.post.FindPostDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,17 +37,17 @@ public class CommentApiController {
     public ResponseEntity<Long> createParentComment(@RequestBody @Valid CreateParentCommentRequest request,
                                                     @AuthenticationPrincipal MemberContext memberContext) {
 
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext.getMemberId();
 
         Long parentComment = commentService.createParentComment(
-                loginMember.getId(),
+                loginMemberId,
                 request.getPostId(),
                 request.getContent());
 
-        Post findPost = postService.findById(request.getPostId());
+        FindPostDto findPostDto = postService.findById(request.getPostId());
 
-        emitterService.notify(findPost.getMember().getId(), POST_MESSAGE);
-        alarmService.saveAlarm(POST_MESSAGE, false, AlarmType.POST, findPost.getMember().getId());
+        emitterService.notify(findPostDto.getMemberId(), POST_MESSAGE);
+        alarmService.saveAlarm(POST_MESSAGE, false, AlarmType.POST, findPostDto.getMemberId());
 
         return ResponseEntity.ok(parentComment);
     }
@@ -58,23 +57,23 @@ public class CommentApiController {
     public ResponseEntity<Long> createChildComment(@RequestBody @Valid CreateChildCommentRequest request,
                                                    @AuthenticationPrincipal MemberContext memberContext) {
 
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext.getMemberId();
 
         Long childComment = commentService.createChildComment(
-                loginMember.getId(),
+                loginMemberId,
                 request.getPostId(),
                 request.getParentId(),
                 request.getContent()
         );
 
-        Post findPost = postService.findById(request.getPostId());
-        Comment findParentComment = commentService.findById(request.getParentId());
+        FindPostDto findPostDto = postService.findById(request.getPostId());
+        FindCommentDto findParentCommentDto = commentService.findById(request.getParentId());
 
-        emitterService.notify(findPost.getMember().getId(), POST_MESSAGE);
-        alarmService.saveAlarm(POST_MESSAGE, false, AlarmType.POST, findPost.getMember().getId());
+        emitterService.notify(findPostDto.getMemberId(), POST_MESSAGE);
+        alarmService.saveAlarm(POST_MESSAGE, false, AlarmType.POST, findPostDto.getMemberId());
 
-        emitterService.notify(findParentComment.getMember().getId(), COMMENT_MESSAGE);
-        alarmService.saveAlarm(COMMENT_MESSAGE, false, AlarmType.COMMENT, findParentComment.getMember().getId());
+        emitterService.notify(findParentCommentDto.getMemberId(), COMMENT_MESSAGE);
+        alarmService.saveAlarm(COMMENT_MESSAGE, false, AlarmType.COMMENT, findParentCommentDto.getMemberId());
 
         return ResponseEntity.ok(childComment);
     }

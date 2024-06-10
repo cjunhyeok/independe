@@ -1,7 +1,6 @@
 package community.independe.service;
 
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.jwk.JWK;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.enums.RegionType;
 import community.independe.exception.CustomException;
@@ -15,8 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -27,7 +24,6 @@ public class MemberServiceImpl implements MemberService {
     private final PasswordEncoder passwordEncoder;
     private final SecuritySigner securitySigner;
     private final RefreshTokenService refreshTokenService;
-    private final JWK jwk;
 
     @Override
     @Transactional
@@ -42,7 +38,7 @@ public class MemberServiceImpl implements MemberService {
         String nickname = joinServiceDto.getNickname();
         Member findNickname = memberRepository.findByNickname(nickname);
         if (findNickname != null) {
-            throw new CustomException(ErrorCode.USERNAME_DUPLICATED);
+            throw new CustomException(ErrorCode.NICKNAME_DUPLICATED);
         }
 
         Member member = Member.builder()
@@ -77,8 +73,8 @@ public class MemberServiceImpl implements MemberService {
             String role = findMember.getRole();
 
             // 해당 부분 리펙토링이 필요할듯
-            String jwtToken = securitySigner.getJwtToken(findUsername, jwk);
-            String refreshToken = securitySigner.getRefreshJwtToken(findUsername, jwk);
+            String jwtToken = securitySigner.getJwtToken(findUsername);
+            String refreshToken = securitySigner.getRefreshJwtToken(findUsername);
             refreshTokenService.save(loginServiceDto.getIp(), role, refreshToken, findUsername);
 
             return LoginResponse.builder()
@@ -137,24 +133,40 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member findById(Long id) {
-        return memberRepository.findById(id).orElseThrow(
+    public boolean checkDuplicateUsername(String username) {
+        Member findMember = memberRepository.findByUsername(username);
+
+        if (findMember == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    @Override
+    public boolean checkDuplicateNickname(String nickname) {
+        Member findMember = memberRepository.findByNickname(nickname);
+
+        if (findMember == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public FindMemberDto findMemberById(Long memberId) {
+        Member findMember = memberRepository.findById(memberId).orElseThrow(
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
-    }
 
-    @Override
-    public Member findByUsername(String username) {
-        return memberRepository.findByUsername(username);
-    }
-
-    @Override
-    public Member findByNickname(String nickname) {
-        return memberRepository.findByNickname(nickname);
-    }
-
-    @Override
-    public List<Member> findAll() {
-        return memberRepository.findAll();
+        return FindMemberDto.builder()
+                .id(findMember.getId())
+                .username(findMember.getUsername())
+                .nickname(findMember.getNickname())
+                .email(findMember.getEmail())
+                .number(findMember.getNumber())
+                .build();
     }
 }

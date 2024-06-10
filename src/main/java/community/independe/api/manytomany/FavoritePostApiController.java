@@ -2,7 +2,6 @@ package community.independe.api.manytomany;
 
 import community.independe.api.dtos.Result;
 import community.independe.domain.manytomany.FavoritePost;
-import community.independe.domain.member.Member;
 import community.independe.security.service.MemberContext;
 import community.independe.service.manytomany.FavoritePostService;
 import community.independe.service.manytomany.dtos.GetFavoritePostServiceDto;
@@ -27,11 +26,11 @@ public class FavoritePostApiController {
     public ResponseEntity addFavoritePost(@PathVariable(name = "postId") Long postId,
                                           @AuthenticationPrincipal MemberContext memberContext) {
 
-        Member loginMember = memberContext.getMember();
-        FavoritePost findFavoritePost = favoritePostService.findByPostIdAndMemberId(postId, loginMember.getId());
+        Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
+        FavoritePost findFavoritePost = favoritePostService.findByPostIdAndMemberId(postId, loginMemberId);
 
         if (findFavoritePost == null) {
-            favoritePostService.save(postId, loginMember.getId());
+            favoritePostService.save(postId, loginMemberId);
         } else if (findFavoritePost.getIsFavorite() == false) {
             favoritePostService.updateIsFavorite(findFavoritePost, true);
         } else if (findFavoritePost.getIsFavorite() == true) {
@@ -46,10 +45,14 @@ public class FavoritePostApiController {
     public Result getFavoritePost(@RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                   @RequestParam(name = "size", required = false, defaultValue = "10") int size,
                                   @AuthenticationPrincipal MemberContext memberContext) {
-        Member loginMember = memberContext.getMember();
+        Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
+        Long totalCount = 0L;
 
-        List<GetFavoritePostServiceDto> response = favoritePostService.findFavoritePostByMemberId(loginMember.getId(), page, size);
-        Long totalCount = response.get(0).getTotalCount();
+        List<GetFavoritePostServiceDto> response = favoritePostService.findFavoritePostByMemberId(loginMemberId, page, size);
+
+        if (!response.isEmpty()) {
+            totalCount = response.get(0).getTotalCount();
+        }
 
         return new Result<>(response, totalCount);
     }

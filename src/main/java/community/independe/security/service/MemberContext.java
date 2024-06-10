@@ -10,22 +10,22 @@ import java.util.Map;
 
 public class MemberContext extends User implements OAuth2User {
 
-    private final Member member;
+    private final Long memberId;
     private Map<String, Object> attributes;
 
     public MemberContext(Member member, Collection<? extends GrantedAuthority> authorities, Map<String, Object> attributes) {
         super(member.getUsername(), member.getPassword(), authorities);
-        this.member = member;
+        this.memberId = member.getId();
         this.attributes = attributes;
     }
 
     public MemberContext(Member member, Collection<? extends GrantedAuthority> authorities) {
         super(member.getUsername(), member.getPassword(), authorities);
-        this.member = member;
+        this.memberId = member.getId();
     }
 
-    public Member getMember() {
-        return member;
+    public Long getMemberId() {
+        return memberId;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package community.independe.service;
 
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.jwk.JWK;
 import community.independe.domain.token.RefreshTokenMapper;
 import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
@@ -23,7 +22,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     private final JwtTokenVerifier jwtTokenVerifier;
     private final SecuritySigner securitySigner;
-    private final JWK jwk;
     private final RedisTemplate redisTemplate;
     private final String RedisKeyPrefix = "refreshToken : ";
 
@@ -59,7 +57,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         }
 
         String role = (String) redisTemplate.opsForHash().get(RedisKeyPrefix + username, "role");
-        String newRefreshToken = securitySigner.getRefreshJwtToken(username, jwk);
+        String newRefreshToken = securitySigner.getRefreshJwtToken(username);
         saveRefreshToken(currentIp, role, newRefreshToken, username);
 
         return newRefreshToken;

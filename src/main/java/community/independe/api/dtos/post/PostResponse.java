@@ -1,9 +1,9 @@
 package community.independe.api.dtos.post;
 
-import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.domain.post.enums.RegionPostType;
 import community.independe.domain.post.enums.RegionType;
+import community.independe.service.dtos.post.FindPostDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +34,10 @@ public class PostResponse {
     private BestCommentDto bestComment;
     private List<PostCommentResponse> comments;
 
-    public PostResponse(Post post, BestCommentDto bestComment ,List<PostCommentResponse> comments, Long commentCount, Long recommendCount, Boolean isRecommend, Boolean isFavorite, Boolean isReport) {
+    public PostResponse(FindPostDto post, BestCommentDto bestComment , List<PostCommentResponse> comments, Long commentCount, Long recommendCount, Boolean isRecommend, Boolean isFavorite, Boolean isReport) {
         this.title = post.getTitle();
         this.content = post.getContent();
-        this.nickname = post.getMember().getNickname();
+        this.nickname = post.getNickname();
         this.createdDate = post.getCreatedDate();
         this.independentPostType = (post.getIndependentPostType() == null) ? null : post.getIndependentPostType().getDescription();
         this.regionType = (post.getRegionType() == null) ? null : post.getRegionType().getDescription();

@@ -3,16 +3,15 @@ package community.independe.api;
 import community.independe.api.dtos.chat.*;
 import community.independe.domain.alarm.AlarmType;
 import community.independe.domain.chat.Chat;
-import community.independe.domain.member.Member;
 import community.independe.exception.CustomException;
 import community.independe.service.AlarmService;
 import community.independe.service.EmitterService;
 import community.independe.service.MemberService;
 import community.independe.service.chat.ChatReadService;
-import community.independe.service.chat.ChatRoomService;
 import community.independe.service.chat.ChatService;
 import community.independe.service.chat.ChatSessionService;
 import community.independe.service.chat.dtos.SaveChatDto;
+import community.independe.service.dtos.FindMemberDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.Header;
@@ -36,15 +35,14 @@ public class ChatApiController {
     private final AlarmService alarmService;
     private final ChatSessionService chatSessionService;
     private final MemberService memberService;
-    private final ChatRoomService chatRoomService;
     private final ChatReadService chatReadService;
 
     @MessageMapping("/private-message")
     public ReceiveMessage receivePrivateMessage(@Payload SendMessage sendMessage, @Header("simpSessionId") String sessionId){
 
-        Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
+        FindMemberDto loginMember = chatSessionService.getMemberSocketSession(sessionId);
         Set<String> chatRoomMembers = chatSessionService.getChatRoomMembers(sendMessage.getChatRoomId().toString());
-        Member findSender = memberService.findById(sendMessage.getSenderId());
+        FindMemberDto findSender = memberService.findMemberById(sendMessage.getSenderId());
 
         // 채팅방 세션에 상대방이 있는지 확인 후 isRead 값을 가져온다.
         Boolean isRead = checkChatRoomParticipate(chatRoomMembers, loginMember);
@@ -64,7 +62,7 @@ public class ChatApiController {
         return makeReceiveMessage(findChat, isRead, findSender);
     }
 
-    private Boolean checkChatRoomParticipate(Set<String> chatRoomMembers, Member loginMember) {
+    private Boolean checkChatRoomParticipate(Set<String> chatRoomMembers, FindMemberDto loginMember) {
         Boolean isRead = false;
         for (String chatRoomMember : chatRoomMembers) {
             if (!chatRoomMember.equals(loginMember.getId().toString())) {
@@ -77,7 +75,7 @@ public class ChatApiController {
         return isRead;
     }
 
-    private Chat saveChat(SendMessage sendMessage, Member sender, Boolean isRead) {
+    private Chat saveChat(SendMessage sendMessage, FindMemberDto sender, Boolean isRead) {
         SaveChatDto saveChatDto = SaveChatDto
                 .builder()
                 .message(sendMessage.getMessage())
@@ -91,7 +89,7 @@ public class ChatApiController {
         return chatService.findById(savedChat);
     }
 
-    private void sendMessageToChatSocket(Chat findChat, Boolean isRead, Member sender, Long chatRoomId) {
+    private void sendMessageToChatSocket(Chat findChat, Boolean isRead, FindMemberDto sender, Long chatRoomId) {
         ReceiveMessage receiveMessage = ReceiveMessage.builder()
                 .message(findChat.getMessage())
                 .chatId(findChat.getId())
@@ -104,8 +102,8 @@ public class ChatApiController {
         simpMessagingTemplate.convertAndSendToUser(chatRoomId.toString(),"/private",receiveMessage);
     }
 
-    private void sendMessageToChatRoomSocket(SendMessage sendMessage, Member loginMember) {
-        Member findReceiver = memberService.findById(sendMessage.getReceiverId());
+    private void sendMessageToChatRoomSocket(SendMessage sendMessage, FindMemberDto loginMember) {
+        FindMemberDto findReceiver = memberService.findMemberById(sendMessage.getReceiverId());
         Long unReadCount = chatReadService.findUnReadCount(sendMessage.getChatRoomId(), findReceiver.getId());
 
         ChatRoomsResponse chatRoomsResponse = ChatRoomsResponse.builder()
@@ -118,7 +116,7 @@ public class ChatApiController {
         simpMessagingTemplate.convertAndSendToUser(findReceiver.getUsername(), "/room", chatRoomsResponse);
     }
 
-    private ReceiveMessage makeReceiveMessage(Chat findChat, Boolean isRead, Member sender) {
+    private ReceiveMessage makeReceiveMessage(Chat findChat, Boolean isRead, FindMemberDto sender) {
         return ReceiveMessage.builder()
                 .chatId(findChat.getId())
                 .message(findChat.getMessage())
@@ -139,7 +137,7 @@ public class ChatApiController {
     @MessageExceptionHandler(CustomException.class)
     public Message handleCustomException(CustomException ex, @Payload Message message, @Header("simpSessionId") String sessionId) {
 
-        Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
+        FindMemberDto loginMember = chatSessionService.getMemberSocketSession(sessionId);
         ExceptionMessage exceptionMessage = ExceptionMessage.builder()
                 .exceptionMessage(ex.getMessage())
                 .chatId(message.getChatId())
@@ -153,7 +151,7 @@ public class ChatApiController {
     @MessageExceptionHandler(Exception.class)
     public Message exceptionHandler(Exception ex, @Payload Message message, @Header("simpSessionId") String sessionId) {
 
-        Member loginMember = chatSessionService.getMemberSocketSession(sessionId);
+        FindMemberDto loginMember = chatSessionService.getMemberSocketSession(sessionId);
         ExceptionMessage exceptionMessage = ExceptionMessage.builder()
                 .exceptionMessage(ex.getMessage())
                 .chatId(message.getChatId())

@@ -4,6 +4,7 @@ import community.independe.domain.member.Member;
 import community.independe.exception.CustomException;
 import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
+import community.independe.service.dtos.FindMemberDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -54,9 +55,17 @@ public class ChatSessionServiceImpl implements ChatSessionService{
 
     @Override
     @Transactional
-    public Member getMemberSocketSession(String sessionId) {
+    public FindMemberDto getMemberSocketSession(String sessionId) {
         String sessionMemberId = redisTemplate.opsForValue().get(SOCKETSESSIONPREIX + sessionId);
-        return memberRepository.findById(Long.parseLong(sessionMemberId)).orElseThrow(
+        Member findMember = memberRepository.findById(Long.parseLong(sessionMemberId)).orElseThrow(
                 () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        return FindMemberDto.builder()
+                .id(findMember.getId())
+                .username(findMember.getUsername())
+                .nickname(findMember.getNickname())
+                .email(findMember.getEmail())
+                .number(findMember.getNumber())
+                .build();
     }
 }
