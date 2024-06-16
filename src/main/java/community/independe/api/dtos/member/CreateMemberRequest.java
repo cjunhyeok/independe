@@ -2,10 +2,11 @@ package community.independe.api.dtos.member;
 
 import community.independe.service.dtos.JoinServiceDto;
 import jakarta.validation.constraints.*;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
+@Getter
 @NoArgsConstructor
 public class CreateMemberRequest {
 
@@ -41,5 +42,16 @@ public class CreateMemberRequest {
                 .isPrivacyCheck(request.getIsPrivacyCheck())
                 .isTermOfUseCheck(request.getIsTermOfUseCheck())
                 .build();
+    }
+
+    @Builder
+    public CreateMemberRequest(Boolean isTermOfUseCheck, Boolean isPrivacyCheck, String username, String password, String nickname, String email, String number) {
+        this.isTermOfUseCheck = isTermOfUseCheck;
+        this.isPrivacyCheck = isPrivacyCheck;
+        this.username = username;
+        this.password = password;
+        this.nickname = nickname;
+        this.email = email;
+        this.number = number;
     }
 }
