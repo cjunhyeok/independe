@@ -42,12 +42,12 @@ public class S3FilesServiceImpl implements FilesService{
 
     @Override
     @Transactional
-    public List<Files> saveFiles(List<MultipartFile> multipartFiles, Long postId) throws IOException {
+    public List<Long> saveFiles(List<MultipartFile> multipartFiles, Long postId) throws IOException {
 
         Post findPost = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        List<Files> files = new ArrayList<>();
+        List<Long> filesId = new ArrayList<>();
 
         for (MultipartFile multipartFile : multipartFiles) {
             if (!multipartFile.isEmpty()) {
@@ -68,12 +68,12 @@ public class S3FilesServiceImpl implements FilesService{
                         .s3Url(s3Url)
                         .post(findPost)
                         .build();
-                filesRepository.save(file);
-                files.add(file);
+                Files saveFile = filesRepository.save(file);
+                filesId.add(saveFile.getId());
             }
         }
 
-        return files;
+        return filesId;
     }
 
     private String createStoreFilename(String originalFilename) {
