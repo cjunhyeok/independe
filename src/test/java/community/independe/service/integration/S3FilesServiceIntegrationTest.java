@@ -54,10 +54,10 @@ public class S3FilesServiceIntegrationTest extends IntegrationTestSupporter {
         multipartFiles.add(new MockMultipartFile("secondFile", "secondFileContent".getBytes()));
 
         // when
-        List<Files> files = filesService.saveFiles(multipartFiles, savedPost.getId());
+        List<Long> filesId = filesService.saveFiles(multipartFiles, savedPost.getId());
 
         // then
-        assertThat(files).hasSize(2);
+        assertThat(filesId).hasSize(2);
     }
 
     @Test
@@ -91,7 +91,7 @@ public class S3FilesServiceIntegrationTest extends IntegrationTestSupporter {
         List<MultipartFile> multipartFiles = new ArrayList<>();
         multipartFiles.add(new MockMultipartFile("firstFile", "firstFileContent".getBytes()));
         multipartFiles.add(new MockMultipartFile("secondFile", "secondFileContent".getBytes()));
-        List<Files> files = filesService.saveFiles(multipartFiles, savedPost.getId());
+        List<Long> filesId = filesService.saveFiles(multipartFiles, savedPost.getId());
 
         // when
         PostFileResponse postFileResponse = filesService.findAllFilesByPostId(savedPost.getId());
@@ -109,7 +109,7 @@ public class S3FilesServiceIntegrationTest extends IntegrationTestSupporter {
         List<MultipartFile> multipartFiles = new ArrayList<>();
         multipartFiles.add(new MockMultipartFile("firstFile", "firstFileContent".getBytes()));
         multipartFiles.add(new MockMultipartFile("secondFile", "secondFileContent".getBytes()));
-        List<Files> files = filesService.saveFiles(multipartFiles, savedPost.getId());
+        List<Long> filesId = filesService.saveFiles(multipartFiles, savedPost.getId());
 
         // when
         AbstractObjectAssert<?, CustomException> extracting =
@@ -132,7 +132,7 @@ public class S3FilesServiceIntegrationTest extends IntegrationTestSupporter {
         List<MultipartFile> multipartFiles = new ArrayList<>();
         multipartFiles.add(new MockMultipartFile("firstFile", "firstFileContent".getBytes()));
         multipartFiles.add(new MockMultipartFile("secondFile", "secondFileContent".getBytes()));
-        List<Files> files = filesService.saveFiles(multipartFiles, savedPost.getId());
+        List<Long> filesId = filesService.saveFiles(multipartFiles, savedPost.getId());
 
         // when
         filesService.deleteFile(savedPost.getId());
