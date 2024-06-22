@@ -1,7 +1,6 @@
 package community.independe.api.manytomany;
 
 import community.independe.api.dtos.Result;
-import community.independe.domain.manytomany.FavoritePost;
 import community.independe.security.service.MemberContext;
 import community.independe.service.manytomany.FavoritePostService;
 import community.independe.service.manytomany.dtos.GetFavoritePostServiceDto;
@@ -27,16 +26,10 @@ public class FavoritePostApiController {
                                           @AuthenticationPrincipal MemberContext memberContext) {
 
         Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
-        FavoritePost findFavoritePost = favoritePostService.findByPostIdAndMemberId(postId, loginMemberId);
 
-        if (findFavoritePost == null) {
-            favoritePostService.save(postId, loginMemberId);
-        } else if (findFavoritePost.getIsFavorite() == false) {
-            favoritePostService.updateIsFavorite(findFavoritePost, true);
-        } else if (findFavoritePost.getIsFavorite() == true) {
-            favoritePostService.updateIsFavorite(findFavoritePost, false);
-        }
-        return ResponseEntity.ok("OK");
+        Long savedFavoritePostId = favoritePostService.save(postId, loginMemberId);
+
+        return ResponseEntity.ok(savedFavoritePostId);
     }
 
     // 즐겨찾기 목록
