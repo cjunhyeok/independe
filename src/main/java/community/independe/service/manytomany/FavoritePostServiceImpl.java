@@ -40,34 +40,23 @@ public class FavoritePostServiceImpl implements FavoritePostService {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-        FavoritePost savedFavoritePost = favoritePostRepository.save(
-                FavoritePost.builder()
-                        .member(findMember)
-                        .post(findPost)
-                        .isFavorite(true)
-                        .build()
-        );
+        FavoritePost findFavoritePost = favoritePostRepository.findByPostIdAndMemberId(postId, memberId);
 
-        return savedFavoritePost.getId();
-    }
+        if (findFavoritePost == null) {
+            FavoritePost savedFavoritePost = favoritePostRepository.save(
+                    FavoritePost.builder()
+                            .member(findMember)
+                            .post(findPost)
+                            .isFavorite(true)
+                            .build()
+            );
 
-    @Override
-    @Transactional
-    public void updateIsFavorite(FavoritePost favoritePost, Boolean isFavorite) {
-        FavoritePost findFavoritePost = favoritePostRepository.findById(favoritePost.getId()).orElseThrow(
-                () -> new CustomException(ErrorCode.FAVORITE_POST_NOT_FOUND)
-        );
-        findFavoritePost.updateIsFavorite(isFavorite);
-    }
+            return savedFavoritePost.getId();
+        } else {
+            findFavoritePost.updateIsFavorite();
 
-    @Override
-    public FavoritePost findByPostIdAndMemberId(Long postId, Long memberId) {
-        return favoritePostRepository.findByPostIdAndMemberId(postId, memberId);
-    }
-
-    @Override
-    public FavoritePost findByPostIdAndMemberIdAndIsRecommend(Long postId, Long memberId) {
-        return favoritePostRepository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId);
+            return findFavoritePost.getId();
+        }
     }
 
     @Override
