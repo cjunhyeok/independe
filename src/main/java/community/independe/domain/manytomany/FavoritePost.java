@@ -36,7 +36,11 @@ public class FavoritePost extends BaseManyToManyEntity {
         this.isFavorite = isFavorite;
     }
 
-    public void updateIsFavorite(Boolean favorite) {
-        isFavorite = favorite;
+    public void updateIsFavorite() {
+        if (this.isFavorite) {
+            this.isFavorite = false;
+        } else {
+            this.isFavorite = true;
+        }
     }
 }
