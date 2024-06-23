@@ -1,6 +1,5 @@
 package community.independe.api.manytomany;
 
-import community.independe.domain.manytomany.ReportPost;
 import community.independe.security.service.MemberContext;
 import community.independe.service.manytomany.ReportPostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,15 +25,7 @@ public class ReportPostApiController {
 
         Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
 
-        ReportPost findReportPost = reportPostService.findByPostIdAndMemberId(postId, loginMemberId);
-
-        if (findReportPost == null) {
-            reportPostService.save(postId, loginMemberId);
-        } else if (findReportPost.getIsReport() == false) {
-            reportPostService.updateIsReport(findReportPost, true);
-        } else if (findReportPost.getIsReport() == true) {
-            reportPostService.updateIsReport(findReportPost, false);
-        }
+        reportPostService.save(postId, loginMemberId);
 
         return ResponseEntity.ok("OK");
     }
