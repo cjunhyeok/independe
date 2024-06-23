@@ -2,7 +2,6 @@ package community.independe.api.manytomany;
 
 import community.independe.api.dtos.Result;
 import community.independe.api.dtos.manytomany.recommendpost.RecommendPostResponse;
-import community.independe.domain.manytomany.RecommendPost;
 import community.independe.security.service.MemberContext;
 import community.independe.service.PostService;
 import community.independe.service.dtos.MyRecommendPostServiceDto;
@@ -30,17 +29,9 @@ public class RecommendPostApiController {
 
         Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
 
-        RecommendPost findRecommendPostByPost = recommendPostService.findByPostIdAndMemberId(postId, loginMemberId);
+        recommendPostService.save(postId, loginMemberId);
 
-        if (findRecommendPostByPost == null) {
-            recommendPostService.save(postId, loginMemberId);
-        } else if(findRecommendPostByPost.getIsRecommend() == false) {
-            recommendPostService.updateIsRecommend(findRecommendPostByPost, true);
-        } else if(findRecommendPostByPost.getIsRecommend() == true) {
-            recommendPostService.updateIsRecommend(findRecommendPostByPost, false);
-        }
-
-        Long countRecommendPost = recommendPostService.countAllByPostIdAndIsRecommend(postId);
+        Long countRecommendPost = recommendPostService.countByPostId(postId);
         RecommendPostResponse recommendPostResponse =
                 RecommendPostResponse.builder().recommendPostCount(countRecommendPost).build();
 
