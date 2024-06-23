@@ -37,7 +37,11 @@ public class ReportPost extends BaseManyToManyEntity{
         this.isReport = isReport;
     }
 
-    public void updateIsReport(Boolean isReport) {
-        this.isReport = isReport;
+    public void updateIsReport() {
+        if (this.isReport) {
+            this.isReport = false;
+        } else {
+            this.isReport = true;
+        }
     }
 }
