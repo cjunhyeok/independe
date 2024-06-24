@@ -34,30 +34,20 @@ public class ReportPostServiceImpl implements ReportPostService {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-        ReportPost savedReportPost = reportPostRepository.save(
-                ReportPost.builder().
-                        member(findMember)
-                        .post(findPost)
-                        .isReport(true)
-                        .build()
-        );
+        ReportPost findReportPost = reportPostRepository.findByPostIdAndMemberId(postId, memberId);
+        if (findReportPost == null) {
+            ReportPost savedReportPost = reportPostRepository.save(
+                    ReportPost.builder().
+                            member(findMember)
+                            .post(findPost)
+                            .isReport(true)
+                            .build()
+            );
 
-        return savedReportPost.getId();
-    }
-
-    @Override
-    @Transactional
-    public void updateIsReport(ReportPost reportPost, Boolean isRecommend) {
-        reportPost.updateIsReport(isRecommend);
-    }
-
-    @Override
-    public ReportPost findByPostIdAndMemberId(Long postId, Long memberId) {
-        return reportPostRepository.findByPostIdAndMemberId(postId, memberId);
-    }
-
-    @Override
-    public ReportPost findByPostIdAndMemberIdAndIsRecommend(Long postId, Long memberId) {
-        return reportPostRepository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId);
+            return savedReportPost.getId();
+        } else {
+            findReportPost.updateIsReport();
+            return findReportPost.getId();
+        }
     }
 }

@@ -35,26 +35,21 @@ public class RecommendCommentServiceImpl implements RecommendCommentService{
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-        RecommendComment savedRecommendComment = recommendCommentRepository.save(
-                RecommendComment.builder()
-                        .comment(findComment)
-                        .member(findMember)
-                        .isRecommend(true)
-                        .build()
-        );
+        RecommendComment findRecommendComment = recommendCommentRepository.findByCommentIdAndMemberId(commentId, memberId);
+        if (findRecommendComment == null) {
+            RecommendComment savedRecommendComment = recommendCommentRepository.save(
+                    RecommendComment.builder()
+                            .comment(findComment)
+                            .member(findMember)
+                            .isRecommend(true)
+                            .build()
+            );
 
-        return savedRecommendComment.getId();
-    }
-
-    @Override
-    public RecommendComment findByCommentIdAndMemberId(Long commentId, Long memberId) {
-        return recommendCommentRepository.findByCommentIdAndMemberId(commentId, memberId);
-    }
-
-    @Override
-    @Transactional
-    public void updateIsRecommend(RecommendComment recommendComment, Boolean isRecommend) {
-        recommendComment.updateIsRecommend(isRecommend);
+            return savedRecommendComment.getId();
+        } else {
+            findRecommendComment.updateIsRecommend();
+            return findRecommendComment.getId();
+        }
     }
 
     @Override

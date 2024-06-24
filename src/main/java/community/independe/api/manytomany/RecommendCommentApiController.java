@@ -1,7 +1,6 @@
 package community.independe.api.manytomany;
 
 import community.independe.api.dtos.Result;
-import community.independe.domain.manytomany.RecommendComment;
 import community.independe.security.service.MemberContext;
 import community.independe.service.CommentService;
 import community.independe.service.dtos.MyRecommendCommentServiceDto;
@@ -30,16 +29,7 @@ public class RecommendCommentApiController {
 
         Long loginMemberId = memberContext == null ? null : memberContext.getMemberId();
 
-        RecommendComment findRecommendComment = recommendCommentService.findByCommentIdAndMemberId(
-                commentId, loginMemberId);
-
-        if (findRecommendComment == null) {
-            Long savedRecommendComment = recommendCommentService.save(commentId, loginMemberId);
-        } else if (findRecommendComment.getIsRecommend() == false) {
-            recommendCommentService.updateIsRecommend(findRecommendComment, true);
-        } else if (findRecommendComment.getIsRecommend() == true) {
-            recommendCommentService.updateIsRecommend(findRecommendComment, false);
-        }
+        Long savedRecommendComment = recommendCommentService.save(commentId, loginMemberId);
 
         return ResponseEntity.ok("OK");
     }

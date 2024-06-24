@@ -37,8 +37,12 @@ public class RecommendPost extends BaseManyToManyEntity{
         this.isRecommend = isRecommend;
     }
 
-    public void updateIsRecommend(Boolean isRecommend) {
-        this.isRecommend = isRecommend;
+    public void updateIsRecommend() {
+        if (this.isRecommend) {
+            this.isRecommend = false;
+        } else {
+            this.isRecommend = true;
+        }
     }
 
     // 연관관계 메서드

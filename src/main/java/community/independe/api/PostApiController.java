@@ -221,7 +221,7 @@ public class PostApiController {
 
         // 댓글
         List<PostCommentResponse> commentsDto = commentService.findCommentsByPostId(findPostDto.getId(), loginMemberId);
-        Long recommendCount = recommendPostService.countAllByPostIdAndIsRecommend(findPostDto.getId());
+        Long recommendCount = recommendPostService.countByPostId(findPostDto.getId());
 
         // 베스트 댓글 찾기
         BestCommentDto bestCommentDto = recommendCommentService.findBestComment();

@@ -33,42 +33,26 @@ public class RecommendPostServiceImpl implements RecommendPostService {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-        RecommendPost savedRecommendPost = recommendPostRepository.save(
-                RecommendPost.builder()
-                        .member(findMember)
-                        .post(findPost)
-                        .isRecommend(true)
-                        .build()
-        );
+        RecommendPost findRecommendPost = recommendPostRepository.findByPostIdAndMemberId(postId, memberId);
 
-        return savedRecommendPost.getId();
+        if (findRecommendPost == null) {
+            RecommendPost savedRecommendPost = recommendPostRepository.save(
+                    RecommendPost.builder()
+                            .member(findMember)
+                            .post(findPost)
+                            .isRecommend(true)
+                            .build()
+            );
+
+            return savedRecommendPost.getId();
+        } else {
+            findRecommendPost.updateIsRecommend();
+            return findRecommendPost.getId();
+        }
     }
 
     @Override
-    @Transactional
-    public void updateIsRecommend(RecommendPost recommendPost, Boolean isRecommend) {
-        recommendPost.updateIsRecommend(isRecommend);
-    }
-
-    @Override
-    public RecommendPost findById(Long recommendPostId) {
-        return recommendPostRepository.findById(recommendPostId)
-                .orElseThrow(() -> new CustomException(ErrorCode.RECOMMEND_POST_NOT_FOUND));
-    }
-
-    @Override
-    public RecommendPost findByPostIdAndMemberId(Long postId, Long memberId) {
-        return recommendPostRepository.findByPostIdAndMemberId(postId, memberId);
-    }
-
-    @Override
-    public Long countAllByPostIdAndIsRecommend(Long postId) {
+    public Long countByPostId(Long postId) {
         return recommendPostRepository.countAllByPostIdAndIsRecommend(postId);
     }
-
-    @Override
-    public RecommendPost findByPostIdAndMemberIdAndIsRecommend(Long postId, Long memberId) {
-        return recommendPostRepository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId);
-    }
-
 }
