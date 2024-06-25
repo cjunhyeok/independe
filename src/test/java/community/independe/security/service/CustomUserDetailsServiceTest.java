@@ -2,7 +2,10 @@ package community.independe.security.service;
 
 import community.independe.IntegrationTestSupporter;
 import community.independe.domain.member.Member;
+import community.independe.exception.CustomException;
+import community.independe.exception.ErrorCode;
 import community.independe.repository.MemberRepository;
+import org.assertj.core.api.AbstractObjectAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,25 @@ public class CustomUserDetailsServiceTest extends IntegrationTestSupporter {
         MemberContext memberContext = (MemberContext) userDetails;
         assertThat(memberContext.getMemberId()).isEqualTo(savedMember.getId());
         assertThat(memberContext.getUsername()).isEqualTo(savedMember.getUsername());
+    }
+
+    @Test
+    @DisplayName("사용자 username 을 잘못 입력할 시 예외가 발생한다.")
+    void loadUserByUsernameFailTest() {
+        // given
+        String username = "username";
+        String nickname = "nickname";
+        Member savedMember = createMember(username, nickname);
+
+        // when
+        AbstractObjectAssert<?, CustomException> extracting = assertThatThrownBy(() -> customUserDetailsService.loadUserByUsername(username + "fail"))
+                .isInstanceOf(CustomException.class)
+                .extracting(ex -> (CustomException) ex);
+
+        // then
+        extracting.satisfies(ex -> {
+            assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_USERNAME);
+        });
     }
 
     private Member createMember(String username, String nickname) {
