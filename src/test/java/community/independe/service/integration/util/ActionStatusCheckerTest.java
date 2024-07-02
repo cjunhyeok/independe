@@ -2,7 +2,9 @@ package community.independe.service.integration.util;
 
 import community.independe.IntegrationTestSupporter;
 import community.independe.domain.comment.Comment;
+import community.independe.domain.manytomany.FavoritePost;
 import community.independe.domain.manytomany.RecommendComment;
+import community.independe.domain.manytomany.RecommendPost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
@@ -103,6 +105,65 @@ public class ActionStatusCheckerTest extends IntegrationTestSupporter {
         assertThat(isRecommend).isFalse();
     }
 
+    @Test
+    @DisplayName("게시글 추천 엔티티의 추천 여부 반환 시 True 를 반환한다.")
+    void isRecommendPostIsTrueTest() {
+        // given
+        Member member = createMember();
+        Post post = createPost(member);
+        createRecommendPost(member, post);
+
+        // when
+        boolean isRecommend = actionStatusChecker.isRecommend(post.getId(), member.getId());
+
+        // then
+        assertThat(isRecommend).isTrue();
+    }
+
+    @Test
+    @DisplayName("게시글 추천 엔티티의 추천 여부 반환 시 False 를 반환한다.")
+    void isRecommendPostIsFalseTest() {
+        // given
+        Member member = createMember();
+        Post post = createPost(member);
+        RecommendPost recommendPost = createRecommendPost(member, post);
+        recommendPost.updateIsRecommend();
+
+        // when
+        boolean isRecommend = actionStatusChecker.isRecommend(post.getId(), member.getId());
+
+        // then
+        assertThat(isRecommend).isFalse();
+    }
+
+
+    @Test
+    @DisplayName("게시글 추천 엔티티 조회 후 null 이면 false 를 반환한다.")
+    void isRecommendPostFalseTest() {
+        // given
+        Member member = createMember();
+        Post post = createPost(member);
+        createRecommendPost(member, post);
+
+        // when
+        boolean isRecommend = actionStatusChecker.isRecommend(post.getId() + 1L, member.getId());
+
+        // then
+        assertThat(isRecommend).isFalse();
+    }
+
+    @Test
+    @DisplayName("memberId 가 null 이면 false 를 반환한다.")
+    void isRecommendPostMemberFalseTest() {
+        // given
+
+        // when
+        boolean isRecommend = actionStatusChecker.isRecommend(null, null);
+
+        // then
+        assertThat(isRecommend).isFalse();
+    }
+
     private Member createMember() {
         Member member = Member.builder()
                 .username("id")
@@ -138,5 +199,23 @@ public class ActionStatusCheckerTest extends IntegrationTestSupporter {
                 .comment(comment)
                 .build();
         return recommendCommentRepository.save(recommendComment);
+    }
+
+    private RecommendPost createRecommendPost(Member member, Post post) {
+        RecommendPost recommendPost = RecommendPost.builder()
+                .isRecommend(true)
+                .member(member)
+                .post(post)
+                .build();
+        return recommendPostRepository.save(recommendPost);
+    }
+
+    private FavoritePost createFavoritePost(Member member, Post post) {
+        FavoritePost favoritePost = FavoritePost.builder()
+                .isFavorite(true)
+                .post(post)
+                .member(member)
+                .build();
+        return favoritePostRepository.save(favoritePost);
     }
 }
