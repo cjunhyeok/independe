@@ -8,21 +8,32 @@ import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
 import community.independe.repository.MemberRepository;
 import community.independe.repository.comment.CommentRepository;
+import community.independe.repository.manytomany.FavoritePostRepository;
 import community.independe.repository.manytomany.RecommendCommentRepository;
+import community.independe.repository.manytomany.RecommendPostRepository;
+import community.independe.repository.manytomany.ReportPostRepository;
 import community.independe.repository.post.PostRepository;
 import community.independe.service.util.ActionStatusChecker;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
 
+@Transactional
 public class ActionStatusCheckerTest extends IntegrationTestSupporter {
 
     @Autowired
     private ActionStatusChecker actionStatusChecker;
     @Autowired
     private RecommendCommentRepository recommendCommentRepository;
+    @Autowired
+    private RecommendPostRepository recommendPostRepository;
+    @Autowired
+    private FavoritePostRepository favoritePostRepository;
+    @Autowired
+    private ReportPostRepository repository;
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
@@ -31,19 +42,65 @@ public class ActionStatusCheckerTest extends IntegrationTestSupporter {
     private CommentRepository commentRepository;
 
     @Test
-    @DisplayName("댓글 추천 엔티티 조회 후 null 이 아니면 true 를 반환한다.")
-    void isRecommendCommentTrueTest() {
+    @DisplayName("댓글 추천 엔티티의 추천 여부 반환 시 True 를 반환한다.")
+    void isRecommendCommentIsTrueTest() {
         // given
         Member member = createMember();
         Post post = createPost(member);
         Comment comment = createComment(member, post);
-        RecommendComment recommendComment = createRecommendComment(member, comment);
+        createRecommendComment(member, comment);
 
         // when
         boolean isRecommend = actionStatusChecker.isRecommendComment(comment.getId(), post.getId(), member.getId());
 
         // then
         assertThat(isRecommend).isTrue();
+    }
+
+    @Test
+    @DisplayName("댓글 추천 엔티티의 추천 여부 반환 시 False 를 반환한다.")
+    void isRecommendCommentIsFalseTest() {
+        // given
+        Member member = createMember();
+        Post post = createPost(member);
+        Comment comment = createComment(member, post);
+        RecommendComment recommendComment = createRecommendComment(member, comment);
+        recommendComment.updateIsRecommend();
+
+        // when
+        boolean isRecommend = actionStatusChecker.isRecommendComment(comment.getId(), post.getId(), member.getId());
+
+        // then
+        assertThat(isRecommend).isFalse();
+    }
+
+
+    @Test
+    @DisplayName("댓글 추천 엔티티 조회 후 null 이면 false 를 반환한다.")
+    void isRecommendCommentFalseTest() {
+        // given
+        Member member = createMember();
+        Post post = createPost(member);
+        Comment comment = createComment(member, post);
+        createRecommendComment(member, comment);
+
+        // when
+        boolean isRecommend = actionStatusChecker.isRecommendComment(comment.getId() + 1L, post.getId(), member.getId());
+
+        // then
+        assertThat(isRecommend).isFalse();
+    }
+
+    @Test
+    @DisplayName("memberId 가 null 이면 false 를 반환한다.")
+    void isRecommendCommentMemberFalseTest() {
+        // given
+
+        // when
+        boolean isRecommend = actionStatusChecker.isRecommendComment(null, null, null);
+
+        // then
+        assertThat(isRecommend).isFalse();
     }
 
     private Member createMember() {
