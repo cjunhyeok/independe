@@ -164,6 +164,65 @@ public class ActionStatusCheckerTest extends IntegrationTestSupporter {
         assertThat(isRecommend).isFalse();
     }
 
+    @Test
+    @DisplayName("게시글 즐겨찾기 엔티티의 추천 여부 반환 시 True 를 반환한다.")
+    void isFavoritePostIsTrueTest() {
+        // given
+        Member member = createMember();
+        Post post = createPost(member);
+        createFavoritePost(member, post);
+
+        // when
+        boolean isRecommend = actionStatusChecker.isFavorite(post.getId(), member.getId());
+
+        // then
+        assertThat(isRecommend).isTrue();
+    }
+
+    @Test
+    @DisplayName("게시글 즐겨찾기 엔티티의 추천 여부 반환 시 False 를 반환한다.")
+    void isFavoritePostIsFalseTest() {
+        // given
+        Member member = createMember();
+        Post post = createPost(member);
+        FavoritePost favoritePost = createFavoritePost(member, post);
+        favoritePost.updateIsFavorite();
+
+        // when
+        boolean isRecommend = actionStatusChecker.isFavorite(post.getId(), member.getId());
+
+        // then
+        assertThat(isRecommend).isFalse();
+    }
+
+
+    @Test
+    @DisplayName("게시글 즐겨찾기 엔티티 조회 후 null 이면 false 를 반환한다.")
+    void isFavoritePostFalseTest() {
+        // given
+        Member member = createMember();
+        Post post = createPost(member);
+        createFavoritePost(member, post);
+
+        // when
+        boolean isRecommend = actionStatusChecker.isFavorite(post.getId() + 1L, member.getId());
+
+        // then
+        assertThat(isRecommend).isFalse();
+    }
+
+    @Test
+    @DisplayName("memberId 가 null 이면 false 를 반환한다.")
+    void isFavoritePostMemberFalseTest() {
+        // given
+
+        // when
+        boolean isRecommend = actionStatusChecker.isFavorite(null, null);
+
+        // then
+        assertThat(isRecommend).isFalse();
+    }
+
     private Member createMember() {
         Member member = Member.builder()
                 .username("id")
