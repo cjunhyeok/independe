@@ -5,6 +5,7 @@ import community.independe.domain.comment.Comment;
 import community.independe.domain.manytomany.FavoritePost;
 import community.independe.domain.manytomany.RecommendComment;
 import community.independe.domain.manytomany.RecommendPost;
+import community.independe.domain.manytomany.ReportPost;
 import community.independe.domain.member.Member;
 import community.independe.domain.post.Post;
 import community.independe.domain.post.enums.IndependentPostType;
@@ -35,7 +36,7 @@ public class ActionStatusCheckerTest extends IntegrationTestSupporter {
     @Autowired
     private FavoritePostRepository favoritePostRepository;
     @Autowired
-    private ReportPostRepository repository;
+    private ReportPostRepository reportPostRepository;
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
@@ -173,10 +174,10 @@ public class ActionStatusCheckerTest extends IntegrationTestSupporter {
         createFavoritePost(member, post);
 
         // when
-        boolean isRecommend = actionStatusChecker.isFavorite(post.getId(), member.getId());
+        boolean isFavorite = actionStatusChecker.isFavorite(post.getId(), member.getId());
 
         // then
-        assertThat(isRecommend).isTrue();
+        assertThat(isFavorite).isTrue();
     }
 
     @Test
@@ -189,10 +190,10 @@ public class ActionStatusCheckerTest extends IntegrationTestSupporter {
         favoritePost.updateIsFavorite();
 
         // when
-        boolean isRecommend = actionStatusChecker.isFavorite(post.getId(), member.getId());
+        boolean isFavorite = actionStatusChecker.isFavorite(post.getId(), member.getId());
 
         // then
-        assertThat(isRecommend).isFalse();
+        assertThat(isFavorite).isFalse();
     }
 
 
@@ -205,10 +206,10 @@ public class ActionStatusCheckerTest extends IntegrationTestSupporter {
         createFavoritePost(member, post);
 
         // when
-        boolean isRecommend = actionStatusChecker.isFavorite(post.getId() + 1L, member.getId());
+        boolean isFavorite = actionStatusChecker.isFavorite(post.getId() + 1L, member.getId());
 
         // then
-        assertThat(isRecommend).isFalse();
+        assertThat(isFavorite).isFalse();
     }
 
     @Test
@@ -217,10 +218,69 @@ public class ActionStatusCheckerTest extends IntegrationTestSupporter {
         // given
 
         // when
-        boolean isRecommend = actionStatusChecker.isFavorite(null, null);
+        boolean isFavorite = actionStatusChecker.isFavorite(null, null);
 
         // then
-        assertThat(isRecommend).isFalse();
+        assertThat(isFavorite).isFalse();
+    }
+
+    @Test
+    @DisplayName("게시글 신고 엔티티의 추천 여부 반환 시 True 를 반환한다.")
+    void isReportPostIsTrueTest() {
+        // given
+        Member member = createMember();
+        Post post = createPost(member);
+        createReportPost(member, post);
+
+        // when
+        boolean isReport = actionStatusChecker.isReport(post.getId(), member.getId());
+
+        // then
+        assertThat(isReport).isTrue();
+    }
+
+    @Test
+    @DisplayName("게시글 신고 엔티티의 추천 여부 반환 시 False 를 반환한다.")
+    void isReportPostIsFalseTest() {
+        // given
+        Member member = createMember();
+        Post post = createPost(member);
+        ReportPost reportPost = createReportPost(member, post);
+        reportPost.updateIsReport();
+
+        // when
+        boolean isReport = actionStatusChecker.isReport(post.getId(), member.getId());
+
+        // then
+        assertThat(isReport).isFalse();
+    }
+
+
+    @Test
+    @DisplayName("게시글 신고 엔티티 조회 후 null 이면 false 를 반환한다.")
+    void isReportPostFalseTest() {
+        // given
+        Member member = createMember();
+        Post post = createPost(member);
+        createReportPost(member, post);
+
+        // when
+        boolean isReport = actionStatusChecker.isReport(post.getId() + 1L, member.getId());
+
+        // then
+        assertThat(isReport).isFalse();
+    }
+
+    @Test
+    @DisplayName("memberId 가 null 이면 false 를 반환한다.")
+    void isReportPostMemberFalseTest() {
+        // given
+
+        // when
+        boolean isReport = actionStatusChecker.isReport(null, null);
+
+        // then
+        assertThat(isReport).isFalse();
     }
 
     private Member createMember() {
@@ -276,5 +336,15 @@ public class ActionStatusCheckerTest extends IntegrationTestSupporter {
                 .member(member)
                 .build();
         return favoritePostRepository.save(favoritePost);
+    }
+
+    private ReportPost createReportPost(Member member, Post post) {
+        ReportPost reportPost = ReportPost
+                .builder()
+                .member(member)
+                .post(post)
+                .isReport(true)
+                .build();
+        return reportPostRepository.save(reportPost);
     }
 }
