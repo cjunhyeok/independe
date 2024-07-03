@@ -1,5 +1,9 @@
 package community.independe.service.util;
 
+import community.independe.domain.manytomany.FavoritePost;
+import community.independe.domain.manytomany.RecommendComment;
+import community.independe.domain.manytomany.RecommendPost;
+import community.independe.domain.manytomany.ReportPost;
 import community.independe.repository.manytomany.FavoritePostRepository;
 import community.independe.repository.manytomany.RecommendCommentRepository;
 import community.independe.repository.manytomany.RecommendPostRepository;
@@ -20,10 +24,11 @@ public class ActionStatusChecker {
         if (memberId == null) {
             return false;
         } else {
-            if (recommendCommentRepository.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, memberId) == null) {
+            RecommendComment recommendComment = recommendCommentRepository.findByCommentIdAndPostIdAndMemberIdAndIsRecommend(commentId, postId, memberId);
+            if (recommendComment == null) {
                 return false;
             } else {
-                return true;
+                return recommendComment.getIsRecommend();
             }
         }
     }
@@ -32,10 +37,11 @@ public class ActionStatusChecker {
         if(memberId == null) {
             return false;
         } else {
-            if(recommendPostRepository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId) == null) {
+            RecommendPost recommendPost = recommendPostRepository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId);
+            if(recommendPost == null) {
                 return false;
             } else {
-                return true;
+                return recommendPost.getIsRecommend();
             }
         }
     }
@@ -44,10 +50,11 @@ public class ActionStatusChecker {
         if(memberId == null) {
             return false;
         } else {
-            if(favoritePostRepository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId) == null) {
+            FavoritePost favoritePost = favoritePostRepository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId);
+            if(favoritePost == null) {
                 return false;
             } else {
-                return true;
+                return favoritePost.getIsFavorite();
             }
         }
     }
@@ -56,10 +63,11 @@ public class ActionStatusChecker {
         if(memberId == null) {
             return false;
         } else {
-            if(repository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId) == null) {
+            ReportPost reportPost = repository.findByPostIdAndMemberIdAndIsRecommend(postId, memberId);
+            if(reportPost == null) {
                 return false;
             } else {
-                return true;
+                return reportPost.getIsReport();
             }
         }
     }
