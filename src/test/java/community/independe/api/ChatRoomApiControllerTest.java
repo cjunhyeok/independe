@@ -58,6 +58,24 @@ public class ChatRoomApiControllerTest extends IntegrationTestSupporter {
         Assertions.assertThat(response).isNotNull();
     }
 
+    @Test
+    @DisplayName("채팅방 목록을 조회한다.")
+    void chatRoomsTest() throws Exception {
+        // given
+        String user = "user";
+        initSave(user, user);
+        String accessToken = getAccessToken(user);
+
+        // when
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.get("/api/chat/rooms")
+                .header("Authorization", accessToken)
+                .with(csrf()));
+
+        // then
+        perform
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
     private Long initSave(String username, String nickname) throws Exception {
         CreateMemberRequest request = CreateMemberRequest
                 .builder()
