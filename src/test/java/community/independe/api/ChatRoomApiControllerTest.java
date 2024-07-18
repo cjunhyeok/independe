@@ -4,7 +4,6 @@ import community.independe.IntegrationTestSupporter;
 import community.independe.api.dtos.chat.ChatRoomRequest;
 import community.independe.api.dtos.member.CreateMemberRequest;
 import community.independe.api.dtos.member.LoginRequest;
-import community.independe.repository.MemberRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +14,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.JsonNode;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -26,8 +26,6 @@ public class ChatRoomApiControllerTest extends IntegrationTestSupporter {
 
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
-    private MemberRepository memberRepository;
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
@@ -69,6 +67,38 @@ public class ChatRoomApiControllerTest extends IntegrationTestSupporter {
         // when
         ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.get("/api/chat/rooms")
                 .header("Authorization", accessToken)
+                .with(csrf()));
+
+        // then
+        perform
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    @DisplayName("채팅 내역을 조회한다.")
+    void chatHistoryTest() throws Exception {
+        String sender = "sender";
+        String receiver = "receiver";
+        initSave(sender, sender);
+        Long receiverId = initSave(receiver, receiver);
+        String accessToken = getAccessToken(sender);
+        ChatRoomRequest request = ChatRoomRequest
+                .builder()
+                .receiverId(receiverId)
+                .build();
+        ResultActions perform = mockMvc.perform(MockMvcRequestBuilders.post("/api/chat/room")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .header("Authorization", accessToken)
+                .with(csrf()));
+        String responseBody = perform.andReturn().getResponse().getContentAsString();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        String chatRoomId = jsonNode.path("data").path("chatRoomId").asText();
+
+        // when
+        perform = mockMvc.perform(MockMvcRequestBuilders.get("/api/chat/history")
+                .header("Authorization", accessToken)
+                .param("chatRoomId", chatRoomId)
                 .with(csrf()));
 
         // then
