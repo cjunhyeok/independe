@@ -13,6 +13,7 @@ import community.independe.util.UrlList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -54,8 +55,12 @@ public class SecurityConfig {
 //                        .accessDeniedHandler(jwtAccessDeniedHandler());
 
         http.authorizeHttpRequests()
-                .requestMatchers(UrlList.getBlackList()).authenticated()
-                .requestMatchers(UrlList.getWhiteList()).permitAll()
+                .requestMatchers(HttpMethod.GET, UrlList.getBlackGetList()).authenticated()
+                .requestMatchers(HttpMethod.POST, UrlList.getBlackPostList()).authenticated()
+                .requestMatchers(HttpMethod.PUT, UrlList.getBlackPutList()).authenticated()
+                .requestMatchers(HttpMethod.DELETE, UrlList.getBlackDeleteList()).authenticated()
+                .requestMatchers(HttpMethod.GET, UrlList.getWhiteGetList()).permitAll()
+                .requestMatchers(HttpMethod.POST, UrlList.getWhitePostList()).permitAll()
                 .anyRequest().authenticated();
 
 //        http.authorizeHttpRequests()

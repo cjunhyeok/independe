@@ -218,9 +218,12 @@ public class MemberApiController {
                             @RequestParam(name = "size", required = false, defaultValue = "10") int size,
                             @AuthenticationPrincipal MemberContext memberContext) {
         Long loginMemberId = memberContext.getMemberId();
+        Long totalCount = 0L;
 
         List<MyPostServiceDto> response = postService.findMyPost(loginMemberId, page, size);
-        Long totalCount = response.get(0).getTotalCount();
+        if (!response.isEmpty()) {
+            totalCount = response.get(0).getTotalCount();
+        }
 
         return new Result(response, totalCount);
     }
@@ -232,9 +235,12 @@ public class MemberApiController {
                                @RequestParam(name = "size", required = false, defaultValue = "10") int size,
                                @AuthenticationPrincipal MemberContext memberContext) {
         Long loginMemberId = memberContext.getMemberId();
+        Long totalCount = 0L;
 
         List<MyCommentServiceDto> response = commentService.getMyComment(loginMemberId, page, size);
-        Long totalCount = response.get(0).getTotalCount();
+        if (!response.isEmpty()) {
+            totalCount = response.get(0).getTotalCount();
+        }
 
         return new Result(response, totalCount);
     }

@@ -29,8 +29,9 @@ public class JwtAuthorizationMacFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            String requestURI = request.getRequestURI();
-            boolean isBlackListed = checkBlackList(requestURI);
+            String url = request.getRequestURI();
+            String method = request.getMethod();
+            boolean isBlackListed = checkBlackList(url, method);
 
             if (isBlackListed) {
                 jwtTokenVerifier.verifyToken(request);
@@ -44,23 +45,33 @@ public class JwtAuthorizationMacFilter extends OncePerRequestFilter {
         }
     }
 
-    private boolean checkBlackList(String requestURI) {
-        boolean isBlackListed = false;
+    private boolean checkBlackList(String url, String method) {
+        if (method == null) {
+            return false;
+        }
 
-        for (String blackList : UrlList.getBlackList()) {
-            if (isPatternMatch(requestURI, blackList)) {
-                isBlackListed = true;
-                break;
+        String[] blackListUrls = UrlList.getBlackList().get(method);
+
+        if (blackListUrls == null) {
+            return false;
+        }
+
+        for (String urlPattern : blackListUrls) {
+            if (matchUrlPattern(urlPattern, url)) {
+                return true;
             }
         }
 
-        return isBlackListed;
+        return false;
     }
 
-    private boolean isPatternMatch(String url, String pattern) {
-        // 패턴이 일치하면 true 반환, **를 정규 표현식으로 처리
-        return url.equals(pattern) || url.matches(pattern.replace("**", ".*"))
-                || (pattern.endsWith("/**") && url.startsWith(pattern.substring(0, pattern.length() - 3)));
+    private boolean matchUrlPattern(String urlPattern, String requestURI) {
+        if (urlPattern.endsWith("/**")) {
+            String basePattern = urlPattern.substring(0, urlPattern.length() - 3);
+            return requestURI.startsWith(basePattern);
+        } else {
+            return urlPattern.equals(requestURI);
+        }
     }
 
     private void makeExceptionMessage(HttpServletResponse response, String message, Exception e) throws IOException {
